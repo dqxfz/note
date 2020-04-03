@@ -21,20 +21,21 @@ import java.util.List;
 @RestController
 @RequestMapping("/portfolio")
 public class PortfolioController {
-    /**
-     * Log4j2 日志工具
-     */
     Logger logger = LogManager.getLogger(this.getClass());
 
-    @Autowired
-    PortfolioService portfolioService;
+    final PortfolioService portfolioService;
+
+    public PortfolioController(PortfolioService portfolioService) {
+        this.portfolioService = portfolioService;
+    }
 
     /**
-     * 获取所有portfolio
-     * @return 返回所有的portfolio
+     * 通过fatherId查询所有子portfolio
+     * @param fatherId 所属文件夹id
+     * @return 返回portfolio列表
      */
     @GetMapping
-    public ActionResult portfolio(String fatherId){
+    public List<EasyUITreeNode> portfolio(String fatherId){
         try{
             return portfolioService.findByFatherId(fatherId);
         } catch (Exception e) {

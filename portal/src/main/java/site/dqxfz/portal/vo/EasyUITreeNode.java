@@ -1,5 +1,6 @@
 package site.dqxfz.portal.vo;
 
+import site.dqxfz.portal.constant.IconClsType;
 import site.dqxfz.portal.constant.PortfolioType;
 
 /**
@@ -12,16 +13,18 @@ public class EasyUITreeNode {
     private String text;
     private String state;
     private PortfolioType type;
+    private IconClsType iconCls;
     private String fatherId;
 
     public EasyUITreeNode() {
     }
 
-    public EasyUITreeNode(String id, String text, String state, PortfolioType type, String fatherId) {
+    public EasyUITreeNode(String id, String text, String state, PortfolioType type, IconClsType iconCls, String fatherId) {
         this.id = id;
         this.text = text;
         this.state = state;
         this.type = type;
+        this.iconCls = iconCls;
         this.fatherId = fatherId;
     }
 
@@ -55,6 +58,14 @@ public class EasyUITreeNode {
 
     public void setType(PortfolioType type) {
         this.type = type;
+    }
+
+    public IconClsType getIconCls() {
+        return iconCls;
+    }
+
+    public void setIconCls(IconClsType iconCls) {
+        this.iconCls = iconCls;
     }
 
     public String getFatherId() {

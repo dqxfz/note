@@ -27,7 +27,7 @@
     font-family: 'Open Sans';
     font-style: italic;
     font-weight: normal;
-    src: local('Open Sans Italic'), url('gitlab/roboto-v20-latin-italic.woff') format('woff');
+    src: local('Open Sans Italic'), url('gitlab/roboto/roboto-v20-latin-italic.woff') format('woff');
 }
 
 @font-face {
@@ -41,7 +41,7 @@
     font-family: 'Open Sans';
     font-style: italic;
     font-weight: bold;
-    src: local('Open Sans Bold Italic'), url('gitlab/roboto-v20-latin-700italic.woff') format('woff');
+    src: local('Open Sans Bold Italic'), url('gitlab/roboto/roboto-v20-latin-700italic.woff') format('woff');
 }
 
 html {

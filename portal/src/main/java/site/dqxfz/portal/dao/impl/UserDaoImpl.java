@@ -13,8 +13,11 @@ import site.dqxfz.portal.pojo.User;
  **/
 @Repository
 public class UserDaoImpl implements UserDao {
-    @Autowired
-    MongoOperations mongoOperations;
+    final MongoOperations mongoOperations;
+
+    public UserDaoImpl(MongoOperations mongoOperations) {
+        this.mongoOperations = mongoOperations;
+    }
 
     @Override
     public User findByUsername(String username) {

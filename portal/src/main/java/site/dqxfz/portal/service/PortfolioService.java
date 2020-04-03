@@ -1,8 +1,10 @@
 package site.dqxfz.portal.service;
 
 
-import site.dqxfz.common.vo.ActionResult;
+import site.dqxfz.portal.vo.EasyUITreeNode;
+
+import java.util.List;
 
 public interface PortfolioService {
-    ActionResult findByFatherId(String fatherId);
+    List<EasyUITreeNode> findByFatherId(String fatherId);
 }

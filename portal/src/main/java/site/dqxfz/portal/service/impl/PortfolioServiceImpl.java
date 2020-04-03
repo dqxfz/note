@@ -2,14 +2,12 @@ package site.dqxfz.portal.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import site.dqxfz.common.vo.ActionResult;
 import site.dqxfz.portal.dao.PortfolioDao;
 import site.dqxfz.portal.dao.UserDao;
-import site.dqxfz.portal.pojo.Portfolio;
-import site.dqxfz.portal.pojo.User;
 import site.dqxfz.portal.service.PortfolioService;
 import site.dqxfz.portal.vo.EasyUITreeNode;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,8 +23,8 @@ public class PortfolioServiceImpl implements PortfolioService {
     UserDao userDao;
 
     @Override
-    public ActionResult findByFatherId(String fatherId) {
-        EasyUITreeNode node = portfolioDao.findByFatherId(fatherId);
-        return new ActionResult(true,null,null,node);
+    public List<EasyUITreeNode> findByFatherId(String fatherId) {
+        List<EasyUITreeNode> nodes = portfolioDao.findByFatherId(fatherId);
+        return nodes;
     }
 }

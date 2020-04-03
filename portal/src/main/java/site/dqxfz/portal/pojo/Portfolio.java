@@ -1,5 +1,6 @@
 package site.dqxfz.portal.pojo;
 
+import site.dqxfz.portal.constant.IconClsType;
 import site.dqxfz.portal.constant.PortfolioType;
 
 import java.util.ArrayList;
@@ -15,15 +16,17 @@ public class Portfolio {
     private String id;
     private String name;
     private PortfolioType type;
+    private IconClsType iconCls;
     private String fatherId;
     private List<String> childIds = new ArrayList<>();
 
     public Portfolio() {
     }
 
-    public Portfolio(String name, PortfolioType type, String fatherId) {
+    public Portfolio(String name, PortfolioType type, IconClsType iconCls, String fatherId) {
         this.name = name;
         this.type = type;
+        this.iconCls = iconCls;
         this.fatherId = fatherId;
     }
 
@@ -51,6 +54,14 @@ public class Portfolio {
         this.type = type;
     }
 
+    public IconClsType getIconCls() {
+        return iconCls;
+    }
+
+    public void setIconCls(IconClsType iconCls) {
+        this.iconCls = iconCls;
+    }
+
     public String getFatherId() {
         return fatherId;
     }
@@ -73,6 +84,7 @@ public class Portfolio {
                 "id='" + id + '\'' +
                 ", name='" + name + '\'' +
                 ", type=" + type +
+                ", iconCls=" + iconCls +
                 ", fatherId='" + fatherId + '\'' +
                 ", childIds=" + childIds +
                 '}';
