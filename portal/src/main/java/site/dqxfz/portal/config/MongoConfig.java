@@ -2,22 +2,22 @@ package site.dqxfz.portal.config;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
-import org.bson.Document;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.CustomConversions;
 import org.springframework.data.mongodb.MongoDbFactory;
 import org.springframework.data.mongodb.config.AbstractMongoClientConfiguration;
+import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
+import org.springframework.data.mongodb.config.EnableMongoAuditing;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.SimpleMongoClientDbFactory;
-import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
+import org.springframework.data.mongodb.core.convert.MongoConverter;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
-import site.dqxfz.portal.pojo.Portfolio;
+import org.springframework.data.mongodb.core.mapping.event.LoggingEventListener;
+import org.springframework.data.mongodb.core.mapping.event.MongoMappingEvent;
+import site.dqxfz.portal.converter.PortfolioReadConverter;
+import site.dqxfz.portal.converter.PortfolioWriteConverter;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * @Description:
@@ -36,27 +36,16 @@ public class MongoConfig extends AbstractMongoClientConfiguration {
         return "note";
     }
 
-//    @Override
-//    public CustomConversions customConversions() {
-//        Converter<Portfolio,Document> converter = portfolio -> {
-//            Document document = new Document();
-//            document.put("_id",portfolio.getId());
-//            document.put("name",portfolio.getName());
-//            document.put("type",portfolio.getType());
-//            document.put("iconCls",portfolio.getIconCls());
-//            document.put("fatherId",portfolio.getFatherId());
-//            document.put("childIds",portfolio.getChildIds());
-//            return document;
-//        };
-//        List<Converter<?, ?>> converters = Arrays.asList(
-//                converter
-//        );
-//        List<Converter<?, ?>> converterList = new ArrayList<Converter<?, ?>>();
-//        converterList.add(converter);
-//        return new MongoCustomConversions(converters);
-//    }
-
-    public @Bean MongoTemplate mongoTemplate(MongoDbFactory mongoDbFactory) {
-        return new MongoTemplate(mongoDbFactory);
+    /**
+     * 添加自定义的Converter
+     * @return
+     */
+    @Override
+    public CustomConversions customConversions() {
+        List<Converter<?, ?>> converterList = new ArrayList();
+        converterList.add(new PortfolioWriteConverter());
+        converterList.add(new PortfolioReadConverter());
+        return new MongoCustomConversions(converterList);
     }
+
 }

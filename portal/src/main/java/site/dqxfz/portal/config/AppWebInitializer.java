@@ -3,13 +3,14 @@ package site.dqxfz.portal.config;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
+import org.springframework.web.filter.FormContentFilter;
+import org.springframework.web.filter.HiddenHttpMethodFilter;
+import org.springframework.web.filter.HttpPutFormContentFilter;
 import org.springframework.web.servlet.DispatcherServlet;
 import site.dqxfz.portal.config.RootConfig;
 import site.dqxfz.portal.config.WebConfig;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRegistration;
+import javax.servlet.*;
 
 /**
  * @Description:
@@ -28,5 +29,8 @@ public class AppWebInitializer implements WebApplicationInitializer {
         ServletRegistration.Dynamic dispatcher = servletContext.addServlet("dispatcher", new DispatcherServlet(webContext));
         dispatcher.setLoadOnStartup(1);
         dispatcher.addMapping("/");
+        // 添加FormContentFilter，使spring mvc能够接受put请求和delete请求
+        FilterRegistration.Dynamic FormContentFilter = servletContext.addFilter("formContentFilter", new FormContentFilter());
+        FormContentFilter.addMappingForUrlPatterns(null,false,"/*");
     }
 }

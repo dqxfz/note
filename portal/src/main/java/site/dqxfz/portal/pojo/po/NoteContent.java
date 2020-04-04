@@ -1,4 +1,4 @@
-package site.dqxfz.portal.pojo;
+package site.dqxfz.portal.pojo.po;
 
 /**
  * @Description: 文件内容对应的实体类

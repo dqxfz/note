@@ -1,29 +1,26 @@
-package site.dqxfz.portal.vo;
+package site.dqxfz.portal.pojo.vo;
 
 import site.dqxfz.portal.constant.IconClsType;
-import site.dqxfz.portal.constant.PortfolioType;
 
 /**
  * @Description:
  * @Author wengyang
  * @Date 2020年02月13日
  **/
-public class EasyUITreeNode {
+public class EasyUiTreeNode {
     private String id;
     private String text;
     private String state;
-    private PortfolioType type;
     private IconClsType iconCls;
     private String fatherId;
 
-    public EasyUITreeNode() {
+    public EasyUiTreeNode() {
     }
 
-    public EasyUITreeNode(String id, String text, String state, PortfolioType type, IconClsType iconCls, String fatherId) {
+    public EasyUiTreeNode(String id, String text, String state, IconClsType iconCls, String fatherId) {
         this.id = id;
         this.text = text;
         this.state = state;
-        this.type = type;
         this.iconCls = iconCls;
         this.fatherId = fatherId;
     }
@@ -50,14 +47,6 @@ public class EasyUITreeNode {
 
     public void setState(String state) {
         this.state = state;
-    }
-
-    public PortfolioType getType() {
-        return type;
-    }
-
-    public void setType(PortfolioType type) {
-        this.type = type;
     }
 
     public IconClsType getIconCls() {

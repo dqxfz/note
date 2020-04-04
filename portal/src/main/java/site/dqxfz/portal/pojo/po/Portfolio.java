@@ -1,10 +1,6 @@
-package site.dqxfz.portal.pojo;
+package site.dqxfz.portal.pojo.po;
 
 import site.dqxfz.portal.constant.IconClsType;
-import site.dqxfz.portal.constant.PortfolioType;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @Description: 文件或者文件夹所对应的实体类
@@ -15,17 +11,14 @@ import java.util.List;
 public class Portfolio {
     private String id;
     private String name;
-    private PortfolioType type;
     private IconClsType iconCls;
     private String fatherId;
-    private List<String> childIds = new ArrayList<>();
 
     public Portfolio() {
     }
 
-    public Portfolio(String name, PortfolioType type, IconClsType iconCls, String fatherId) {
+    public Portfolio(String name, IconClsType iconCls, String fatherId) {
         this.name = name;
-        this.type = type;
         this.iconCls = iconCls;
         this.fatherId = fatherId;
     }
@@ -46,14 +39,6 @@ public class Portfolio {
         this.name = name;
     }
 
-    public PortfolioType getType() {
-        return type;
-    }
-
-    public void setType(PortfolioType type) {
-        this.type = type;
-    }
-
     public IconClsType getIconCls() {
         return iconCls;
     }
@@ -70,23 +55,13 @@ public class Portfolio {
         this.fatherId = fatherId;
     }
 
-    public List<String> getChildIds() {
-        return childIds;
-    }
-
-    public void setChildIds(List<String> childIds) {
-        this.childIds = childIds;
-    }
-
     @Override
     public String toString() {
         return "Portfolio{" +
                 "id='" + id + '\'' +
                 ", name='" + name + '\'' +
-                ", type=" + type +
                 ", iconCls=" + iconCls +
                 ", fatherId='" + fatherId + '\'' +
-                ", childIds=" + childIds +
                 '}';
     }
 }

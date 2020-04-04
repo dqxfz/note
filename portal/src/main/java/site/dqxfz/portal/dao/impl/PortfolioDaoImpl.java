@@ -1,13 +1,13 @@
 package site.dqxfz.portal.dao.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
-import site.dqxfz.portal.constant.PortfolioType;
+import site.dqxfz.portal.constant.IconClsType;
 import site.dqxfz.portal.dao.PortfolioDao;
-import site.dqxfz.portal.pojo.Portfolio;
-import site.dqxfz.portal.vo.EasyUITreeNode;
+import site.dqxfz.portal.pojo.po.Portfolio;
+import site.dqxfz.portal.pojo.vo.EasyUiTreeNode;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,20 +28,22 @@ public class PortfolioDaoImpl implements PortfolioDao {
     }
 
     @Override
-    public List<EasyUITreeNode> findByFatherId(String fatherId) {
+    public List<Portfolio> listByFatherId(String fatherId) {
         Query query = query(where("fatherId").is(fatherId));
         List<Portfolio> portfolios = mongoOperations.find(query, Portfolio.class);
-        List<EasyUITreeNode> nodes = portfolios.stream()
-                .map(portfolio -> {
-                    return new EasyUITreeNode(
-                            portfolio.getId(),
-                            portfolio.getName(),
-                            portfolio.getType().equals(PortfolioType.FOLDER) ? "closed" : "open",
-                            portfolio.getType(),
-                            portfolio.getIconCls(),
-                            portfolio.getFatherId());
-                })
-                .collect(Collectors.toList());
-        return nodes;
+        return portfolios;
+    }
+
+    @Override
+    public Portfolio save(Portfolio portfolio) {
+        Portfolio result = mongoOperations.insert(portfolio);
+        return result;
+    }
+
+    @Override
+    public void updateNameById(String id, String name) {
+        Update update = new Update().set("name", name);
+        Query query = query(where("id").is(id));
+        mongoOperations.updateFirst(query,update,Portfolio.class);
     }
 }

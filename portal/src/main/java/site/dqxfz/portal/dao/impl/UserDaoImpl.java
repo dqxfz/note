@@ -1,10 +1,9 @@
 package site.dqxfz.portal.dao.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.stereotype.Repository;
 import site.dqxfz.portal.dao.UserDao;
-import site.dqxfz.portal.pojo.User;
+import site.dqxfz.portal.pojo.po.User;
 
 /**
  * @Description:

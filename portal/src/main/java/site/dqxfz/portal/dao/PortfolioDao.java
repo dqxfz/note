@@ -1,10 +1,15 @@
 package site.dqxfz.portal.dao;
 
 
-import site.dqxfz.portal.vo.EasyUITreeNode;
+import site.dqxfz.portal.pojo.po.Portfolio;
+import site.dqxfz.portal.pojo.vo.EasyUiTreeNode;
 
 import java.util.List;
 
 public interface PortfolioDao {
-    List<EasyUITreeNode> findByFatherId(String fatherId);
+    List<Portfolio> listByFatherId(String fatherId);
+
+    Portfolio save(Portfolio portfolio);
+
+    void updateNameById(String id, String name);
 }

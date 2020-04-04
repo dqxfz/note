@@ -1,3 +1,5 @@
+let errorMessage = '执行失败';
+let sucessMessage = '执行成功';
 function cursorInit() {
     $.fn.extend({
         insertAtCaret: function(myValue){
@@ -26,30 +28,33 @@ function cursorInit() {
         }
     });
 }
+function changeMenuState(node) {
+    if(node.fatherId == 'wy') {
+        $('#rename').hide();
+        $('#remove').hide();
+    } else {
+        $('#rename').show();
+        $('#remove').show();
+    }
+    if(node.iconCls != 'icon-folder') {
+        $('#add').hide();
+        $('#upload').hide();
+        $('#download').show();
+    } else {
+        $('#add').show();
+        $('#upload').show();
+        $('#download').hide();
+    }
+}
 function initPortfolio() {
     $(portfolio).tree({
-        url: '/portfolio?fatherId=wy',
+        url: '/portfolio?id=wy',
         method: 'get',
         onContextMenu: function(e, node){
             displayContent(node);
             e.preventDefault();
             $(portfolio).tree('select', node.target);
-            if(node.father_id == 0) {
-                $('#rename').hide();
-                $('#remove').hide();
-            } else {
-                $('#rename').show();
-                $('#remove').show();
-            }
-            if(node.catalog_type != 0) {
-                $('#add').hide();
-                $('#upload').hide();
-                $('#download').show();
-            } else {
-                $('#add').show();
-                $('#upload').show();
-                $('#download').hide();
-            }
+            changeMenuState(node);
             $('#mm').menu('show', {
                 left: e.pageX,
                 top: e.pageY
@@ -59,35 +64,36 @@ function initPortfolio() {
             node_text = node.text;
         },
         onAfterEdit: function(node) {
-            if(node.id == "0") {
+            if(node.id == 0) {
                 $.ajax({
-                    url: "/catalog/addFolder",
-                    data: {"father_id":node.father_id,"catalog_name":node.text,"catalog_type":node.catalog_type},
+                    url: "/portfolio",
+                    method: 'post',
+                    data: {"fatherId":node.fatherId,"name":node.text,"iconCls":node.iconCls},
+                    dataType: 'json',
                     success: function (obj) {
-                        if(!obj.success){
-                            tree.tree('remove',node.target);
-                            alert(obj.data);
-                        } else {
-                            node.id = obj.data;
-                        }
+                        node.id = obj.data;
+                    },
+                    error: function () {
+                        alert(errorMessage);
+                        $(portfolio).tree('remove',node.target);
                     }
                 });
             } else {
                 $.ajax({
-                    url: "/catalog/renameFolder",
-                    data: {"catalog_id": node.id, "catalog_name": node.text},
-                    success: function (obj) {
-                        if(!obj.success) {
-                            alert(obj.data);
-                            $('#tt').tree('update', {
-                                target: node.target,
-                                text: node_text
-                            });
-                        } else {
-                            if(node.catalog_type != 0) {
-                                $('#note_title').text(node.text)
-                            }
+                    url: "/portfolio",
+                    method: 'put',
+                    data: {"id":node.id,"name":node.text},
+                    success: function () {
+                        if(node.iconCls != 'icon-folder') {
+                            $('#note_title').text(node.text)
                         }
+                    },
+                    error: function () {
+                        alert(errorMessage);
+                        $(portfolio).tree('update', {
+                            target: node.target,
+                            text: node_text
+                        });
                     }
                 });
             }
@@ -99,33 +105,15 @@ function initPortfolio() {
             //     // displayContent(node);
             // }
         },
-        onExpand: function (node) {
-            queryChildren(node);
-        },
-        onCollapse: function (node) {
-            removeChildren(node);
-        }
-    })
-}
-function queryChildren(node){
-    $.ajax({
-        url: "/portfolio?" + node.id,
-        dataType: "json",
-        success: function (data) {
-            if(data) {
-                $(portfolio).tree('append',{
-                    parent: node.target,
-                    data: data
-                });
-            }
-        }
-    });
-}
-function removeChildren(node) {
 
+        // onCollapse: function (node) {
+        //     removeChildren(node);
+        // }
+    }).tree('options').url = "/portfolio";
 }
+
 function displayContent(node) {
-    if(node.catalog_type != 0) {
+    if(node.iconCls != 'icon-folder') {
         $('#model_view').show();
         $('#model_edit').hide();
         if(node.id == current_file) {
@@ -140,7 +128,7 @@ function displayContent(node) {
                     alert(obj.data);
                 } else {
                     $('#note_title').text(node.text);
-                    if(node.catalog_type == 3) {
+                    if(node.iconCls == 3) {
                         $('#noteContent').val("此文件暂不支持预览");
                     } else {
                         $('#noteContent').val(obj.data);
@@ -205,8 +193,8 @@ function menuHandler(item){
                     id: 0,
                     state: 'closed',
                     text: '新文件夹',
-                    father_id: node.id,
-                    catalog_type: 0
+                    fatherId: node.id,
+                    iconCls: 'icon-folder'
                 }]
             });
             var node02 = tree.tree('find',0);
@@ -221,8 +209,8 @@ function menuHandler(item){
                     id: 0,
                     state: 'open',
                     text: '新文件',
-                    father_id: node.id,
-                    catalog_type: 1
+                    fatherId: node.id,
+                    iconCls: 'icon-markdown'
                 }]
             });
             var node02 = tree.tree('find',0);
@@ -242,7 +230,7 @@ function menuHandler(item){
             });
             $.ajax({
                 url: "/catalog/removeFolder",
-                data: {"father_id": node.father_id,"catalog_id": node.id},
+                data: {"fatherId": node.fatherId,"catalog_id": node.id},
                 success: function (obj) {
                     if(obj.success){
                         tree.tree('remove',node.target);
@@ -296,7 +284,7 @@ function convert(){
 }
 function buttonHandler(btn) {
     var node = $(portfolio).tree('getSelected');
-    if(node && node.catalog_type != 0) {
+    if(node && node.iconCls != 0) {
         var content = $('#noteContent').val();
         switch (btn) {
             case "save": {
@@ -310,7 +298,7 @@ function buttonHandler(btn) {
                 break;
             }
             case "edit": {
-                if(node.catalog_type != 3 && node.catalog_type != 2) {
+                if(node.iconCls != 3 && node.iconCls != 2) {
                     $('#model_edit').show();
                     $('#model_view').hide();
                 } else {
@@ -341,15 +329,15 @@ function uploadFile() {
         success: function (obj) {
             var node = obj.data;
             if(obj.success) {
-                var parent = $(portfolio).tree('find',node.father_id);
+                var parent = $(portfolio).tree('find',node.fatherId);
                 $(portfolio).tree('append', {
                     parent: parent.target,
                     data: [{
                         id: node.catalog_id,
-                        state: node.catalog_type,
+                        state: node.iconCls,
                         text: node.catalog_name,
-                        father_id: node.father_id,
-                        catalog_type: node.catalog_type
+                        fatherId: node.fatherId,
+                        iconCls: node.iconCls
                     }]
                 });
                 $('#upload_dlg').dialog('close');

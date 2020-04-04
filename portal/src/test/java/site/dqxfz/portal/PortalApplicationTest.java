@@ -1,31 +1,19 @@
 package site.dqxfz.portal;
 
-import com.mongodb.MongoClient;
-import com.mongodb.client.MongoClients;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bson.Document;
-import org.bson.types.ObjectId;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.mongodb.core.MongoOperations;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.messaging.converter.MessageConverter;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import site.dqxfz.portal.config.RootConfig;
 import site.dqxfz.portal.constant.IconClsType;
-import site.dqxfz.portal.constant.PortfolioType;
-import site.dqxfz.portal.pojo.Portfolio;
-
-import java.util.Arrays;
-import java.util.Collections;
+import site.dqxfz.portal.pojo.po.Portfolio;
 
 /**
  * @Description:
@@ -46,13 +34,13 @@ public class PortalApplicationTest {
      */
     @Test
     public void test01(){
-        Portfolio portfolio = new Portfolio("我的文件夹", PortfolioType.FOLDER, IconClsType.FOLDER,"wy");
+        Portfolio portfolio = new Portfolio("我的文件夹", IconClsType.FOLDER,"wy");
         logger.info(portfolio);
         mongoOperations.insert(portfolio);
     }
     @Test
     public void test02(){
-        Portfolio portfolio = mongoOperations.findById("5e86e97562246e1cc378e467", Portfolio.class);
+        Portfolio portfolio = mongoOperations.findById("5e8822212b33d81356b974c9", Portfolio.class);
         logger.info(portfolio);
 //        logger.info(portfolio.getType() == PortfolioType.NOTEFILE);
 //        logger.info(portfolio.getType().equals(PortfolioType.NOTEFILE));
@@ -73,21 +61,17 @@ public class PortalApplicationTest {
             Document document = new Document();
             document.put("_id",portfolio.getId());
             document.put("name",portfolio.getName());
-            document.put("type",portfolio.getType());
             document.put("iconCls",portfolio.getIconCls());
             document.put("fatherId",portfolio.getFatherId());
-            document.put("childIds",portfolio.getChildIds());
             return document;
         };
 //        Collections.sort();
-        Document convert = convert(new Portfolio("我的文件夹", PortfolioType.FOLDER, IconClsType.FOLDER, "wy"), portfolio -> {
+        Document convert = convert(new Portfolio("我的文件夹", IconClsType.FOLDER, "wy"), portfolio -> {
             Document document = new Document();
             document.put("_id",portfolio.getId());
             document.put("name",portfolio.getName());
-            document.put("type",portfolio.getType());
             document.put("iconCls",portfolio.getIconCls());
             document.put("fatherId",portfolio.getFatherId());
-            document.put("childIds",portfolio.getChildIds());
             return document;
         });
         logger.info(convert);

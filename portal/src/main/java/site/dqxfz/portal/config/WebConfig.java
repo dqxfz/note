@@ -4,10 +4,15 @@ import com.mongodb.MongoClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.format.FormatterRegistry;
+import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import site.dqxfz.portal.converter.IconClsTypeConverter;
+
+import java.util.List;
 
 /**
  * @Description: 配置DispatcherServlet的WebApplicationContext（子容器），通常管理三层架构的视图层view
@@ -28,4 +33,8 @@ public class WebConfig implements WebMvcConfigurer {
         configurer.enable();
     }
 
+    @Override
+    public void addFormatters(FormatterRegistry registry) {
+        registry.addConverter(new IconClsTypeConverter());
+    }
 }
