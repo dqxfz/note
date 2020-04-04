@@ -35,7 +35,7 @@ public class PortfolioDaoImpl implements PortfolioDao {
     }
 
     @Override
-    public Portfolio save(Portfolio portfolio) {
+    public Portfolio savePortfolio(Portfolio portfolio) {
         Portfolio result = mongoOperations.insert(portfolio);
         return result;
     }

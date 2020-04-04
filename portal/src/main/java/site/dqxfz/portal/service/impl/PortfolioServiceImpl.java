@@ -3,8 +3,10 @@ package site.dqxfz.portal.service.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import site.dqxfz.portal.constant.IconClsType;
+import site.dqxfz.portal.dao.ContentDao;
 import site.dqxfz.portal.dao.PortfolioDao;
 import site.dqxfz.portal.dao.UserDao;
+import site.dqxfz.portal.pojo.po.Content;
 import site.dqxfz.portal.pojo.po.Portfolio;
 import site.dqxfz.portal.pojo.vo.ActionResult;
 import site.dqxfz.portal.service.PortfolioService;
@@ -23,10 +25,12 @@ import java.util.stream.Collectors;
 public class PortfolioServiceImpl implements PortfolioService {
     private final PortfolioDao portfolioDao;
     private final UserDao userDao;
+    private final ContentDao contentDao;
 
-    public PortfolioServiceImpl(PortfolioDao portfolioDao, UserDao userDao) {
+    public PortfolioServiceImpl(PortfolioDao portfolioDao, UserDao userDao, ContentDao contentDao) {
         this.portfolioDao = portfolioDao;
         this.userDao = userDao;
+        this.contentDao = contentDao;
     }
 
     @Override
@@ -46,7 +50,11 @@ public class PortfolioServiceImpl implements PortfolioService {
 
     @Override
     public Portfolio savePortfolio(Portfolio portfolio) {
-        Portfolio result = portfolioDao.save(portfolio);
+        Portfolio result = portfolioDao.savePortfolio(portfolio);
+        // 如果是创建markdown文件，则初始化markdown文件的内容
+        if(result.getIconCls() == IconClsType.MARKDOWN) {
+            contentDao.saveContent(new Content(result.getId(),null));
+        }
         return result;
     }
 

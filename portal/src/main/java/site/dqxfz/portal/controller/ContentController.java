@@ -10,6 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
  * @Date 2020年04月02日
  **/
 @Controller
-public class NoteContentController {
+public class ContentController {
 
 }

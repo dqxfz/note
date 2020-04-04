@@ -12,21 +12,36 @@
     <script src="../js/easyui/jquery.min.js"></script>
     <script src="../js/easyui/jquery.easyui.min.js"></script>
     <script src="../js/showdown/dist/showdown.js"></script>
-    <script src="../js/note-1.0.js"></script>
+    <script src="../js/note/note-folder.js"></script>
+    <script src="../js/note/note-content.js"></script>
 
 </head>
 <body>
 <script>
-    var node_text = "新文件夹";
-    var current_file = "0";
-    var portfolio = '#portfolio';
-    $(function () {
-        $('#model_edit').hide();
-        // paseImg();
-        initPortfolio();
-        // queryCatalog();
+    let node_text = "新文件夹";
+    let current_file = "0";
+    let errorMessage = '执行失败';
+    let sucessMessage = '执行成功';
+
+    let portfolio = '#portfolio';
+    let noteContent = '#note_content';
+    let nodeDisplay = '#note_display';
+    let noteTitle = '#note_title';
+    let modelView = '#model_view';
+    let modelEdit = '#model_edit';
+    let markdown = 'icon-markdown';
+    let folder = 'icon-folder';
+
+    function initContent() {
+        changeDisplayState(false);
         // convert();
+        // paseImg();
         // cursorInit();
+    }
+
+    $(function () {
+        initPortfolio();
+        initContent();
     });
 </script>
 <div id="portal" class="easyui-layout" style="width:100%;height:100%;">
@@ -54,8 +69,8 @@
             </div>
         </div>
         <div id="model_edit" style="width: 100%;height: 100%;">
-            <textarea id="noteContent" onkeyup="convert()"></textarea>
-            <div id="noteDisplay"></div>
+            <textarea id="note_content" onkeyup="convert()"></textarea>
+            <div id="note_display"></div>
         </div>
         <div id="model_view" style="width: 100%;height: 100%; padding-bottom: 70px">
         </div>

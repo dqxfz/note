@@ -26,9 +26,6 @@ import java.util.List;
 public class PortfolioController {
     Logger logger = LogManager.getLogger(this.getClass());
 
-    @Autowired
-    ApplicationContext ac;
-
     final PortfolioService portfolioService;
 
     public PortfolioController(PortfolioService portfolioService) {
@@ -41,12 +38,12 @@ public class PortfolioController {
      * @return 返回子portfolio列表
      */
     @GetMapping
-    public ResponseEntity portfolio(String id){
+    public ResponseEntity queryPortfolio(String id){
         try{
             List<EasyUiTreeNode> nodes = portfolioService.listPortfolios(id);
             return new ResponseEntity(nodes, nodes.size() > 0 ? HttpStatus.OK : HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
         }
         return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -57,12 +54,12 @@ public class PortfolioController {
      * @return ResponseEntity
      */
     @PostMapping
-    public ResponseEntity portfolio(Portfolio portfolio){
+    public ResponseEntity savePortfolio(Portfolio portfolio){
         try{
             Portfolio result = portfolioService.savePortfolio(portfolio);
-            return new ResponseEntity(new ActionResult(ActionResult.SUCCESS_MESSAGE,result.getId()),HttpStatus.OK);
+            return new ResponseEntity(new ActionResult(ActionResult.SUCCESS_MESSAGE,result.getId()), HttpStatus.OK);
         } catch (Exception e) {
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
         }
         return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -74,12 +71,12 @@ public class PortfolioController {
      * @return ResponseEntity
      */
     @PutMapping
-    public ResponseEntity portfolio(String id,String name){
+    public ResponseEntity updatePortfolio(String id, String name){
         try{
-            portfolioService.updatePortfolio(id,name);
-            return new ResponseEntity(new ActionResult(ActionResult.SUCCESS_MESSAGE,null),HttpStatus.OK);
+            portfolioService.updatePortfolio(id, name);
+            return new ResponseEntity(new ActionResult(ActionResult.SUCCESS_MESSAGE, null), HttpStatus.OK);
         } catch (Exception e) {
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
         }
         return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
     }

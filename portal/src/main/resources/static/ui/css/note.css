@@ -25,26 +25,34 @@ html,body {
 }
 /*图标css*/
 .icon-markdown {
-    background:url('../image/markdown.png') no-repeat center center !important;
+    background: url('../image/markdown.png') no-repeat;
+    background-size:100% 100%;
 }
 .icon-folder {
-    background:url('../image/folder.png') no-repeat center center !important;
+    background:url('../image/folder.png') no-repeat;
+    background-size:100% 100%;
 }
 .icon-application {
-    background:url('../image/application.png') no-repeat center center !important;
+    background:url('../image/application.png') no-repeat;
+    background-size:100% 100%;
 }
 .icon-audio {
-    background:url('../image/audio.png') no-repeat center center !important;
+    background:url('../image/audio.png') no-repeat;
+    background-size:100% 100%;
 }
 .icon-image {
-    background:url('../image/image.png') no-repeat center center !important;
+    background:url('../image/image.png') no-repeat;
+    background-size:100% 100%;
 }
 .icon-text {
-    background:url('../image/text.png') no-repeat center center !important;
+    background:url('../image/text.png') no-repeat;
+    background-size:100% 100%;
 }
 .icon-unknown {
-    background:url('../image/unknown.png') no-repeat center center !important;
+    background:url('../image/unknown.png') no-repeat;
+    background-size:100% 100%;
 }
 .icon-video {
-    background:url('../image/video.png') no-repeat center center !important;
+    background:url('../image/video.png') no-repeat;
+    background-size:100% 100%;
 }

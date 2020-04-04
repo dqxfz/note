@@ -9,7 +9,7 @@ import java.util.List;
 public interface PortfolioDao {
     List<Portfolio> listByFatherId(String fatherId);
 
-    Portfolio save(Portfolio portfolio);
+    Portfolio savePortfolio(Portfolio portfolio);
 
     void updateNameById(String id, String name);
 }

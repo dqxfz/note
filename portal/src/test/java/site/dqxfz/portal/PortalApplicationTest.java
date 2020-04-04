@@ -34,9 +34,8 @@ public class PortalApplicationTest {
      */
     @Test
     public void test01(){
-        Portfolio portfolio = new Portfolio("我的文件夹", IconClsType.FOLDER,"wy");
+        Portfolio portfolio = mongoOperations.insert(new Portfolio("我的文件夹", IconClsType.FOLDER,"wy"));
         logger.info(portfolio);
-        mongoOperations.insert(portfolio);
     }
     @Test
     public void test02(){

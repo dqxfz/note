@@ -13,11 +13,11 @@ public class PortfolioWriteConverter implements Converter<Portfolio, Document> {
     @Override
     public Document convert(Portfolio portfolio) {
         Document document = new Document();
-        document.put("_id",portfolio.getId());
-        document.put("name",portfolio.getName());
-        //将枚举类的value值存入数据库
-        document.put("iconCls",portfolio.getIconCls().getValue());
-        document.put("fatherId",portfolio.getFatherId());
+        document.put("_id", portfolio.getId());
+        document.put("name", portfolio.getName());
+        // 将枚举类的value值存入数据库
+        document.put("iconCls", portfolio.getIconCls().getValue());
+        document.put("fatherId", portfolio.getFatherId());
         return document;
     }
 }
