@@ -24,35 +24,35 @@ html,body {
     border: 1px solid #70bcf6
 }
 /*图标css*/
-.icon-markdown {
+.markdown {
     background: url('../image/markdown.png') no-repeat;
     background-size:100% 100%;
 }
-.icon-folder {
+.folder {
     background:url('../image/folder.png') no-repeat;
     background-size:100% 100%;
 }
-.icon-application {
+.application {
     background:url('../image/application.png') no-repeat;
     background-size:100% 100%;
 }
-.icon-audio {
+.audio {
     background:url('../image/audio.png') no-repeat;
     background-size:100% 100%;
 }
-.icon-image {
+.image {
     background:url('../image/image.png') no-repeat;
     background-size:100% 100%;
 }
-.icon-text {
+.text {
     background:url('../image/text.png') no-repeat;
     background-size:100% 100%;
 }
-.icon-unknown {
+.unknown {
     background:url('../image/unknown.png') no-repeat;
     background-size:100% 100%;
 }
-.icon-video {
+.video {
     background:url('../image/video.png') no-repeat;
     background-size:100% 100%;
 }

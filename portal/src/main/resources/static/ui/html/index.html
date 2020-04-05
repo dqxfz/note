@@ -23,7 +23,7 @@
 <body>
 <script>
     let node_text = "新文件夹";
-    let current_file = "0";
+    let current_file = 0;
     let errorMessage = '执行失败';
     let sucessMessage = '执行成功';
 
@@ -33,8 +33,8 @@
     let noteTitle = '#note_title';
     let modelView = '#model_view';
     let modelEdit = '#model_edit';
-    let markdown = 'icon-markdown';
-    let folder = 'icon-folder';
+    let markdown = 'markdown';
+    let folder = 'folder';
 
     $(function () {
         initPortfolio();
@@ -90,10 +90,6 @@
 </div>
 <div id="upload_dlg" class="easyui-dialog" data-options="closed:true,closable:false,modal:true,buttons:'#upload_dlg_buttons'"
      style="width: 300px; height: 150px; padding: 10px 20px; text-align: center;">
-<!--    <form id="file_form" method="post" enctype="multipart/form-data">-->
-<!--        <input id="father_id_text" type="hidden" name="father_id">-->
-<!--        <input name="note_file" class="easyui-filebox" style="width:200px">-->
-<!--    </form>-->
     <input id="note_file" class="easyui-filebox" style="width:200px">
     <div id="upload_dlg_buttons">
         <a href="javascript:void(0);" class="easyui-linkbutton" id="submitbutton" data-options="iconCls:'icon-ok'" onclick="uploadFile()">确定</a>

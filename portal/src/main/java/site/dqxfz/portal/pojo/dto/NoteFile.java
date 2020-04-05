@@ -7,11 +7,11 @@ package site.dqxfz.portal.pojo.dto;
  **/
 public class NoteFile {
     /**
-     * 上传是否结束
+     * 父portfolio的id
      */
-    private boolean complete;
+    private String fatherId;
     /**
-     * 上传文件的第几段
+     * 上传文件的第几段,值为-1时表示上传完成
      */
     private Integer snippetNum;
     /**
@@ -31,12 +31,12 @@ public class NoteFile {
      */
     private String content;
 
-    public boolean isComplete() {
-        return complete;
+    public String getFatherId() {
+        return fatherId;
     }
 
-    public void setComplete(boolean complete) {
-        this.complete = complete;
+    public void setFatherId(String fatherId) {
+        this.fatherId = fatherId;
     }
 
     public Integer getSnippetNum() {
@@ -77,5 +77,20 @@ public class NoteFile {
 
     public void setContent(String content) {
         this.content = content;
+    }
+    public boolean isComplete(){
+        return snippetNum == -1;
+    }
+
+    @Override
+    public String toString() {
+        return "NoteFile{" +
+                "fatherId='" + fatherId + '\'' +
+                ", snippetNum=" + snippetNum +
+                ", name='" + name + '\'' +
+                ", uuidName='" + uuidName + '\'' +
+                ", type='" + type + '\'' +
+                ", content='" + content + '\'' +
+                '}';
     }
 }

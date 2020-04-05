@@ -1,4 +1,5 @@
 
+
 function changeMenuState(node) {
     if(node.fatherId == 'wy') {
         $('#rename').hide();
@@ -85,45 +86,36 @@ function initPortfolio() {
     }).tree('options').url = "/portfolio";
 }
 
+function appendNode(idValue,stateValue, textValue, iconClsVlaue) {
+    let node = $(portfolio).tree('getSelected');
+    $(portfolio).tree('append', {
+        parent: node.target,
+        data: [{
+            id: idValue,
+            state: stateValue,
+            text: textValue,
+            fatherId: node.id,
+            iconCls: iconClsVlaue
+        }]
+    });
+    let node02 = tree.tree('find',0);
+    tree.tree('beginEdit',node02.target);
+}
+
 function menuHandler(item){
-    let tree = $(portfolio);
-    let node = tree.tree('getSelected');
+    let node = $(portfolio).tree('getSelected');
 
     switch(item.name) {
         case 'folder': {
-            tree.tree('append', {
-                parent: node.target,
-                data: [{
-                    id: 0,
-                    state: 'closed',
-                    text: '新文件夹',
-                    fatherId: node.id,
-                    iconCls: folder
-                }]
-            });
-            let node02 = tree.tree('find',0);
-            // tree.tree('expand',node.target);
-            tree.tree('beginEdit',node02.target);
+            appendNode(0,'closed','新文件夹', folder);
             break;
         }
         case 'markdown': {
-            tree.tree('append', {
-                parent: node.target,
-                data: [{
-                    id: 0,
-                    state: 'open',
-                    text: '新文件',
-                    fatherId: node.id,
-                    iconCls: markdown
-                }]
-            });
-            let node02 = tree.tree('find',0);
-            // tree.tree('expand',node.target);
-            tree.tree('beginEdit',node02.target);
+            appendNode(0,'open','新文件', markdown);
             break;
         }
         case 'rename': {
-            tree.tree('beginEdit',node.target);
+            $(portfolio).tree('beginEdit',node.target);
             break;
         }
         case 'remove': {
@@ -137,7 +129,7 @@ function menuHandler(item){
                 data: {"fatherId": node.fatherId,"catalog_id": node.id},
                 success: function (obj) {
                     if(obj.success){
-                        tree.tree('remove',node.target);
+                        $(portfolio).tree('remove',node.target);
                     } else {
                         alert(obj.data);
                     }
@@ -149,7 +141,7 @@ function menuHandler(item){
             break;
         }
         case 'upload': {
-            $('#father_id_text').val(node.id);
+            noteFile.fatherId = node.id;
             $('#upload_dlg').dialog('open').dialog('setTitle','上传文件');
             break;
         }
@@ -163,6 +155,10 @@ function menuHandler(item){
 function uploadFile() {
     let file = $('#note_file').filebox('files')[0];
     if(file) {
-        sendFile(file);
+        uploadingFile = file;
+        noteFile.name = uploadingFile.name;
+        noteFile.type = uploadingFile.type;
+        noteFile.uuidName = generateUUID();
+        transferSnippet(0);
     }
 }

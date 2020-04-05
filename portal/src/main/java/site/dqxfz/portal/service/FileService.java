@@ -9,7 +9,5 @@ import java.io.IOException;
  * @date 2020年04月05日
  **/
 public interface FileService {
-    String createFile(String name) throws IOException;
-
-    void uploadFileContent(NoteFile noteFile);
+    Object uploadFileContent(NoteFile noteFile) throws IOException;
 }

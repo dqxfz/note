@@ -14,35 +14,35 @@ public enum IconClsType {
     /**
      * markdown文件
      */
-    MARKDOWN("icon-markdown"),
+    MARKDOWN("markdown"),
     /**
      * 文件夹
      */
-    FOLDER("icon-folder"),
+    FOLDER("folder"),
     /**
      * MIME类型为application
      */
-    APPLICATION("icon-application"),
+    APPLICATION("application"),
     /**
      * MIME类型为audio
      */
-    AUDIO("icon-audio"),
+    AUDIO("audio"),
     /**
      * MIME类型为image
      */
-    IMAGE("icon-image"),
+    IMAGE("image"),
     /**
      * MIME类型为text
      */
-    TEXT("icon-text"),
+    TEXT("text"),
     /**
      * MIME类型为video
      */
-    VIDEO("icon-video"),
+    VIDEO("video"),
     /**
      * MIME类型未知
      */
-    UNKNOWN("icon-unknown");
+    UNKNOWN("unknown");
 
     private final String value;
 
@@ -66,9 +66,6 @@ public enum IconClsType {
      */
     public static IconClsType getValueOf(String iconCls) {
         IconClsType iconClsType = resolve(iconCls);
-        if (iconClsType == null) {
-            throw new IllegalArgumentException("No matching constant for [" + iconCls + "]");
-        }
         return iconClsType;
     }
 

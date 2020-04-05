@@ -16,7 +16,6 @@ import site.dqxfz.portal.service.FileService;
  * @Date 2020年04月02日
  **/
 @Controller
-@MessageMapping("/file")
 public class FileController {
     private final Logger logger = LogManager.getLogger(this.getClass());
 
@@ -28,28 +27,19 @@ public class FileController {
         this.template = template;
     }
 
-    /**
-     * 创建文件
-     * @param name 文件名
-     * @return 生成的唯一文件名，如果失败返回500错误
-     */
-    @MessageMapping("/name")
-    public void createFile(String name){
-        try {
-            String uuidName = fileService.createFile(name);
-            template.convertAndSend("/file/name",new ResponseEntity(uuidName, HttpStatus.OK));
-        } catch (Exception e) {
-            logger.error(e.getMessage(),e);
-            template.convertAndSend("/file/name",new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR));
-        }
+    private void send(String destination, HttpStatus status, Object data) {
+        template.convertAndSend(destination,new ResponseEntity(data, status));
     }
 
-    @MessageMapping("/content")
+
+    @MessageMapping("/file")
     public void uploadFileContent(NoteFile noteFile) {
         try {
-            fileService.uploadFileContent(noteFile);
+            Object data = fileService.uploadFileContent(noteFile);
+            send("/topic/file", HttpStatus.OK, data);
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
+            send("/topic/file", HttpStatus.INTERNAL_SERVER_ERROR, null);
         }
     }
 }

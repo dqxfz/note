@@ -21,8 +21,6 @@ import static org.springframework.data.mongodb.core.query.Query.query;
  **/
 @Service
 public class ContentServiceImpl implements ContentService {
-    private final String ICON_PREFIX = "icon-";
-
     private final String TEXT_SIGN = "${text}";
 
     private final TemplateEngine templateEngine;
@@ -39,7 +37,7 @@ public class ContentServiceImpl implements ContentService {
         String text = contentDao.getContentById(id);
         Context context = new Context();
 //        context.setVariable("text",text);
-        String render = templateEngine.process(iconCls.substring(ICON_PREFIX.length()), context);
+        String render = templateEngine.process(iconCls, context);
         render = render.replace(TEXT_SIGN,text);
         return render;
     }
