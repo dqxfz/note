@@ -1,4 +1,11 @@
 
+function initContent() {
+    changeEditState(false);
+    convert();
+    // paseImg();
+    // cursorInit();
+}
+
 function cursorInit() {
     $.fn.extend({
         insertAtCaret: function(myValue){
@@ -28,30 +35,39 @@ function cursorInit() {
     });
 }
 
-function changeDisplayState(edit) {
+function changeEditState(edit) {
     if(edit) {
+        // 编辑状态
         $(modelView).hide();
         $(modelEdit).show();
     } else {
+        // 视图状态
         $(modelView).show();
         $(modelEdit).hide();
     }
 }
 
 function displayContent(node) {
-    // 如果不是文件夹，并且node节点不是当前正在显示的节点，则执行操作
-    if(node.iconCls != folder && node.id != current_file) {
+    // 如果不是文件夹则执行操作
+    if(node.iconCls != folder) {
+        // 如果node节点是当前正在显示或者正在编辑的节点，则设置为视图状态后返回
+        if(node.id == current_file) {
+            changeEditState(false);
+            return;
+        }
         current_file = node.id;
-        changeDisplayState(false);
+        changeEditState(false);
         $.ajax({
             url: "/content",
             data: {"id": node.id, "iconCls": node.iconCls},
             success: function (obj) {
                 $(noteTitle).text(node.text);
-                $(noteContent).val(obj.data);
+                $(noteContent).val(obj);
                 convert();
             }
         });
+    } else {
+        $(portfolio).tree('expand',node.target);
     }
 }
 function paseImg()
@@ -93,9 +109,9 @@ function buttonHandler(btn) {
                 $.ajax({
                     url: "/content",
                     method: 'put',
-                    data: {id: node.id, content: $(noteContent).val()},
+                    data: {id: node.id, text: $(noteContent).val()},
                     success: function () {
-                        alert(sucessMessage);
+                        // alert(sucessMessage);
                     },
                     error: function () {
                         alert(errorMessage);
@@ -104,7 +120,7 @@ function buttonHandler(btn) {
                 break;
             }
             case "edit": {
-                node.iconCls == markdown ? changeDisplayState(true) : changeDisplayState(false);
+                node.iconCls == markdown ? changeEditState(true) : changeEditState(false);
                 break;
             }
             case "more": {

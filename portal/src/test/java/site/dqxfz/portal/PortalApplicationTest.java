@@ -15,6 +15,8 @@ import site.dqxfz.portal.config.RootConfig;
 import site.dqxfz.portal.constant.IconClsType;
 import site.dqxfz.portal.pojo.po.Portfolio;
 
+import java.util.UUID;
+
 /**
  * @Description:
  * @Author wengyang
@@ -34,7 +36,7 @@ public class PortalApplicationTest {
      */
     @Test
     public void test01(){
-        Portfolio portfolio = mongoOperations.insert(new Portfolio("我的文件夹", IconClsType.FOLDER,"wy"));
+        Portfolio portfolio = mongoOperations.insert(new Portfolio("我的文件夹", null, IconClsType.FOLDER,"wy"));
         logger.info(portfolio);
     }
     @Test
@@ -65,7 +67,7 @@ public class PortalApplicationTest {
             return document;
         };
 //        Collections.sort();
-        Document convert = convert(new Portfolio("我的文件夹", IconClsType.FOLDER, "wy"), portfolio -> {
+        Document convert = convert(new Portfolio("我的文件夹", null, IconClsType.FOLDER, "wy"), portfolio -> {
             Document document = new Document();
             document.put("_id",portfolio.getId());
             document.put("name",portfolio.getName());
@@ -80,5 +82,10 @@ public class PortalApplicationTest {
         return converter.convert(obj);
     }
 
+    @Test
+    public void test05(){
+        String uuid = UUID.randomUUID().toString();
+        System.out.println(uuid);
+    }
 
 }

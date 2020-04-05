@@ -3,7 +3,7 @@ package site.dqxfz.portal.pojo.vo;
 import site.dqxfz.portal.constant.IconClsType;
 
 /**
- * @Description:
+ * @Description: 返回给EasyUI Tree控件的数据类
  * @Author wengyang
  * @Date 2020年02月13日
  **/

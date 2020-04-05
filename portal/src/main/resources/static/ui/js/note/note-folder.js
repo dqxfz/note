@@ -23,9 +23,8 @@ function addPortfolio(node) {
         url: "/portfolio",
         method: 'post',
         data: {"fatherId":node.fatherId,"name":node.text,"iconCls":node.iconCls},
-        dataType: 'json',
         success: function (obj) {
-            node.id = obj.data;
+            node.id = obj;
         },
         error: function () {
             alert(errorMessage);
@@ -103,7 +102,7 @@ function menuHandler(item){
                 }]
             });
             let node02 = tree.tree('find',0);
-            tree.tree('expand',node.target);
+            // tree.tree('expand',node.target);
             tree.tree('beginEdit',node02.target);
             break;
         }
@@ -119,7 +118,7 @@ function menuHandler(item){
                 }]
             });
             let node02 = tree.tree('find',0);
-            tree.tree('expand',node.target);
+            // tree.tree('expand',node.target);
             tree.tree('beginEdit',node02.target);
             break;
         }
@@ -162,41 +161,8 @@ function menuHandler(item){
 };
 
 function uploadFile() {
-    $.messager.progress({
-        title: '提示',
-        msg: '文件上传中，请稍候……',
-        text: ''
-    });
-    $.ajax({
-        type: "post",
-        url: "/catalog/uploadFile",
-        data: new FormData($('#file_form')[0]),
-        processData: false,
-        contentType: false,
-        success: function (obj) {
-            let node = obj.data;
-            if(obj.success) {
-                let parent = $(portfolio).tree('find',node.fatherId);
-                $(portfolio).tree('append', {
-                    parent: parent.target,
-                    data: [{
-                        id: node.catalog_id,
-                        state: node.iconCls,
-                        text: node.catalog_name,
-                        fatherId: node.fatherId,
-                        iconCls: node.iconCls
-                    }]
-                });
-                $('#upload_dlg').dialog('close');
-            } else {
-                alert(node);
-            }
-        },
-        error: function () {
-            alert("异常!");
-        },
-        complete: function () {
-            $.messager.progress('close');
-        }
-    });
+    let file = $('#note_file').filebox('files')[0];
+    if(file) {
+        sendFile(file);
+    }
 }

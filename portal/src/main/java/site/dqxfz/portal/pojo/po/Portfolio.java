@@ -11,14 +11,16 @@ import site.dqxfz.portal.constant.IconClsType;
 public class Portfolio {
     private String id;
     private String name;
+    private String type;
     private IconClsType iconCls;
     private String fatherId;
 
     public Portfolio() {
     }
 
-    public Portfolio(String name, IconClsType iconCls, String fatherId) {
+    public Portfolio(String name, String type, IconClsType iconCls, String fatherId) {
         this.name = name;
+        this.type = type;
         this.iconCls = iconCls;
         this.fatherId = fatherId;
     }
@@ -39,6 +41,14 @@ public class Portfolio {
         this.name = name;
     }
 
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
     public IconClsType getIconCls() {
         return iconCls;
     }
@@ -53,15 +63,5 @@ public class Portfolio {
 
     public void setFatherId(String fatherId) {
         this.fatherId = fatherId;
-    }
-
-    @Override
-    public String toString() {
-        return "Portfolio{" +
-                "id='" + id + '\'' +
-                ", name='" + name + '\'' +
-                ", iconCls=" + iconCls +
-                ", fatherId='" + fatherId + '\'' +
-                '}';
     }
 }

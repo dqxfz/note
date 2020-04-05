@@ -2,18 +2,13 @@ package site.dqxfz.portal.controller;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.filter.HttpPutFormContentFilter;
 import site.dqxfz.portal.pojo.po.Portfolio;
-import site.dqxfz.portal.pojo.vo.ActionResult;
-import site.dqxfz.portal.service.PortfolioService;
 import site.dqxfz.portal.pojo.vo.EasyUiTreeNode;
+import site.dqxfz.portal.service.PortfolioService;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -24,9 +19,9 @@ import java.util.List;
 @RestController
 @RequestMapping("/portfolio")
 public class PortfolioController {
-    Logger logger = LogManager.getLogger(this.getClass());
+    private final Logger logger = LogManager.getLogger(this.getClass());
 
-    final PortfolioService portfolioService;
+    private final PortfolioService portfolioService;
 
     public PortfolioController(PortfolioService portfolioService) {
         this.portfolioService = portfolioService;
@@ -57,7 +52,7 @@ public class PortfolioController {
     public ResponseEntity savePortfolio(Portfolio portfolio){
         try{
             Portfolio result = portfolioService.savePortfolio(portfolio);
-            return new ResponseEntity(new ActionResult(ActionResult.SUCCESS_MESSAGE,result.getId()), HttpStatus.OK);
+            return new ResponseEntity(result.getId(), HttpStatus.OK);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
@@ -74,7 +69,7 @@ public class PortfolioController {
     public ResponseEntity updatePortfolio(String id, String name){
         try{
             portfolioService.updatePortfolio(id, name);
-            return new ResponseEntity(new ActionResult(ActionResult.SUCCESS_MESSAGE, null), HttpStatus.OK);
+            return new ResponseEntity(HttpStatus.OK);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
