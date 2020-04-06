@@ -13,4 +13,6 @@ public interface PortfolioService {
     Portfolio savePortfolio(Portfolio portfolio);
 
     void updatePortfolio(String id, String name);
+
+    void detePortfolio(String id);
 }

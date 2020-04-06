@@ -75,4 +75,14 @@ public class PortfolioController {
         }
         return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
     }
+    @DeleteMapping
+    public ResponseEntity deletePortfolio(String id) {
+        try {
+            portfolioService.detePortfolio(id);
+            return new ResponseEntity(HttpStatus.OK);
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
+        }
+        return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }

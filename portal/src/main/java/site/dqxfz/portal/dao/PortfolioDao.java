@@ -12,4 +12,8 @@ public interface PortfolioDao {
     Portfolio savePortfolio(Portfolio portfolio);
 
     void updateNameById(String id, String name);
+
+    Portfolio getPortfolioById(String id);
+
+    void deleteListByIdList(List<String> portfolioIdList);
 }

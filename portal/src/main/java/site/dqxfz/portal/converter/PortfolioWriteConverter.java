@@ -1,6 +1,7 @@
 package site.dqxfz.portal.converter;
 
 import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.springframework.core.convert.converter.Converter;
 import site.dqxfz.portal.pojo.po.Portfolio;
 
@@ -15,9 +16,11 @@ public class PortfolioWriteConverter implements Converter<Portfolio, Document> {
         Document document = new Document();
         document.put("_id", portfolio.getId());
         document.put("name", portfolio.getName());
+        document.put("type",portfolio.getType());
         // 将枚举类的value值存入数据库
         document.put("iconCls", portfolio.getIconCls().getValue());
         document.put("fatherId", portfolio.getFatherId());
+//        document.put("fatherId", new ObjectId(portfolio.getFatherId()));
         return document;
     }
 }

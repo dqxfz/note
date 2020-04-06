@@ -1,5 +1,6 @@
 package site.dqxfz.portal.service.impl;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import site.dqxfz.portal.constant.IconClsType;
@@ -23,7 +24,8 @@ import java.util.UUID;
  **/
 @Service
 public class FileServiceImpl implements FileService {
-    private final String FILE_PATH = "/home/wy/Mine/temp/file/";
+    @Value("${file.path}")
+    private String filePath;
 
     private final PortfolioDao portfolioDao;
     private final ContentDao contentDao;
@@ -35,6 +37,15 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public Object uploadFileContent(NoteFile noteFile) throws IOException {
+        File file = new File(filePath + noteFile.getUuidName());
+        if(!file.exists()) {
+            // 创建文件
+            file.createNewFile();
+        }
+        byte[] bytes = new BASE64Decoder().decodeBuffer(noteFile.getContent());
+        FileOutputStream outputStream = new FileOutputStream(file, true);
+        outputStream.write(bytes);
+        outputStream.close();
         // 文件传输完成，保存文件元信息到数据库
         if(noteFile.isComplete()) {
             String type = noteFile.getType();
@@ -55,15 +66,7 @@ public class FileServiceImpl implements FileService {
                     portfolio.getIconCls(),
                     portfolio.getFatherId());
         } else {
-            File file = new File(FILE_PATH + noteFile.getUuidName());
-            if(!file.exists()) {
-                // 创建文件
-                file.createNewFile();
-            }
-            byte[] bytes = new BASE64Decoder().decodeBuffer(noteFile.getContent());
-            FileOutputStream outputStream = new FileOutputStream(file, true);
-            outputStream.write(bytes);
-            outputStream.close();
+            // 返回要传输的下一段
             return noteFile.getSnippetNum() + 1;
         }
     }

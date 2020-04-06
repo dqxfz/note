@@ -56,3 +56,11 @@ html,body {
     background:url('../image/video.png') no-repeat;
     background-size:100% 100%;
 }
+.icon-stop {
+    background:url('../image/stop.png') no-repeat;
+    background-size:100% 100%;
+}
+.icon-start {
+    background:url('../image/start.png') no-repeat;
+    background-size:100% 100%;
+}

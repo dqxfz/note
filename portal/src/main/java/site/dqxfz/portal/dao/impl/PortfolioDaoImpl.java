@@ -44,6 +44,17 @@ public class PortfolioDaoImpl implements PortfolioDao {
     public void updateNameById(String id, String name) {
         Update update = new Update().set("name", name);
         Query query = query(where("id").is(id));
-        mongoOperations.updateFirst(query,update,Portfolio.class);
+        mongoOperations.updateFirst(query, update, Portfolio.class);
+    }
+
+    @Override
+    public Portfolio getPortfolioById(String id) {
+        Portfolio portfolio = mongoOperations.findById(id, Portfolio.class);
+        return portfolio;
+    }
+
+    @Override
+    public void deleteListByIdList(List<String> portfolioIdList) {
+        mongoOperations.remove(query(where("id").in(portfolioIdList)),Portfolio.class);
     }
 }

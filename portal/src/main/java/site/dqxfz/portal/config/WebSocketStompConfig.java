@@ -31,6 +31,6 @@ public class WebSocketStompConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureWebSocketTransport(WebSocketTransportRegistration registry) {
         //限制传输大小为10M
-        registry.setMessageSizeLimit(10 * 1024 * 1024);
+        registry.setMessageSizeLimit(100 * 1024 * 1024);
     }
 }

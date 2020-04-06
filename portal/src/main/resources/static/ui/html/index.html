@@ -22,11 +22,11 @@
 </head>
 <body>
 <script>
-    let node_text = "新文件夹";
-    let current_file = 0;
+    /**
+     * 常量
+     */
     let errorMessage = '执行失败';
     let sucessMessage = '执行成功';
-
     let portfolio = '#portfolio';
     let noteContent = '#note_content';
     let nodeDisplay = '#note_display';
@@ -35,12 +35,46 @@
     let modelEdit = '#model_edit';
     let markdown = 'markdown';
     let folder = 'folder';
+    let endPointUrl = 'http://' + window.location.host + "/note";
+    // 单位为1MB
+    let sizeUnit = 1024 * 1024;
+    // 限制分段上传大小为10MB
+    let snippetSizeThreshold = 5 * sizeUnit;
+
+    /**
+     * 后续可能会改变值的变量
+     */
+    let node_text;
+    let current_file;
+    // start:正在传输 stop: 停止传输 cancel: 取消传输
+    let uploadState = 'stop';
+    // 面向消息的stomp对象
+    let stomp;
+    // 指向当前正在上传的文件对象
+    let uploadingFile;
+    // 当前是否在上传
+    let isUploading = false;
+    // 传输到服务器的数据对象
+    let noteFile = {
+        fatherId: '',
+        snippetNum: 0,
+        name: '',
+        uuidName: '',
+        type: '',
+        content: ''
+    }
 
     $(function () {
         initPortfolio();
         initContent();
         initStomp();
     });
+    function uploadStateChange(checked) {
+        uploadState = checked ? 'stop' : 'start';
+        if(uploadState == 'start' && !isUploading) {
+            transferSnippet(noteFile.snippetNum);
+        }
+    }
 </script>
 <div id="portal" class="easyui-layout" style="width:100%;height:100%;">
     <div region="west" split="true" title="导航栏" noheader="true" style="width:15%;">
@@ -90,11 +124,22 @@
 </div>
 <div id="upload_dlg" class="easyui-dialog" data-options="closed:true,closable:false,modal:true,buttons:'#upload_dlg_buttons'"
      style="width: 300px; height: 150px; padding: 10px 20px; text-align: center;">
-    <input id="note_file" class="easyui-filebox" style="width:200px">
+    <input id="note_file" class="easyui-filebox" style="width:100%" required="true" validType="fileSize[200,'MB']">
     <div id="upload_dlg_buttons">
-        <a href="javascript:void(0);" class="easyui-linkbutton" id="submitbutton" data-options="iconCls:'icon-ok'" onclick="uploadFile()">确定</a>
-        <a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon-cancel'" onclick="$('#upload_dlg').dialog('close')">取消</a>
+        <a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon-ok'" onclick="uploadFile()">确定</a>
+        <a href="javascript:void(0);" class="easyui-linkbutton" style="float: left" data-options="iconCls:'icon-cancel'" onclick="$('#upload_dlg').dialog('close')">取消</a>
     </div>
 </div>
+<div id="process_dlg" class="easyui-dialog" data-options="closed:true,closable:false,modal:true,buttons:'#process_dlg_buttons',noheader:true"
+     style="width: 500px; height: 100px; padding: 10px 10px; text-align: center;">
+    <div style="width:100%; height: 100%;">
+        <div id="progress_bar" class="easyui-progressbar" data-options="value:0" style="width:80%; height: 100%; float: left"></div>
+        <input class="easyui-switchbutton" data-options="onText:'继续',offText:'暂停',onChange:uploadStateChange" style="float: right;height: 100%">
+    </div>
+    <div id="process_dlg_buttons">
+        <a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon-cancel'" onclick="closeFileUpload('cancel')">取消</a>
+    </div>
+</div>
+
 </body>
 </html>
