@@ -163,16 +163,14 @@ function menuHandler(item){
                 text: ''
             });
             $.ajax({
-                url: "/catalog/removeFolder",
-                data: {"fatherId": node.fatherId,"catalog_id": node.id},
-                success: function (obj) {
-                    if(obj.success){
-                        $(portfolio).tree('remove',node.target);
-                    } else {
-                        alert(obj.data);
-                    }
+                url: "/portfolio",
+                method: "delete",
+                data: {"id": node.id},
+                success: function () {
+                    $(portfolio).tree('remove',node.target);
+                    $.messager.progress('close');
                 },
-                complete: function () {
+                error: function () {
                     $.messager.progress('close');
                 }
             });

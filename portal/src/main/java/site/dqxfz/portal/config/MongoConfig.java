@@ -2,6 +2,7 @@ package site.dqxfz.portal.config;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.CustomConversions;
@@ -26,14 +27,19 @@ import java.util.*;
  **/
 @Configuration
 public class MongoConfig extends AbstractMongoClientConfiguration {
+    @Value("${mongo.url}")
+    private String mongoUrl;
+    @Value("${mongo.database}")
+    private String mongoDatabase;
+
     @Override
     public MongoClient mongoClient() {
-        return MongoClients.create("mongodb://localhost");
+        return MongoClients.create(mongoUrl);
     }
 
     @Override
     protected String getDatabaseName() {
-        return "note";
+        return mongoDatabase;
     }
 
     /**

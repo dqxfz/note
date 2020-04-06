@@ -1,6 +1,7 @@
 package site.dqxfz.portal.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import site.dqxfz.portal.constant.IconClsType;
@@ -26,7 +27,7 @@ import java.util.stream.Collectors;
  **/
 @Service
 public class PortfolioServiceImpl implements PortfolioService {
-    @Autowired
+    @Value("${file.path}")
     private String filePath;
     private final PortfolioDao portfolioDao;
     private final UserDao userDao;

@@ -8,13 +8,17 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.core.io.Resource;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import site.dqxfz.portal.config.RootConfig;
 import site.dqxfz.portal.constant.IconClsType;
 import site.dqxfz.portal.pojo.po.Portfolio;
+import site.dqxfz.portal.service.ContentService;
+import site.dqxfz.portal.service.impl.ContentServiceImpl;
 
+import java.io.*;
 import java.util.UUID;
 
 /**
@@ -31,13 +35,17 @@ public class PortalApplicationTest {
 
     @Autowired
     ApplicationContext ac;
+
+    @Autowired
+    ContentServiceImpl contentService;
     /**
      * 初始化数据库
      */
     @Test
-    public void test01(){
+    public void test01() throws IOException {
         Portfolio portfolio = mongoOperations.insert(new Portfolio("我的文件夹", null, IconClsType.FOLDER,"wy"));
         logger.info(portfolio);
+
     }
     @Test
     public void test02(){
@@ -47,35 +55,25 @@ public class PortalApplicationTest {
 //        logger.info(portfolio.getType().equals(PortfolioType.NOTEFILE));
     }
     @Test
-    public void test03(){
-//        logger.info(HttpStatus.ACCEPTED.name());
-//        String[] beanNamesForType = ac.getBeanNamesForType(HttpMessageConverter.class);
-//
-//        logger.info(Arrays.asList(beanNamesForType));
-//        IconClsType application = IconClsType.valueOf("APPLICATION");
-//        IconClsType application1 = Enum.valueOf(IconClsType.class, "APPLICATION");
-//        logger.info(application1 == IconClsType.APPLICATION);
+    public void test03() throws IOException {
+        Resource template = ac.getResource("classpath:static/template/markdown.html");
+        InputStream inputStream = template.getInputStream();
+        InputStreamReader in = new InputStreamReader(inputStream);
+        BufferedReader reader = new BufferedReader(in);
+        StringBuffer buffer = new StringBuffer();
+        String line = reader.readLine(); // 读取第一行
+        while (line != null) { // 如果 line 为空说明读完了
+            buffer.append(line); // 将读到的内容添加到 buffer 中
+            buffer.append("\n"); // 添加换行符
+            line = reader.readLine(); // 读取下一行
+        }
+        inputStream.close();
+        in.close();
+        reader.close();
+        logger.info(buffer.toString());
     }
     @Test
     public void test04(){
-        Converter<Portfolio, Document> converter = portfolio -> {
-            Document document = new Document();
-            document.put("_id",portfolio.getId());
-            document.put("name",portfolio.getName());
-            document.put("iconCls",portfolio.getIconCls());
-            document.put("fatherId",portfolio.getFatherId());
-            return document;
-        };
-//        Collections.sort();
-        Document convert = convert(new Portfolio("我的文件夹", null, IconClsType.FOLDER, "wy"), portfolio -> {
-            Document document = new Document();
-            document.put("_id",portfolio.getId());
-            document.put("name",portfolio.getName());
-            document.put("iconCls",portfolio.getIconCls());
-            document.put("fatherId",portfolio.getFatherId());
-            return document;
-        });
-        logger.info(convert);
     }
 
     private  <S,T> T convert(S obj,Converter<S, T> converter) {

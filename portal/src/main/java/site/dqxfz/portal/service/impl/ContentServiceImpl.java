@@ -1,6 +1,8 @@
 package site.dqxfz.portal.service.impl;
 
-import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -8,26 +10,21 @@ import site.dqxfz.portal.dao.ContentDao;
 import site.dqxfz.portal.pojo.po.Content;
 import site.dqxfz.portal.service.ContentService;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.net.URL;
-
-import static org.springframework.data.mongodb.core.query.Criteria.where;
-import static org.springframework.data.mongodb.core.query.Query.query;
-
 /**
  * @author WENG Yang
  * @date 2020年04月05日
  **/
 @Service
 public class ContentServiceImpl implements ContentService {
-    private final String TEXT_SIGN = "${text}";
+    @Value("${content.templateParam}")
+    private String templateParam;
 
+    private final ApplicationContext ac;
     private final TemplateEngine templateEngine;
-
     private final ContentDao contentDao;
 
-    public ContentServiceImpl(TemplateEngine templateEngine, ContentDao contentDao) {
+    public ContentServiceImpl(ApplicationContext ac, TemplateEngine templateEngine, ContentDao contentDao) {
+        this.ac = ac;
         this.templateEngine = templateEngine;
         this.contentDao = contentDao;
     }
@@ -35,10 +32,8 @@ public class ContentServiceImpl implements ContentService {
     @Override
     public String getContent(String id, String iconCls) {
         String text = contentDao.getContentById(id);
-        Context context = new Context();
-//        context.setVariable("text",text);
-        String render = templateEngine.process(iconCls, context);
-        render = render.replace(TEXT_SIGN,text);
+        String render = templateEngine.process(iconCls, new Context());
+        render = render.replace(templateParam,text == null ? "" : text);
         return render;
     }
 
