@@ -203,8 +203,7 @@ function menuHandler(item){
 
 function uploadFile() {
     if($('#note_file').filebox('isValid')) {
-        //设置当前上传文件状态为打开
-        uploadState = 'start';
+        let uuidName = generateUUID();
         $('#process_dlg').dialog('open');
         uploadingFile = $('#note_file').filebox('files')[0];
         uploadingFile.snippetNum=0;

@@ -21,6 +21,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -61,9 +63,11 @@ public class WebsocketFileHandler extends AbstractWebSocketHandler {
 
     @Override
     protected void handleBinaryMessage(WebSocketSession session, BinaryMessage message) throws Exception {
+        Instant start = Instant.now();
         try{
             fileService.uploadFile(message.getPayload().array(),session.getAttributes());
             sendMessage(session,CommandType.RESPONSE_CONTINUE,null);
+            logger.info("文件片段上传完成，共耗时：" + Duration.between(start,Instant.now()).toMillis() + "ms");
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
         }

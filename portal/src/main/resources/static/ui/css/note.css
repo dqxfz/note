@@ -4,6 +4,7 @@ html,body {
     padding: 0;
     margin: 0;
 }
+
 #note_content {
     height: 100%;
     width: 50%;
@@ -56,11 +57,15 @@ html,body {
     background:url('../image/video.png') no-repeat;
     background-size:100% 100%;
 }
-.icon-stop {
+.note-icon-stop {
     background:url('../image/stop.png') no-repeat;
     background-size:100% 100%;
 }
-.icon-start {
+.note-icon-start {
     background:url('../image/start.png') no-repeat;
+    background-size:100% 100%;
+}
+.note-icon-cancel {
+    background:url('../image/cancel.png') no-repeat;
     background-size:100% 100%;
 }

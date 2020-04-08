@@ -17,6 +17,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Map;
 
 /**
@@ -62,34 +64,33 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public void uploadFile(byte[] bytes, Map<String, Object> sessionAttributes) throws IOException {
-        OutputStream outputStream = (OutputStream) sessionAttributes.get("outputStream");
+        File file = (File) sessionAttributes.get("file");
+        FileOutputStream outputStream = new FileOutputStream(file, true);
         outputStream.write(bytes);
+        outputStream.close();
     }
 
     @Override
     public void createFile(NoteFile noteFile, Map<String, Object> sessionAttributes) throws IOException {
+        logger.info(noteFile.getName() + "创建时间：" + Instant.now());
+        sessionAttributes.put("start", Instant.now());
         File file = new File(filePath + noteFile.getUuidName());
         if(!file.exists()) {
-            // 创建文件
             file.createNewFile();
         }
-        FileOutputStream outputStream = new FileOutputStream(file, true);
-        FileOutputStream previousOutputStream = (FileOutputStream) sessionAttributes.get("outputStream");
-        if(previousOutputStream != null) {
-            previousOutputStream.close();
-        }
-        sessionAttributes.put("outputStream", outputStream);
+        sessionAttributes.put("file", file);
     }
 
     @Override
     public EasyUiTreeNode saveFileMetaData(Map<String, Object> sessionAttributes) throws IOException {
-        // 关闭文件流
-        OutputStream outputStream = (OutputStream) sessionAttributes.get("outputStream");
-        outputStream.close();
-        sessionAttributes.remove("outputStream");
         // 保存文件元信息
         NoteFile noteFile = (NoteFile) sessionAttributes.get("noteFile");
         EasyUiTreeNode easyUiTreeNode = savePortfolio(noteFile);
+        Instant start = (Instant) sessionAttributes.get("start");
+        logger.info(start);
+        Duration duration = Duration.between(start, Instant.now());
+        logger.info(noteFile.getName() + "结束时间：" + Instant.now());
+        logger.info(noteFile.getName() + " 上传完成，共耗时： " + duration.toMillis() + "ms");
         return easyUiTreeNode;
     }
 

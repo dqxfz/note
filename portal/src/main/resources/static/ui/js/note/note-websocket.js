@@ -1,23 +1,11 @@
 
 function transferSnippet(snippetNum) {
-    isUploading = true;
-    if(uploadState == 'start') {
-        let start = snippetNum * snippetSizeThreshold;
-        let end = start + snippetSizeThreshold;
-        //如果start大于等于文件size大小,说明上传完成
-        if(start >= uploadingFile.size) {
-            console.log('上传完成');
-            return ;
-        }
-        let blob = uploadingFile.slice(start, end);
-        let reader = new FileReader();
-        reader.readAsArrayBuffer(blob);
-        reader.onload = function (e) {
-            let result = e.target.result;
-            ws.send(result);
-        }
-    } else {
-        isUploading = false;
+    let start = snippetNum * snippetSizeThreshold;
+    let blob = uploadingFile.slice(start, start + snippetSizeThreshold);
+    let reader = new FileReader();
+    reader.readAsArrayBuffer(blob);
+    reader.onload = function (e) {
+        ws.send(e.target.result);
     }
 }
 function transferFileMetaData() {
@@ -31,11 +19,8 @@ function transferFileComplete() {
     ws.send(JSON.stringify(fileDTO));
 }
 function closeFileUpload(closeReason) {
-    uploadState = 'stop';
     uploadingFile = null;
-    isUploading = false;
     $('#progress_bar').progressbar('setValue', 0);
-
     if(closeReason == 'success' || closeReason == 'cancel') {
         let msgValue = closeReason == 'success' ? '上传成功' : '您已取消文件上传';
         $('#process_dlg').dialog('close');
