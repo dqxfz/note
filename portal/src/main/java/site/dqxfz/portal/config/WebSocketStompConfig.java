@@ -13,14 +13,13 @@ import org.springframework.web.socket.config.annotation.WebSocketTransportRegist
  * @Author wengyangfileList[i]
  * @Date 2020年03月22日
  **/
-@Configuration
-@EnableWebSocketMessageBroker
+//@Configuration
+//@EnableWebSocketMessageBroker
 @ComponentScan({"site.dqxfz.portal.websocket"})
 public class WebSocketStompConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/note").withSockJS();
-
+        registry.addEndpoint("/note");
     }
 
     @Override

@@ -182,7 +182,20 @@ function menuHandler(item){
             break;
         }
         case 'download': {
-
+            let downloadUrl = '/portfolio/note/download';
+            if(node.iconCls != markdown) {
+                downloadUrl = '/portfolio/file/download'
+            }
+            $.ajax({
+                url: downloadUrl,
+                data: {"id": node.id},
+                success: function (obj) {
+                    download(obj,node.text);
+                },
+                error: function () {
+                    alert('下载失败');
+                }
+            });
             break;
         }
     }
@@ -194,9 +207,107 @@ function uploadFile() {
         uploadState = 'start';
         $('#process_dlg').dialog('open');
         uploadingFile = $('#note_file').filebox('files')[0];
+        uploadingFile.snippetNum=0;
+
         noteFile.name = uploadingFile.name;
         noteFile.type = uploadingFile.type;
         noteFile.uuidName = generateUUID();
-        transferSnippet(0);
+        // let idx = noteFile.name.lastIndexOf('.');
+        // if(idx != -1) {
+        //     noteFile.uuidName += noteFile.name.substring(idx);
+        // }
+        // 传输文件元信息
+        transferFileMetaData();
+        // 开始传输数据
+        transferSnippet(uploadingFile.snippetNum);
     }
+}
+// /**
+//  * 获取 blob
+//  * @param  {String} url 目标文件地址
+//  * @return {cb}
+//  */
+// function getBlob(url,cb) {
+//     var xhr = new XMLHttpRequest();
+//     xhr.open('GET', url, true);
+//     xhr.responseType = 'blob';
+//     xhr.onload = function() {
+//         if (xhr.status === 200) {
+//             cb(xhr.response);
+//         }
+//     };
+//     xhr.send();
+// }
+//
+// /**
+//  * 保存
+//  * @param  {Blob} blob
+//  * @param  {String} filename 想要保存的文件名称
+//  */
+// function saveAs(blob, filename) {
+//     if (window.navigator.msSaveOrOpenBlob) {
+//         navigator.msSaveBlob(blob, filename);
+//     } else {
+//         var link = document.createElement('a');
+//         var body = document.querySelector('body');
+//
+//         link.href = window.URL.createObjectURL(blob);
+//         link.download = filename;
+//
+//         // fix Firefox
+//         link.style.display = 'none';
+//         body.appendChild(link);
+//
+//         link.click();
+//         body.removeChild(link);
+//
+//         window.URL.revokeObjectURL(link.href);
+//     };
+// }
+//
+// /**
+//  * 下载
+//  * @param  {String} url 目标文件地址
+//  * @param  {String} filename 想要保存的文件名称
+//  */
+// function download(url, filename) {
+//     getBlob(url, function(blob) {
+//         saveAs(blob, filename);
+//     });
+// };
+
+function getBlob(url) {
+    return new Promise(resolve => {
+        const xhr = new XMLHttpRequest()
+// 避免 200 from disk cache
+        url = url + '?r=${Math.random()}'
+            xhr.open('get',url, true)
+        xhr.responseType = 'blob'
+xhr.onload = () => {
+    if (xhr.status === 200) {
+        debugger
+        resolve(xhr.response)
+    }
+}
+        xhr.send()
+    })
+}
+function saveAs(blob,filename) {
+    if(window.navigator.msSaveOrOpenBlob){
+        navigator.msSaveBlob(blob,filename)
+    }else{
+        const anchor=document.createElement('a')
+        const body= document.querySelector('body')
+        anchor.href=window.URL.createObjectURL(blob)
+        anchor.download = filename
+        anchor.style.display='none'
+        body.appendChild(anchor)
+        anchor.click()
+        body.removeChild(anchor)
+        window.URL.revokeObjectURL(anchor.href)
+    }
+}
+async function download(url,newFileName) {
+    const blob= await getBlob(url)
+    saveAs(blob,newFileName)
 }

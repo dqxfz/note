@@ -1,5 +1,7 @@
 package site.dqxfz.portal;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bson.Document;
@@ -13,21 +15,29 @@ import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import site.dqxfz.portal.config.RootConfig;
+import site.dqxfz.portal.constant.CommandType;
 import site.dqxfz.portal.constant.IconClsType;
 import site.dqxfz.portal.pojo.po.Portfolio;
 import site.dqxfz.portal.service.ContentService;
 import site.dqxfz.portal.service.impl.ContentServiceImpl;
 
 import java.io.*;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @Description:
  * @Author wengyang
  * @Date 2020年04月02日
  **/
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = RootConfig.class)
+//@RunWith(SpringJUnit4ClassRunner.class)
+//@ContextConfiguration(classes = RootConfig.class)
 public class PortalApplicationTest {
     Logger logger = LogManager.getLogger(this.getClass());
     @Autowired
@@ -73,17 +83,30 @@ public class PortalApplicationTest {
         logger.info(buffer.toString());
     }
     @Test
-    public void test04(){
-    }
-
-    private  <S,T> T convert(S obj,Converter<S, T> converter) {
-        return converter.convert(obj);
+    public void test04() throws InterruptedException {
+        Instant start = Instant.now();
+        TimeUnit.SECONDS.sleep(2);
+        TimeUnit.NANOSECONDS.sleep(100);
+        Instant end = Instant.now();
+        Duration duration = Duration.between(start, end);
+        logger.info(duration.toMillis());
+        logger.info(duration.toNanos());
+//        int nano = duration.getNano();
+//        logger.info(nano);
     }
 
     @Test
     public void test05(){
         String uuid = UUID.randomUUID().toString();
         System.out.println(uuid);
+    }
+    @Test
+    public void test06() throws JsonProcessingException {
+        Map<String,Object> map = new HashMap(2);
+        map.put("responseCode", CommandType.RESPONSE_CONTINUE);
+        ObjectMapper mapper = new ObjectMapper();
+        String response = mapper.writeValueAsString(map);
+        logger.info(response);
     }
 
 }

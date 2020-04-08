@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.4.0/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.js"></script>
+
+    <script>
+        
+        window.onload = function () {
+            // originWebsocket();
+            stompWebsocket();
+            // var url = 'ws://' + window.location.host + '/marco'
+            // var sock  = new WebSocket(url);
+            // var url = 'http://localhost:8080/marcopolo';
+            // var sock = new SockJS(url);
+            // var stomp = Stomp.over(sock);
+            // var payload = JSON.stringify({'message' : 'Marco'});
+            // stomp.connect('guest','guest',function (frame) {
+            //     setTimeout(function () {sayStomp(), 5000});
+            //     stomp.subscribe('/topic/marco02', function(message){
+            //         console.log('Received message: ', message.body);
+            //         // setTimeout(function () {sayStomp(), 5000});
+            //     });
+            // });
+            // function sayStomp() {
+            //     console.log('Sending Marco01!');
+            //     stomp.send("/app/marco01",{},'marco01');
+            // }
+
+            // sock.onopen = function() {
+            //     console.log('Opening');
+            //     sayMarco();
+            // };
+            // sock.onmessage = function(e) {
+            //     console.log('Received message: ', e.data);
+            //     setTimeout(function () {sayMarco(), 5000})
+            // };
+            // sock.onclose = function() {
+            //     console.log('Closing');
+            // };
+            // function sayMarco() {
+            //     console.log('Sending Marco!');
+            //     sock.send("Marco!");
+            // }
+        }
+        function stompWebsocket() {
+            var url = 'ws://127.0.0.1:8080/note';
+            var sock = new WebSocket(url);
+            sock.binaryType='arraybuffer';
+            var stomp = Stomp.over(sock);
+            stomp.connect('guest','guest',function (frame) {
+                sock.send("wy");
+                // sayStomp();
+            });
+            var str = "ab";
+            var blob = new Blob([str], {
+                type: 'application/plain'
+            });
+            function sayStomp() {
+                console.log('Sending ' + str  + '!');
+                // stomp.send("/app/hello",{},str);
+                // stomp.send("/app/file",{},'Hello');
+                var fileReader = new FileReader();
+                fileReader.readAsArrayBuffer(blob);
+                // fileReader.readAsDataURL(blob);
+                fileReader.onload = function (e) {
+                    // 获取到文件对象
+                    var result = e.target.result;
+                    sock.send("wy");
+                    // sock.send(result);
+                    // 发送数据到服务器端
+                    // stomp.send("/app/name",{},"wy");
+
+                }
+            }
+        }
+
+        function originWebsocket() {
+            var url = 'ws://' + window.location.host + '/note'
+            var sock  = new WebSocket(url);
+            // var url = 'http://' + window.location.host + '/file';
+            // var sock = new SockJS(url);
+            sock.onopen = function() {
+                console.log('Opening');
+                sayFile();
+            };
+            sock.onmessage = function(e) {
+                console.log('Received message: ', e.data);
+                // setTimeout(function () {sayFile(), 5000})
+            };
+            sock.onclose = function() {
+                console.log('Closing');
+            };
+            var str = "123";
+            var blob = new Blob([str], {
+                type: 'text/plain'
+            });
+            function sayFile() {
+                console.log('Sending File!');
+                // sock.send("File!");
+                var fileReader = new FileReader();
+                fileReader.readAsArrayBuffer(blob);
+                fileReader.onload = function (e) {
+                    // 获取到文件对象
+                    var result = e.target.result;
+                    // var buf = new Uint8Array(result);
+                    // 发送数据到服务器端
+                    sock.send("wy");
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+
+Hello World!
+</body>
+</html>

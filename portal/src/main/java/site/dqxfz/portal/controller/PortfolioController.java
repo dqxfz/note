@@ -75,11 +75,28 @@ public class PortfolioController {
         }
         return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    /**
+     * 删除id portfolio以及子portfolio
+     * @param id 将要删除的portfolio的id
+     * @return 删除成功则返回200
+     */
     @DeleteMapping
     public ResponseEntity deletePortfolio(String id) {
         try {
             portfolioService.detePortfolio(id);
             return new ResponseEntity(HttpStatus.OK);
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
+        }
+        return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @GetMapping("/file/download")
+    public ResponseEntity downloadFile(String id) {
+        try {
+            String downloadUrl = portfolioService.getDownloadUrl(id);
+            return new ResponseEntity(downloadUrl, HttpStatus.OK);
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
         }

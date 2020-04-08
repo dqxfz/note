@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script>
+    /**
+     * 获取 blob
+     * @param  {String} url 目标文件地址
+     * @return {cb}
+     */
+    function getBlob(url,cb) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', url, true);
+        xhr.responseType = 'blob';
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                cb(xhr.response);
+            }
+        };
+        xhr.addEventListener(
+            'progress',
+            function (evt) {
+                if (evt.lengthComputable) {
+                    let percentComplete = evt.loaded / evt.total;
+                    let percentage = percentComplete * 100;
+                    console.log(percentage + '%');
+                }
+            },
+            false
+        );
+        xhr.send();
+    }
+
+    /**
+     * 保存
+     * @param  {Blob} blob
+     * @param  {String} filename 想要保存的文件名称
+     */
+    function saveAs(blob, filename) {
+        if (window.navigator.msSaveOrOpenBlob) {
+            navigator.msSaveBlob(blob, filename);
+        } else {
+            var link = document.createElement('a');
+            var body = document.querySelector('body');
+
+            link.href = window.URL.createObjectURL(blob);
+            link.download = filename;
+
+            // fix Firefox
+            link.style.display = 'none';
+            body.appendChild(link);
+
+            link.click();
+            body.removeChild(link);
+
+            window.URL.revokeObjectURL(link.href);
+        };
+    }
+
+    /**
+     * 下载
+     * @param  {String} url 目标文件地址
+     * @param  {String} filename 想要保存的文件名称
+     */
+    function download(url, filename) {
+        getBlob(url, function(blob) {
+            saveAs(blob, filename);
+        });
+    };
+    var url = 'http://file.dqxfz.site/4676c6be-e0f3-4ccf-b459-35fc20282112';
+    fetch(url).then(response => {
+
+        var reader = response.body.getReader();
+        var headers = response.headers;
+        var totalLength = headers.get('Content-Length');
+        var bytesReceived = 0;
+
+        reader.read().then(function processResult(result) {
+            if (result.done) {
+                return;
+            }
+
+            bytesReceived += result.value.length;
+            console.log(`progress: ${bytesReceived / totalLength * 100}%`);
+
+            return reader.read().then(processResult);
+        });
+    });
+</script>
+<!--<a href="http://file.dqxfz.site/35d0cdd2-ff33-42ed-e020-48b52299668c" download="md">download</a>-->
+<!--<button  onclick="download('http://file.dqxfz.site/4676c6be-e0f3-4ccf-b459-35fc20282112','md.jpg')">-->
+<!--<button  onclick="fetch('http://file.dqxfz.site/4676c6be-e0f3-4ccf-b459-35fc20282112')">-->
+<!--<p>点击 W3School 的 logo 来下载该图片：<p>-->
+
+<!--    <button  onclick="download('http://file.dqxfz.site/4676c6be-e0f3-4ccf-b459-35fc20282112','md.jpg')">-->
+<!--    </button>-->
+</body>
+</html>

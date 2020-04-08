@@ -17,7 +17,7 @@
 
     <script src="../js/note/note-folder.js"></script>
     <script src="../js/note/note-content.js"></script>
-    <script src="../js/note/note-stomp.js"></script>
+    <script src="../js/note/note-websocket.js"></script>
 
 </head>
 <body>
@@ -35,11 +35,11 @@
     let modelEdit = '#model_edit';
     let markdown = 'markdown';
     let folder = 'folder';
-    let endPointUrl = 'http://' + window.location.host + "/note";
+    let socketUrl = 'ws://' + window.location.host + "/note";
     // 单位为1MB
     let sizeUnit = 1024 * 1024;
     // 限制分段上传大小为10MB
-    let snippetSizeThreshold = 5 * sizeUnit;
+    let snippetSizeThreshold = 2 * sizeUnit;
 
     /**
      * 后续可能会改变值的变量
@@ -49,30 +49,36 @@
     // start:正在传输 stop: 停止传输 cancel: 取消传输
     let uploadState = 'stop';
     // 面向消息的stomp对象
-    let stomp;
+    let ws, stomp;
     // 指向当前正在上传的文件对象
     let uploadingFile;
     // 当前是否在上传
     let isUploading = false;
-    // 传输到服务器的数据对象
+    // 文件元数据
     let noteFile = {
-        fatherId: '',
-        snippetNum: 0,
-        name: '',
-        uuidName: '',
-        type: '',
-        content: ''
+        fatherId: null,
+        name: null,
+        uuidName: null,
+        type: null,
     }
+    // 传输到服务器的数据对象
+    let fileDTO = {
+        // 1: 表示上传开始 2: 表示文件传输完成
+        command: null,
+        // 携带的数据
+        data: null
+    }
+
 
     $(function () {
         initPortfolio();
         initContent();
-        initStomp();
+        initWebsocket();
     });
     function uploadStateChange(checked) {
         uploadState = checked ? 'stop' : 'start';
         if(uploadState == 'start' && !isUploading) {
-            transferSnippet(noteFile.snippetNum);
+            // transferSnippet(noteFile.snippetNum);
         }
     }
 </script>
@@ -124,7 +130,7 @@
 </div>
 <div id="upload_dlg" class="easyui-dialog" data-options="closed:true,closable:false,modal:true,buttons:'#upload_dlg_buttons'"
      style="width: 300px; height: 150px; padding: 10px 20px; text-align: center;">
-    <input id="note_file" class="easyui-filebox" style="width:100%" required="true" validType="fileSize[200,'MB']">
+    <input id="note_file" class="easyui-filebox" style="width:100%" required="true" validType="fileSize[500,'MB']">
     <div id="upload_dlg_buttons">
         <a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon-ok'" onclick="uploadFile()">确定</a>
         <a href="javascript:void(0);" class="easyui-linkbutton" style="float: left" data-options="iconCls:'icon-cancel'" onclick="$('#upload_dlg').dialog('close')">取消</a>

@@ -6,6 +6,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
+import site.dqxfz.portal.constant.IconClsType;
 import site.dqxfz.portal.dao.ContentDao;
 import site.dqxfz.portal.pojo.po.Content;
 import site.dqxfz.portal.service.ContentService;
@@ -16,8 +17,10 @@ import site.dqxfz.portal.service.ContentService;
  **/
 @Service
 public class ContentServiceImpl implements ContentService {
-    @Value("${content.templateParam}")
-    private String templateParam;
+    @Value("${content.template.placeholder}")
+    private String contentTemplatePlaceholder;
+    @Value("${file.server.url}")
+    private String fileServerUrl;
 
     private final ApplicationContext ac;
     private final TemplateEngine templateEngine;
@@ -32,8 +35,12 @@ public class ContentServiceImpl implements ContentService {
     @Override
     public String getContent(String id, String iconCls) {
         String text = contentDao.getContentById(id);
+        IconClsType iconClsType = IconClsType.getValueOf(iconCls);
+        if(!(iconClsType == IconClsType.FOLDER || iconClsType == IconClsType.MARKDOWN)) {
+            text = fileServerUrl + "/" + text;
+        }
         String render = templateEngine.process(iconCls, new Context());
-        render = render.replace(templateParam,text == null ? "" : text);
+        render = render.replace(contentTemplatePlaceholder,text == null ? "" : text);
         return render;
     }
 
