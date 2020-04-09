@@ -52,4 +52,11 @@ public class ContentDaoImpl implements ContentDao {
         Query query = query(where("id").in(contentIdList));
         mongoOperations.remove(query, Content.class);
     }
+
+    @Override
+    public Content getContentBytext(String uuidName) {
+        Query query = query(where("text").is(uuidName));
+        Content content = mongoOperations.findOne(query, Content.class);
+        return content;
+    }
 }

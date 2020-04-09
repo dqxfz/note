@@ -13,6 +13,7 @@ import site.dqxfz.portal.pojo.po.Content;
 import site.dqxfz.portal.pojo.po.Portfolio;
 import site.dqxfz.portal.pojo.vo.EasyUiTreeNode;
 import site.dqxfz.portal.service.FileService;
+import sun.misc.BASE64Decoder;
 
 import java.io.*;
 import java.time.Duration;
@@ -29,6 +30,8 @@ public class FileServiceImpl implements FileService {
 
     @Value("${file.path}")
     private String filePath;
+    @Value("${file.server.url}")
+    private String fileServerUrl;
 
     private final PortfolioDao portfolioDao;
     private final ContentDao contentDao;
@@ -60,24 +63,46 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public EasyUiTreeNode saveFileMetaData(Map<String, Object> sessionAttributes, String md5) throws IOException {
+        String filePathName = (String) sessionAttributes.get("filePathName");
+        String endFileMd5 = DigestUtils.md5DigestAsHex(new FileInputStream(filePathName));
+        // 文件上传出错
+        if(!endFileMd5.equals(md5)) {
+            return null;
+        }
         // 保存文件元信息
         NoteFile noteFile = (NoteFile) sessionAttributes.get("noteFile");
         EasyUiTreeNode easyUiTreeNode = savePortfolio(noteFile);
-        String filePathName = (String) sessionAttributes.get("filePathName");
-        String endFileMd5 = DigestUtils.md5DigestAsHex(new FileInputStream(filePathName));
-        System.out.println(endFileMd5);
-        System.out.println(md5);
-        logger.info(endFileMd5.equals(md5));
-//        File file = new File(filePathName);
-//        String size = String.valueOf(file.length());
-//        System.out.println(size);
-//        System.out.println(noteFile.getSize());
-//        logger.info(size.equals(noteFile.getSize()));
         Instant start = (Instant) sessionAttributes.get("start");
         Duration duration = Duration.between(start, Instant.now());
         logger.info(noteFile.getName() + "结束时间：" + Instant.now());
         logger.info(noteFile.getName() + " 上传完成，共耗时： " + duration.toMillis() + "ms");
         return easyUiTreeNode;
+    }
+
+    @Override
+    public void clearFile(String filePathName, String uuidName) {
+
+        Content content = contentDao.getContentBytext(uuidName);
+        // 如果数据库没有已经保存好了的文件信息，说明文件没有上传完成
+        if(content == null) {
+            File file = new File(filePathName);
+            file.delete();
+        }
+    }
+
+    @Override
+    public String uploadImage(String uuidName, String base64) throws IOException {
+        String imageBase64 = base64.substring(base64.indexOf(',') + 1);
+        BASE64Decoder d = new BASE64Decoder();
+        byte[] buf = d.decodeBuffer(imageBase64);
+        File file = new File(filePath + "image/" + uuidName);
+        if(!file.exists()) {
+            file.createNewFile();
+        }
+        FileOutputStream out = new FileOutputStream(file);
+        out.write(buf);
+        out.close();
+        return "![](" + fileServerUrl + "/image/" + uuidName + ")";
     }
 
     /**

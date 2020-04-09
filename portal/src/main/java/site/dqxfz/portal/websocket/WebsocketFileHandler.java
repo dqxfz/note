@@ -1,10 +1,8 @@
 package site.dqxfz.portal.websocket;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.util.JsonUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.CloseStatus;
@@ -14,14 +12,11 @@ import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 import site.dqxfz.portal.constant.CommandType;
 import site.dqxfz.portal.pojo.dto.FileDTO;
 import site.dqxfz.portal.pojo.dto.NoteFile;
+import site.dqxfz.portal.pojo.po.Portfolio;
 import site.dqxfz.portal.pojo.vo.EasyUiTreeNode;
 import site.dqxfz.portal.service.FileService;
-import sun.misc.BASE64Decoder;
+import site.dqxfz.portal.service.PortfolioService;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
-import java.nio.ByteBuffer;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
@@ -56,7 +51,7 @@ public class WebsocketFileHandler extends AbstractWebSocketHandler {
                 }
                 case UPLOAD_COMPLETE: {
                     EasyUiTreeNode easyUiTreeNode = fileService.saveFileMetaData(sessionAttributes,fileDTO.getData());
-                    sendMessage(session, CommandType.RESPONSE_COMPLETE, easyUiTreeNode);
+                    sendMessage(session, easyUiTreeNode == null ? CommandType.RESPONSE_ERROR : CommandType.RESPONSE_COMPLETE, easyUiTreeNode);
                     break;
                 }
             }
@@ -65,11 +60,9 @@ public class WebsocketFileHandler extends AbstractWebSocketHandler {
 
     @Override
     protected void handleBinaryMessage(WebSocketSession session, BinaryMessage message) throws Exception {
-        Instant start = Instant.now();
         try{
             fileService.uploadFile(message.getPayload().array(),session.getAttributes());
             sendMessage(session,CommandType.RESPONSE_CONTINUE,null);
-            logger.info("文件片段上传完成，共耗时：" + Duration.between(start,Instant.now()).toMillis() + "ms");
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
         }
@@ -85,6 +78,9 @@ public class WebsocketFileHandler extends AbstractWebSocketHandler {
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-
+        // 清理没有上传完成的文件
+        NoteFile noteFile = (NoteFile) session.getAttributes().get("noteFile");
+        String filePathName = (String) session.getAttributes().get("filePathName");
+        fileService.clearFile(filePathName, noteFile.getUuidName());
     }
 }

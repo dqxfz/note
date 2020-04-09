@@ -10,6 +10,7 @@ public enum CommandType {
     UPLOAD_START("upload_start"),
     UPLOAD_COMPLETE("upload_complete"),
     RESPONSE_CONTINUE("response_continue"),
+    RESPONSE_ERROR("response_error"),
     RESPONSE_COMPLETE("response_complete");
 
     private final String value;

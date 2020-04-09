@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>良笔记</title>
     <link rel="stylesheet" href="../js/easyui/themes/default/easyui.css">
     <link rel="stylesheet" href="../js/easyui/themes/icon.css">
     <link rel="stylesheet" href="../css/typora/gitlab.css">
@@ -45,9 +45,8 @@
             UPLOAD_START: "upload_start",
             UPLOAD_COMPLETE: "upload_complete",
             RESPONSE_CONTINUE: "response_continue",
+            RESPONSE_ERROR: "response_error",
             RESPONSE_COMPLETE: "response_complete",
-            CLOSE_CANCEL: 'close_cancel',
-            CLOSE_SUCCESS: 'close_success',
             UPLOAD: 'upload',
             DOWNLOAD: 'download'
         }
@@ -58,7 +57,7 @@
         // 单位为1MB
         let sizeUnit = 1024 * 1024;
         // 限制分段上传大小为10MB
-        let snippetSizeThreshold = 5 * sizeUnit;
+        let snippetSizeThreshold = 3 * sizeUnit;
         /**
          * 在程序运行时可能会改变值的变量
          */
@@ -71,22 +70,7 @@
             initPortfolio();
             initContent();
         });
-        function cancel(btn) {
-            let processDiv = $(btn).parent();
-            let uuid = processDiv.attr('id');
-            switch (processDiv.attr('eventType')) {
-                case CommandType.UPLOAD:{
-                    let ws = wsArray[uuid];
-                    closeFileUpload(ws, CommandType.CLOSE_CANCEL);
-                    break;
-                }
-                case CommandType.DOWNLOAD: {
-                    xhrArray[uuid].abort();
-                    break;
-                }
-            }
 
-        }
     </script>
 </head>
 <body>

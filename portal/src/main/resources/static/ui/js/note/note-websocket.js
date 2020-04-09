@@ -25,7 +25,7 @@ function transferFileComplete(ws) {
     }
     ws.send(JSON.stringify(fileDTO));
 }
-function closeFileUpload(ws,closeReason) {
+function closeFileUpload(ws) {
     ws.session.process.parent().remove();
     ws.close(1000,"正常关闭");
 }
@@ -49,12 +49,19 @@ function messageCallback(e) {
             transferSnippet(ws);
             file.snippetNum++;
             break;
-        };
+        }
         // 整个上传文件以及保存文件元信息过程完成
         case CommandType.RESPONSE_COMPLETE: {
-            closeFileUpload(ws,'success');
+            closeFileUpload(ws);
             let obj = resp.data;
             appendNode(obj.id,obj.state,obj.text, obj.iconCls, obj.fatherId);
+            break;
+        }
+        // 上传失败
+        case CommandType.RESPONSE_ERROR: {
+            closeFileUpload(ws);
+            $.messager.alert('异常','上传失败','error');
+            break;
         }
     }
 
@@ -75,4 +82,21 @@ function initWebsocket() {
     ws.onmessage = messageCallback;
     ws.onclose = closeCallback;
     return ws;
+}
+
+function cancel(btn) {
+    let processDiv = $(btn).parent();
+    let uuid = processDiv.attr('id');
+    switch (processDiv.attr('eventType')) {
+        case CommandType.UPLOAD:{
+            let ws = wsArray[uuid];
+            closeFileUpload(ws);
+            break;
+        }
+        case CommandType.DOWNLOAD: {
+            xhrArray[uuid].abort();
+            break;
+        }
+    }
+
 }

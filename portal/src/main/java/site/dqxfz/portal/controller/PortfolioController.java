@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import site.dqxfz.portal.pojo.po.Portfolio;
 import site.dqxfz.portal.pojo.vo.EasyUiTreeNode;
+import site.dqxfz.portal.service.FileService;
 import site.dqxfz.portal.service.PortfolioService;
 
 import java.util.List;
@@ -22,9 +23,11 @@ public class PortfolioController {
     private final Logger logger = LogManager.getLogger(this.getClass());
 
     private final PortfolioService portfolioService;
+    private final FileService fileService;
 
-    public PortfolioController(PortfolioService portfolioService) {
+    public PortfolioController(PortfolioService portfolioService, FileService fileService) {
         this.portfolioService = portfolioService;
+        this.fileService = fileService;
     }
 
     /**
@@ -92,10 +95,25 @@ public class PortfolioController {
         return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    /**
+     * 获取文件下载链接
+     * @param id 文件上数据库中的id标识
+     * @return 文件下载链接
+     */
     @GetMapping("/file/download")
     public ResponseEntity downloadFile(String id) {
         try {
             String downloadUrl = portfolioService.getDownloadUrl(id);
+            return new ResponseEntity(downloadUrl, HttpStatus.OK);
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
+        }
+        return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    @PostMapping("/image")
+    public ResponseEntity uploadImage(String base64, String uuidName){
+        try {
+            String downloadUrl = fileService.uploadImage(uuidName, base64);
             return new ResponseEntity(downloadUrl, HttpStatus.OK);
         } catch (Exception e) {
             logger.error(e.getMessage(),e);

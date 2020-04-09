@@ -14,4 +14,6 @@ public interface ContentDao {
     List<Content> listContentByIdList(List<String> idList);
 
     void deleteListByIdList(List<String> contentIdList);
+
+    Content getContentBytext(String uuidName);
 }
