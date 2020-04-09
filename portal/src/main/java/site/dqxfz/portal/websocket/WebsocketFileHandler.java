@@ -7,6 +7,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.util.JsonUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.BinaryMessage;
+import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.AbstractWebSocketHandler;
@@ -50,6 +51,7 @@ public class WebsocketFileHandler extends AbstractWebSocketHandler {
                     NoteFile noteFile = mapper.readValue(fileDTO.getData(), NoteFile.class);
                     sessionAttributes.put("noteFile",noteFile);
                     fileService.createFile(noteFile,sessionAttributes);
+                    sendMessage(session,CommandType.RESPONSE_CONTINUE,null);
                     break;
                 }
                 case UPLOAD_COMPLETE: {
@@ -79,5 +81,10 @@ public class WebsocketFileHandler extends AbstractWebSocketHandler {
         ObjectMapper mapper = new ObjectMapper();
         String response = mapper.writeValueAsString(map);
         session.sendMessage(new TextMessage(response));
+    }
+
+    @Override
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+
     }
 }

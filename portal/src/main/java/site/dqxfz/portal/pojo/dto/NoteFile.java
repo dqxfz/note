@@ -23,6 +23,19 @@ public class NoteFile {
      */
     private String type;
 
+    /**
+     * 文件大小
+     */
+    private String size;
+
+    public String getSize() {
+        return size;
+    }
+
+    public void setSize(String size) {
+        this.size = size;
+    }
+
     public String getFatherId() {
         return fatherId;
     }

@@ -12,19 +12,15 @@
     <script src="../js/easyui/jquery.min.js"></script>
     <script src="../js/easyui/jquery.easyui.min.js"></script>
     <script src="../js/showdown/dist/showdown.js"></script>
-    <script src="../js/websocket/sockjs.min.js"></script>
-    <script src="../js/websocket/stomp.js"></script>
 
-    <script src="../js/note/note-folder.js"></script>
+    <script src="../js/note/note-portfolio.js"></script>
     <script src="../js/note/note-content.js"></script>
     <script src="../js/note/note-websocket.js"></script>
     <style>
-        .process{
+        #process_div{
             position: absolute;
             bottom: 2px;
             right: 2px;
-            /*width: 500px;*/
-            /*height: 50px;*/
             padding: 10px 10px;
             text-align: center;
             background: white;
@@ -44,48 +40,52 @@
         let modelEdit = '#model_edit';
         let markdown = 'markdown';
         let folder = 'folder';
+        let CommandType = {
+            UPLOAD_START: "upload_start",
+            UPLOAD_COMPLETE: "upload_complete",
+            RESPONSE_CONTINUE: "response_continue",
+            RESPONSE_COMPLETE: "response_complete",
+            CLOSE_CANCEL: 'close_cancel',
+            CLOSE_SUCCESS: 'close_success',
+            UPLOAD: 'upload',
+            DOWNLOAD: 'download'
+        }
+        /**
+         * socket相关配置参数
+         */
         let socketUrl = 'ws://' + window.location.host + "/note";
         // 单位为1MB
         let sizeUnit = 1024 * 1024;
         // 限制分段上传大小为10MB
         let snippetSizeThreshold = 5 * sizeUnit;
-
         /**
-         * 后续可能会改变值的变量
+         * 在程序运行时可能会改变值的变量
          */
         let node_text;
         let current_file;
-        // start:正在传输 stop: 停止传输 cancel: 取消传输
-        let uploadState = 'stop';
-
-        // 面向消息的stomp对象
-        let ws, stomp;
-        // 指向当前正在上传的文件对象
-        let uploadingFile;
-        // 当前是否在上传
-        let isUploading = false;
-        let socks = new Object();
-        // 文件元数据
-        let noteFile = {
-            fatherId: null,
-            name: null,
-            uuidName: null,
-            type: null,
-        }
-        // 传输到服务器的数据对象
-        let fileDTO = {
-            // 1: 表示上传开始 2: 表示文件传输完成
-            command: null,
-            // 携带的数据
-            data: null
-        }
-
+        let wsArray = new Object();
+        let xhrArray = new Object();
 
         $(function () {
             initPortfolio();
             initContent();
-            initWebsocket();
         });
+        function cancel(btn) {
+            let processDiv = $(btn).parent();
+            let uuid = processDiv.attr('id');
+            switch (processDiv.attr('eventType')) {
+                case CommandType.UPLOAD:{
+                    let ws = wsArray[uuid];
+                    closeFileUpload(ws, CommandType.CLOSE_CANCEL);
+                    break;
+                }
+                case CommandType.DOWNLOAD: {
+                    xhrArray[uuid].abort();
+                    break;
+                }
+            }
+
+        }
     </script>
 </head>
 <body>
@@ -143,18 +143,12 @@
         <a href="javascript:void(0);" class="easyui-linkbutton" style="float: left" data-options="iconCls:'icon-cancel'" onclick="$('#upload_dlg').dialog('close')">取消</a>
     </div>
 </div>
-<!--<div id="process_dlg" class="easyui-dialog" data-options="closable:false,modal:true,noheader:true"-->
-<!--     style="width: 500px; height: 100px; padding: 10px 10px; text-align: center;">-->
-<!--    <div id="progress_bar" class="easyui-progressbar" data-options="value:10" style="width:430px; height: 20px; float: left"></div>-->
-<!--    <button class="markdown" style="width:20px;height: 20px"></button>-->
-<!--&lt;!&ndash;    <a href="javascript:void(0);" class="markdown" onclick="closeFileUpload('cancel')"></a>&ndash;&gt;-->
-<!--</div>-->
-<div class="process" >
-    <div>
-        <span  style="float: left; width: 70px;overflow:hidden;margin-right: 10px">aasdfsadf89s8df9afafsafa</span>
-        <div class="easyui-progressbar" style="width:350px; height: 20px; float: left; margin-right: 10px"></div>
-        <button class="note-icon-cancel" style="width:20px;height: 20px;border: none;"></button>
-    </div>
+<div id="process_template" style="display: none">
+    <button style="width:20px;height: 20px;border: none;float: left;margin-right: 10px" disabled="disabled"></button>
+    <span  style="float: left; width: 100px; height: 20px; overflow:hidden;margin-right: 10px"></span>
+    <div style="width:350px; height: 20px; float: left; margin-right: 10px"></div>
+    <button class="note-icon-cancel" style="width:20px;height: 20px;border: none;" onclick="cancel(this)"/>
 </div>
+<div id="process_div" />
 </body>
 </html>

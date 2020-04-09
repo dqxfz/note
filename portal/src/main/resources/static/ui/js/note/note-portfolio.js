@@ -121,22 +121,22 @@ function initPortfolio() {
     }).tree('options').url = "/portfolio";
 }
 
-function appendNode(idValue,stateValue, textValue, iconClsVlaue) {
-    let node = $(portfolio).tree('getSelected');
+function appendNode(idValue,stateValue, textValue, iconClsVlaue, fatherId) {
+    let father = $(portfolio).tree('find', fatherId);
     $(portfolio).tree('append', {
-        parent: node.target,
+        parent: father.target,
         data: [{
             id: idValue,
             state: stateValue,
             text: textValue,
-            fatherId: node.id,
+            fatherId: fatherId,
             iconCls: iconClsVlaue
         }]
     });
     // 如果是新加的就编辑名字
     if(idValue == 0) {
-        let node02 = $(portfolio).tree('find', idValue);
-        $(portfolio).tree('beginEdit', node02.target);
+        let node = $(portfolio).tree('find', idValue);
+        $(portfolio).tree('beginEdit', node.target);
     }
 }
 
@@ -145,11 +145,11 @@ function menuHandler(item){
 
     switch(item.name) {
         case 'folder': {
-            appendNode(0,'closed','新文件夹', folder);
+            appendNode(0,'closed','新文件夹', folder, node.id);
             break;
         }
         case 'markdown': {
-            appendNode(0,'open','新文件', markdown);
+            appendNode(0,'open','新文件', markdown, node.id);
             break;
         }
         case 'rename': {
@@ -177,7 +177,6 @@ function menuHandler(item){
             break;
         }
         case 'upload': {
-            noteFile.fatherId = node.id;
             $('#upload_dlg').dialog('open').dialog('setTitle','上传文件');
             break;
         }
@@ -190,7 +189,7 @@ function menuHandler(item){
                 url: downloadUrl,
                 data: {"id": node.id},
                 success: function (obj) {
-                    download(obj,node.text);
+                    downloadFile(obj,node);
                 },
                 error: function () {
                     alert('下载失败');
@@ -200,113 +199,130 @@ function menuHandler(item){
         }
     }
 };
+function generateUUID() {
+    var d = new Date().getTime();
+    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        var r = (d + Math.random() * 16) % 16 | 0;
+        d = Math.floor(d / 16);
+        return (c == 'x' ? r : (r & 0x7 | 0x8)).toString(16);
+    });
+    return uuid;
+};
+function createProcessBar(session) {
+    let process_bar = $('#process_template').clone();
+    process_bar.attr('id',session.noteFile.uuidName);
+    process_bar.attr('eventType',CommandType.UPLOAD);
+    $(process_bar.children('button')[0]).attr('class','note-icon-upload');
+    $(process_bar.children('span')[0]).text(session.file.name);
+    let process = $(process_bar.children('div')[0]);
+    process.progressbar({value:0})
+    $('#process_div').append(process_bar);
+    process_bar.show();
 
+    session.process = process;
+}
 function uploadFile() {
     if($('#note_file').filebox('isValid')) {
+        $('#upload_dlg').dialog('close');
         let uuidName = generateUUID();
-        $('#process_dlg').dialog('open');
-        uploadingFile = $('#note_file').filebox('files')[0];
-        uploadingFile.snippetNum=0;
-
-        noteFile.name = uploadingFile.name;
-        noteFile.type = uploadingFile.type;
-        noteFile.uuidName = generateUUID();
-        // let idx = noteFile.name.lastIndexOf('.');
-        // if(idx != -1) {
-        //     noteFile.uuidName += noteFile.name.substring(idx);
-        // }
-        // 传输文件元信息
-        transferFileMetaData();
-        // 开始传输数据
-        transferSnippet(uploadingFile.snippetNum);
+        let file = $('#note_file').filebox('files')[0];
+        let selectedNode = $(portfolio).tree('getSelected');
+        file.snippetNum = 0;
+        let ws = initWebsocket();
+        wsArray[uuidName] = ws;
+        ws.session = {
+            file: file,
+            noteFile: {
+                fatherId: selectedNode.id,
+                name: file.name,
+                uuidName: uuidName,
+                type: file.type,
+                size: file.size
+            }
+        }
+        // 创建进度条
+        createProcessBar(ws.session);
     }
 }
-// /**
-//  * 获取 blob
-//  * @param  {String} url 目标文件地址
-//  * @return {cb}
-//  */
-// function getBlob(url,cb) {
-//     var xhr = new XMLHttpRequest();
-//     xhr.open('GET', url, true);
-//     xhr.responseType = 'blob';
-//     xhr.onload = function() {
-//         if (xhr.status === 200) {
-//             cb(xhr.response);
-//         }
-//     };
-//     xhr.send();
-// }
-//
-// /**
-//  * 保存
-//  * @param  {Blob} blob
-//  * @param  {String} filename 想要保存的文件名称
-//  */
-// function saveAs(blob, filename) {
-//     if (window.navigator.msSaveOrOpenBlob) {
-//         navigator.msSaveBlob(blob, filename);
-//     } else {
-//         var link = document.createElement('a');
-//         var body = document.querySelector('body');
-//
-//         link.href = window.URL.createObjectURL(blob);
-//         link.download = filename;
-//
-//         // fix Firefox
-//         link.style.display = 'none';
-//         body.appendChild(link);
-//
-//         link.click();
-//         body.removeChild(link);
-//
-//         window.URL.revokeObjectURL(link.href);
-//     };
-// }
-//
-// /**
-//  * 下载
-//  * @param  {String} url 目标文件地址
-//  * @param  {String} filename 想要保存的文件名称
-//  */
-// function download(url, filename) {
-//     getBlob(url, function(blob) {
-//         saveAs(blob, filename);
-//     });
-// };
-
-function getBlob(url) {
-    return new Promise(resolve => {
-        const xhr = new XMLHttpRequest()
-// 避免 200 from disk cache
-        url = url + '?r=${Math.random()}'
-            xhr.open('get',url, true)
-        xhr.responseType = 'blob'
-xhr.onload = () => {
+function updateProgress(e) {
+    let metadata = e.target.metadata;
+    if (e.lengthComputable) {
+        let processNum =Math.floor(e.loaded / e.total * 100 * 100) / 100;
+        metadata.process.progressbar('setValue', processNum);
+    }
+}
+function transferComplete(e) {
+    let xhr = e.target;
     if (xhr.status === 200) {
-        debugger
-        resolve(xhr.response)
+        saveAs(xhr.response, xhr.metadata);
     }
+    xhr.metadata.process.parent().remove();
 }
-        xhr.send()
-    })
+function transferFailed(e) {
+    alert('下载失败');
 }
-function saveAs(blob,filename) {
-    if(window.navigator.msSaveOrOpenBlob){
-        navigator.msSaveBlob(blob,filename)
-    }else{
-        const anchor=document.createElement('a')
-        const body= document.querySelector('body')
-        anchor.href=window.URL.createObjectURL(blob)
-        anchor.download = filename
-        anchor.style.display='none'
-        body.appendChild(anchor)
-        anchor.click()
-        body.removeChild(anchor)
-        window.URL.revokeObjectURL(anchor.href)
+function transferCanceled(e) {
+    e.target.metadata.process.parent().remove();
+}
+/**
+ * 获取 blob
+ * @param  {String} url 目标文件地址
+ * @return {cb}
+ */
+function getBlob(metadata) {
+    let xhr = new XMLHttpRequest();
+    xhrArray[metadata.node.id] = xhr;
+    xhr.metadata = metadata;
+    xhr.open('GET', metadata.url, true);
+    xhr.responseType = 'blob';
+    xhr.onload = transferComplete;
+    xhr.onprogress = updateProgress;
+    xhr.onerror = transferFailed;
+    xhr.onabort = transferCanceled;
+    xhr.send();
+}
+
+/**
+ * 保存
+ * @param  {Blob} blob
+ * @param  {String} filename 想要保存的文件名称
+ */
+function saveAs(blob, filename) {
+    if (window.navigator.msSaveOrOpenBlob) {
+        navigator.msSaveBlob(blob, filename);
+    } else {
+        let link = document.createElement('a');
+        let body = document.querySelector('body');
+
+        link.href = window.URL.createObjectURL(blob);
+        link.download = filename;
+
+        // fix Firefox
+        link.style.display = 'none';
+        body.appendChild(link);
+
+        link.click();
+        body.removeChild(link);
+
+        window.URL.revokeObjectURL(link.href);
+    };
+}
+
+function downloadFile(url,node) {
+    let process_bar = $('#process_template').clone();
+    process_bar.attr('id',node.id);
+    process_bar.attr('eventType',CommandType.DOWNLOAD);
+    $(process_bar.children('button')[0]).attr('class','note-icon-download');
+    $(process_bar.children('span')[0]).text(node.text);
+    let process = $(process_bar.children('div')[0]);
+    process.progressbar({value:0})
+    $('#process_div').append(process_bar);
+    process_bar.show();
+
+    let downloadMetadata = {
+        url: url,
+        node: node,
+        process: process
     }
-}
-async function download(url,newFileName) {
-    const blob= await getBlob(url)
-    saveAs(blob,newFileName)
+    getBlob(downloadMetadata);
 }

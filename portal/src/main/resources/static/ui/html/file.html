@@ -3,6 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <link rel="stylesheet" href="../js/easyui/themes/default/easyui.css">
+    <link rel="stylesheet" href="../js/easyui/themes/icon.css">
+    <link rel="stylesheet" href="../css/note.css">
+    <script src="../js/easyui/jquery.min.js"></script>
+    <script src="../js/easyui/jquery.easyui.min.js"></script>
+    <style>
+        #process_div{
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            /*width: 500px;*/
+            /*height: 50px;*/
+            padding: 10px 10px;
+            text-align: center;
+            background: grey;
+        }
+    </style>
 </head>
 <body>
 <script>
@@ -70,32 +87,86 @@
             saveAs(blob, filename);
         });
     };
-    var url = 'http://file.dqxfz.site/4676c6be-e0f3-4ccf-b459-35fc20282112';
-    fetch(url).then(response => {
-
-        var reader = response.body.getReader();
-        var headers = response.headers;
-        var totalLength = headers.get('Content-Length');
-        var bytesReceived = 0;
-
-        reader.read().then(function processResult(result) {
-            if (result.done) {
-                return;
-            }
-
-            bytesReceived += result.value.length;
-            console.log(`progress: ${bytesReceived / totalLength * 100}%`);
-
-            return reader.read().then(processResult);
-        });
-    });
+    // var url = 'http://file.dqxfz.site/4676c6be-e0f3-4ccf-b459-35fc20282112';
+    // fetch(url).then(response => {
+    //
+    //     var reader = response.body.getReader();
+    //     var headers = response.headers;
+    //     var totalLength = headers.get('Content-Length');
+    //     var bytesReceived = 0;
+    //
+    //     reader.read().then(function processResult(result) {
+    //         if (result.done) {
+    //             return;
+    //         }
+    //
+    //         bytesReceived += result.value.length;
+    //         console.log(`progress: ${bytesReceived / totalLength * 100}%`);
+    //
+    //         return reader.read().then(processResult);
+    //     });
+    // });
+    let i = 0;
+    function increase() {
+        let process_bar = $('#process_template').clone();
+        process_bar.attr('id',i);
+        process_bar.show();
+        let spans = process_bar.children('span');
+        let divs = process_bar.children('div');
+        $(spans[0]).text("asdfafafffff" +
+            "fffffffffffffffffffffff");
+        $(divs[0]).attr('id','id' + i);
+        i++;
+        $(divs[0]).progressbar({
+            value:60
+        })
+        // spans[0].text(i++);
+        $('#process_div').append(process_bar);
+    }
+    function decrease() {
+        let process_bar = $('#1');
+        if(process_bar) {
+            process_bar.remove();
+        }
+    }
+    function up() {
+        let p = $('#1').children('div')[0];
+        $('#1').up = "bb";
+        if(p) {
+            $(p).progressbar('setValue', 50);
+        }
+    }
+    function down() {
+        let btn = $('#1').children('button')[1];
+        $(btn).attr('class','note-icon-download')
+    }
+    function cancel(btn) {
+        let p = $(btn).parent().children('div')[0];
+        console.log($(btn).parent().up);
+        // console.log(b.attr('id'));
+        // b.remove();
+    }
 </script>
 <!--<a href="http://file.dqxfz.site/35d0cdd2-ff33-42ed-e020-48b52299668c" download="md">download</a>-->
-<!--<button  onclick="download('http://file.dqxfz.site/4676c6be-e0f3-4ccf-b459-35fc20282112','md.jpg')">-->
+<!--<button  onclick="download('http://file.dqxfz.site/611dd0ef-c10e-49b7-f211-46dce4861f44','test')"></button>-->
 <!--<button  onclick="fetch('http://file.dqxfz.site/4676c6be-e0f3-4ccf-b459-35fc20282112')">-->
 <!--<p>点击 W3School 的 logo 来下载该图片：<p>-->
 
 <!--    <button  onclick="download('http://file.dqxfz.site/4676c6be-e0f3-4ccf-b459-35fc20282112','md.jpg')">-->
 <!--    </button>-->
+<button onclick="increase()">添加</button>
+<button onclick="decrease()">减少</button>
+<button onclick="up()">+</button>
+<button onclick="down()">-</button>
+<div id="process_template" style="display: none">
+<!--    <button class="note-icon-upload" style="width:20px;height: 20px;border: none; float: left"/>-->
+    <button class="note-icon-upload" style="width:20px;height: 20px;border: none;float: left;margin-right: 10px" disabled="disabled"></button>
+    <span  style="float: left; width: 70px;overflow:hidden;margin-right: 10px">aasdfsadf89s8df9afafsafa</span>
+    <div style="width:350px; height: 20px; float: left; margin-right: 10px"></div>
+    <button class="note-icon-cancel" style="width:20px;height: 20px;border: none;" onclick="cancel(this)"></button>
+
+</div>
+<div id="process_div" >
+</div>
 </body>
 </html>

@@ -69,3 +69,11 @@ html,body {
     background:url('../image/cancel.png') no-repeat;
     background-size:100% 100%;
 }
+.note-icon-download {
+    background:url('../image/download.png') no-repeat;
+    background-size:100% 100%;
+}
+.note-icon-upload {
+    background:url('../image/upload.png') no-repeat;
+    background-size:100% 100%;
+}

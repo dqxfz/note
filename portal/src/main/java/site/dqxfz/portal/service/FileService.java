@@ -11,8 +11,6 @@ import java.util.Map;
  * @date 2020年04月05日
  **/
 public interface FileService {
-    Object uploadFileContent(NoteFile noteFile) throws IOException;
-
     void uploadFile(byte[] array, Map<String, Object> attributes) throws IOException;
 
     void createFile(NoteFile noteFile, Map<String, Object> sessionAttributes) throws IOException;

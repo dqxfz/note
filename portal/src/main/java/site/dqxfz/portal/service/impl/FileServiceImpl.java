@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.DigestUtils;
 import site.dqxfz.portal.constant.IconClsType;
 import site.dqxfz.portal.dao.ContentDao;
 import site.dqxfz.portal.dao.PortfolioDao;
@@ -13,10 +14,7 @@ import site.dqxfz.portal.pojo.po.Portfolio;
 import site.dqxfz.portal.pojo.vo.EasyUiTreeNode;
 import site.dqxfz.portal.service.FileService;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
@@ -41,31 +39,9 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public Object uploadFileContent(NoteFile noteFile) throws IOException {
-//        File file = new File(filePath + noteFile.getUuidName());
-//        if(!file.exists()) {
-//            // 创建文件
-//            file.createNewFile();
-//        }
-//        byte[] bytes = new BASE64Decoder().decodeBuffer(noteFile.getContent());
-//        FileOutputStream outputStream = new FileOutputStream(file, true);
-//        outputStream.write(bytes);
-//        outputStream.close();
-//        // 文件传输完成，保存文件元信息到数据库
-//        if(noteFile.isComplete()) {
-//          upload_complete  EasyUiTreeNode easyUiTreeNode = savePortfolio(noteFile);
-//            return easyUiTreeNode;
-//        } else {
-//            // 返回要传输的下一段
-//            return noteFile.getSnippetNum() + 1;
-//        }
-        return null;
-    }
-
-    @Override
     public void uploadFile(byte[] bytes, Map<String, Object> sessionAttributes) throws IOException {
-        File file = (File) sessionAttributes.get("file");
-        FileOutputStream outputStream = new FileOutputStream(file, true);
+        String filePathName = (String) sessionAttributes.get("filePathName");
+        FileOutputStream outputStream = new FileOutputStream(filePathName, true);
         outputStream.write(bytes);
         outputStream.close();
     }
@@ -74,11 +50,12 @@ public class FileServiceImpl implements FileService {
     public void createFile(NoteFile noteFile, Map<String, Object> sessionAttributes) throws IOException {
         logger.info(noteFile.getName() + "创建时间：" + Instant.now());
         sessionAttributes.put("start", Instant.now());
-        File file = new File(filePath + noteFile.getUuidName());
+        String filePathName = filePath + noteFile.getUuidName();
+        File file = new File(filePathName);
         if(!file.exists()) {
             file.createNewFile();
         }
-        sessionAttributes.put("file", file);
+        sessionAttributes.put("filePathName", filePathName);
     }
 
     @Override
@@ -91,6 +68,12 @@ public class FileServiceImpl implements FileService {
         Duration duration = Duration.between(start, Instant.now());
         logger.info(noteFile.getName() + "结束时间：" + Instant.now());
         logger.info(noteFile.getName() + " 上传完成，共耗时： " + duration.toMillis() + "ms");
+        String filePathName = (String) sessionAttributes.get("filePathName");
+        File file = new File(filePathName);
+        String size = String.valueOf(file.length());
+        System.out.println(size);
+        System.out.println(noteFile.getSize());
+        logger.info(size.equals(noteFile.getSize()));
         return easyUiTreeNode;
     }
 
