@@ -55,7 +55,7 @@ public class WebsocketFileHandler extends AbstractWebSocketHandler {
                     break;
                 }
                 case UPLOAD_COMPLETE: {
-                    EasyUiTreeNode easyUiTreeNode = fileService.saveFileMetaData(sessionAttributes);
+                    EasyUiTreeNode easyUiTreeNode = fileService.saveFileMetaData(sessionAttributes,fileDTO.getData());
                     sendMessage(session, CommandType.RESPONSE_COMPLETE, easyUiTreeNode);
                     break;
                 }

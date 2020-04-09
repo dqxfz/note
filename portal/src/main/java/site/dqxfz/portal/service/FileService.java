@@ -15,5 +15,5 @@ public interface FileService {
 
     void createFile(NoteFile noteFile, Map<String, Object> sessionAttributes) throws IOException;
 
-    EasyUiTreeNode saveFileMetaData(Map<String, Object> sessionAttributes) throws IOException;
+    EasyUiTreeNode saveFileMetaData(Map<String, Object> sessionAttributes, String md5) throws IOException;
 }

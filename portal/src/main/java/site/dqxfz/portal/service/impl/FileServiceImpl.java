@@ -59,21 +59,24 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public EasyUiTreeNode saveFileMetaData(Map<String, Object> sessionAttributes) throws IOException {
+    public EasyUiTreeNode saveFileMetaData(Map<String, Object> sessionAttributes, String md5) throws IOException {
         // 保存文件元信息
         NoteFile noteFile = (NoteFile) sessionAttributes.get("noteFile");
         EasyUiTreeNode easyUiTreeNode = savePortfolio(noteFile);
+        String filePathName = (String) sessionAttributes.get("filePathName");
+        String endFileMd5 = DigestUtils.md5DigestAsHex(new FileInputStream(filePathName));
+        System.out.println(endFileMd5);
+        System.out.println(md5);
+        logger.info(endFileMd5.equals(md5));
+//        File file = new File(filePathName);
+//        String size = String.valueOf(file.length());
+//        System.out.println(size);
+//        System.out.println(noteFile.getSize());
+//        logger.info(size.equals(noteFile.getSize()));
         Instant start = (Instant) sessionAttributes.get("start");
-        logger.info(start);
         Duration duration = Duration.between(start, Instant.now());
         logger.info(noteFile.getName() + "结束时间：" + Instant.now());
         logger.info(noteFile.getName() + " 上传完成，共耗时： " + duration.toMillis() + "ms");
-        String filePathName = (String) sessionAttributes.get("filePathName");
-        File file = new File(filePathName);
-        String size = String.valueOf(file.length());
-        System.out.println(size);
-        System.out.println(noteFile.getSize());
-        logger.info(size.equals(noteFile.getSize()));
         return easyUiTreeNode;
     }
 

@@ -238,7 +238,8 @@ function uploadFile() {
                 uuidName: uuidName,
                 type: file.type,
                 size: file.size
-            }
+            },
+            spark: new SparkMD5.ArrayBuffer()
         }
         // 创建进度条
         createProcessBar(ws.session);
