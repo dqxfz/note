@@ -1,6 +1,6 @@
 package site.dqxfz.portal.service;
 
-import site.dqxfz.portal.pojo.dto.NoteFile;
+import site.dqxfz.portal.pojo.vo.NoteFile;
 import site.dqxfz.portal.pojo.vo.EasyUiTreeNode;
 
 import java.io.IOException;

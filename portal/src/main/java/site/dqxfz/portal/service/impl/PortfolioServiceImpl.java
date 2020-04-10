@@ -6,7 +6,6 @@ import org.springframework.util.StringUtils;
 import site.dqxfz.portal.constant.IconClsType;
 import site.dqxfz.portal.dao.ContentDao;
 import site.dqxfz.portal.dao.PortfolioDao;
-import site.dqxfz.portal.dao.UserDao;
 import site.dqxfz.portal.pojo.po.Content;
 import site.dqxfz.portal.pojo.po.Portfolio;
 import site.dqxfz.portal.pojo.vo.EasyUiTreeNode;
@@ -29,12 +28,10 @@ public class PortfolioServiceImpl implements PortfolioService {
     @Value("${file.server.url}")
     private String fileServerUrl;
     private final PortfolioDao portfolioDao;
-    private final UserDao userDao;
     private final ContentDao contentDao;
 
-    public PortfolioServiceImpl(PortfolioDao portfolioDao, UserDao userDao, ContentDao contentDao) {
+    public PortfolioServiceImpl(PortfolioDao portfolioDao, ContentDao contentDao) {
         this.portfolioDao = portfolioDao;
-        this.userDao = userDao;
         this.contentDao = contentDao;
     }
 

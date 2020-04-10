@@ -33,11 +33,5 @@ public class AppWebInitializer implements WebApplicationInitializer {
         // 添加FormContentFilter，使spring mvc能够接受put请求和delete请求
         FilterRegistration.Dynamic FormContentFilter = servletContext.addFilter("formContentFilter", new FormContentFilter());
         FormContentFilter.addMappingForUrlPatterns(null,false,"/*");
-        // 添加编码过滤器
-        CharacterEncodingFilter encodingFilter = new CharacterEncodingFilter();
-        encodingFilter.setEncoding("UTF-8");
-        encodingFilter.setForceEncoding(true);
-        FilterRegistration.Dynamic characterEncodingFilter = servletContext.addFilter("characterEncodingFilter", encodingFilter);
-        characterEncodingFilter.addMappingForUrlPatterns(null,false,"/*");
     }
 }

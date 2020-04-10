@@ -1,4 +1,4 @@
-package site.dqxfz.portal.websocket;
+package site.dqxfz.portal.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
@@ -10,15 +10,11 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 import site.dqxfz.portal.constant.CommandType;
-import site.dqxfz.portal.pojo.dto.FileDTO;
-import site.dqxfz.portal.pojo.dto.NoteFile;
-import site.dqxfz.portal.pojo.po.Portfolio;
+import site.dqxfz.portal.pojo.vo.FileDTO;
+import site.dqxfz.portal.pojo.vo.NoteFile;
 import site.dqxfz.portal.pojo.vo.EasyUiTreeNode;
 import site.dqxfz.portal.service.FileService;
-import site.dqxfz.portal.service.PortfolioService;
 
-import java.time.Duration;
-import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 

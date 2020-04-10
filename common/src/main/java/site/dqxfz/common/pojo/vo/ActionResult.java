@@ -1,4 +1,4 @@
-package site.dqxfz.portal.pojo.vo;
+package site.dqxfz.common.pojo.vo;
 
 /**
  * @Description: 响应数据格式

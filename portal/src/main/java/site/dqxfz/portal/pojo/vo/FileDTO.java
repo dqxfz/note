@@ -1,4 +1,4 @@
-package site.dqxfz.portal.pojo.dto;
+package site.dqxfz.portal.pojo.vo;
 
 import site.dqxfz.portal.constant.CommandType;
 

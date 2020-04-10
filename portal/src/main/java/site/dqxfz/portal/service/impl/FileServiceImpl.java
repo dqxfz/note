@@ -8,7 +8,7 @@ import org.springframework.util.DigestUtils;
 import site.dqxfz.portal.constant.IconClsType;
 import site.dqxfz.portal.dao.ContentDao;
 import site.dqxfz.portal.dao.PortfolioDao;
-import site.dqxfz.portal.pojo.dto.NoteFile;
+import site.dqxfz.portal.pojo.vo.NoteFile;
 import site.dqxfz.portal.pojo.po.Content;
 import site.dqxfz.portal.pojo.po.Portfolio;
 import site.dqxfz.portal.pojo.vo.EasyUiTreeNode;

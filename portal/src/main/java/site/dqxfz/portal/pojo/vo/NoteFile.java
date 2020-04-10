@@ -1,4 +1,4 @@
-package site.dqxfz.portal.pojo.dto;
+package site.dqxfz.portal.pojo.vo;
 
 /**
  * websocket上传文件元信息格式
