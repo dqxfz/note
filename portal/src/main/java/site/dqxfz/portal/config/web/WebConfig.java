@@ -6,7 +6,7 @@ import org.springframework.format.FormatterRegistry;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.*;
-import site.dqxfz.portal.converter.IconClsTypeConverter;
+import site.dqxfz.portal.converter.IconClsConverter;
 import site.dqxfz.portal.interceptor.LoginInterceptor;
 
 import java.nio.charset.StandardCharsets;
@@ -43,7 +43,7 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addFormatters(FormatterRegistry registry) {
-        registry.addConverter(new IconClsTypeConverter());
+        registry.addConverter(new IconClsConverter());
     }
 
     @Override
