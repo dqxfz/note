@@ -1,7 +1,5 @@
 package site.dqxfz.portal.constant;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import org.springframework.lang.Nullable;
 
@@ -10,7 +8,7 @@ import org.springframework.lang.Nullable;
  * @Author wengyang
  * @Date 2020年04月2日
  **/
-public enum IconClsType {
+public enum IconClsEnum {
     /**
      * markdown文件
      */
@@ -46,7 +44,7 @@ public enum IconClsType {
 
     private final String value;
 
-    IconClsType(String value) {
+    IconClsEnum(String value) {
         this.value = value;
     }
 
@@ -60,20 +58,20 @@ public enum IconClsType {
         return this.value;
     }
     /**
-     * 根据typeValue获取对应的枚举类
-     * @param iconCls 将要获取枚举类的值
-     * @return 返回value为typeValue的枚举类，如果为空，则抛出异常IllegalArgumentException
+     * 根据iconClsValue获取对应的枚举类
+     * @param iconClsValue 将要获取枚举类的值
+     * @return 返回value为iconClsValue的枚举类，如果为空，则抛出异常IllegalArgumentException
      */
-    public static IconClsType getValueOf(String iconCls) {
-        IconClsType iconClsType = resolve(iconCls);
-        return iconClsType;
+    public static IconClsEnum getValueOf(String iconClsValue) {
+        IconClsEnum iconCls = resolve(iconClsValue);
+        return iconCls;
     }
 
     @Nullable
-    public static IconClsType resolve(String typeValue) {
-        for (IconClsType iconClsType : values()) {
-            if (iconClsType.value.equals(typeValue)) {
-                return iconClsType;
+    public static IconClsEnum resolve(String iconClsValue) {
+        for (IconClsEnum iconCls : values()) {
+            if (iconCls.value.equals(iconClsValue)) {
+                return iconCls;
             }
         }
         return null;

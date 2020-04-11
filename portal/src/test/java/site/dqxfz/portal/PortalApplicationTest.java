@@ -4,28 +4,26 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.bson.Document;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.core.convert.converter.Converter;
-import org.springframework.core.io.Resource;
 import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import site.dqxfz.common.util.ResourceUtils;
 import site.dqxfz.portal.config.RootConfig;
-import site.dqxfz.portal.constant.CommandType;
-import site.dqxfz.portal.constant.IconClsType;
+import site.dqxfz.portal.config.web.WebConfig;
+import site.dqxfz.portal.constant.CommandEnum;
+import site.dqxfz.portal.constant.IconClsEnum;
 import site.dqxfz.portal.pojo.po.Portfolio;
-import site.dqxfz.portal.service.ContentService;
+import site.dqxfz.portal.pojo.po.User;
 import site.dqxfz.portal.service.impl.ContentServiceImpl;
 
-import java.io.*;
+import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -36,8 +34,8 @@ import java.util.concurrent.TimeUnit;
  * @Author wengyang
  * @Date 2020年04月02日
  **/
-//@RunWith(SpringJUnit4ClassRunner.class)
-//@ContextConfiguration(classes = RootConfig.class)
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = RootConfig.class)
 public class PortalApplicationTest {
     Logger logger = LogManager.getLogger(this.getClass());
     @Autowired
@@ -48,12 +46,15 @@ public class PortalApplicationTest {
 
     @Autowired
     ContentServiceImpl contentService;
+
+    @Autowired
+    RedisTemplate<String, User> redisTemplate;
     /**
      * 初始化数据库
      */
     @Test
     public void test01() throws IOException {
-        Portfolio portfolio = mongoOperations.insert(new Portfolio("我的文件夹", null, IconClsType.FOLDER,"wy"));
+        Portfolio portfolio = mongoOperations.insert(new Portfolio("我的文件夹", null, IconClsEnum.FOLDER,"wy"));
         logger.info(portfolio);
 
     }
@@ -66,21 +67,9 @@ public class PortalApplicationTest {
     }
     @Test
     public void test03() throws IOException {
-        Resource template = ac.getResource("classpath:static/template/markdown.html");
-        InputStream inputStream = template.getInputStream();
-        InputStreamReader in = new InputStreamReader(inputStream);
-        BufferedReader reader = new BufferedReader(in);
-        StringBuffer buffer = new StringBuffer();
-        String line = reader.readLine(); // 读取第一行
-        while (line != null) { // 如果 line 为空说明读完了
-            buffer.append(line); // 将读到的内容添加到 buffer 中
-            buffer.append("\n"); // 添加换行符
-            line = reader.readLine(); // 读取下一行
-        }
-        inputStream.close();
-        in.close();
-        reader.close();
-        logger.info(buffer.toString());
+        String sourcePath = "static/template/video01.html";
+        String resource = ResourceUtils.getResource(ac, sourcePath);
+        logger.info(resource);
     }
     @Test
     public void test04() throws InterruptedException {
@@ -103,10 +92,19 @@ public class PortalApplicationTest {
     @Test
     public void test06() throws JsonProcessingException {
         Map<String,Object> map = new HashMap(2);
-        map.put("responseCode", CommandType.RESPONSE_CONTINUE);
+        map.put("responseCode", CommandEnum.RESPONSE_CONTINUE);
         ObjectMapper mapper = new ObjectMapper();
         String response = mapper.writeValueAsString(map);
         logger.info(response);
+    }
+    @Test
+    public void test07(){
+        redisTemplate.boundValueOps("user").set(new User("1","2","3"));
+    }
+    @Test
+    public void test08(){
+        User user = redisTemplate.boundValueOps("user").get();
+        logger.info(user);
     }
 
 }

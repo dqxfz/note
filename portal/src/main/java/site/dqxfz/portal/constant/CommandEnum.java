@@ -6,7 +6,7 @@ import org.springframework.lang.Nullable;
  * @author WENG Yang
  * @date 2020年04月08日
  **/
-public enum CommandType {
+public enum CommandEnum {
     UPLOAD_START("upload_start"),
     UPLOAD_COMPLETE("upload_complete"),
     RESPONSE_CONTINUE("response_continue"),
@@ -15,26 +15,26 @@ public enum CommandType {
 
     private final String value;
 
-    CommandType(String value) {
+    CommandEnum(String value) {
         this.value = value;
     }
 
     public String getValue() {
         return value;
     }
-    public static CommandType getValueOf(String typeValue) {
-        CommandType commandType = resolve(typeValue);
-        if (commandType == null) {
-            throw new IllegalArgumentException("No matching constant for [" + typeValue + "]");
+    public static CommandEnum getValueOf(String commandValue) {
+        CommandEnum command = resolve(commandValue);
+        if (command == null) {
+            throw new IllegalArgumentException("No matching constant for [" + commandValue + "]");
         }
-        return commandType;
+        return command;
     }
 
     @Nullable
-    public static CommandType resolve(String typeValue) {
-        for (CommandType commandType : values()) {
-            if (commandType.value.equals(typeValue)) {
-                return commandType;
+    public static CommandEnum resolve(String commandValue) {
+        for (CommandEnum command : values()) {
+            if (command.value.equals(commandValue)) {
+                return command;
             }
         }
         return null;

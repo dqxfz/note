@@ -3,37 +3,7 @@ function initContent() {
     changeEditState(false);
     convert();
     paseInit();
-    // cursorInit();
 }
-
-// function cursorInit() {
-//     $.fn.extend({
-//         insertAtCaret: function(myValue){
-//             let $t=$(this)[0];
-//             if (document.selection) {
-//                 this.focus();
-//                 sel = document.selection.createRange();
-//                 sel.text = myValue;
-//                 this.focus();
-//             }
-//             else
-//             if ($t.selectionStart || $t.selectionStart == '0') {
-//                 let startPos = $t.selectionStart;
-//                 let endPos = $t.selectionEnd;
-//                 let scrollTop = $t.scrollTop;
-//                 $t.value = $t.value.substring(0, startPos) + myValue + $t.value.substring(endPos, $t.value.length);
-//                 this.focus();
-//                 $t.selectionStart = startPos + myValue.length;
-//                 $t.selectionEnd = startPos + myValue.length;
-//                 $t.scrollTop = scrollTop;
-//             }
-//             else {
-//                 this.value += myValue;
-//                 this.focus();
-//             }
-//         }
-//     });
-// }
 
 function changeEditState(edit) {
     if(edit) {
@@ -58,7 +28,7 @@ function displayContent(node) {
         current_file = node.id;
         changeEditState(false);
         $.ajax({
-            url: "/content",
+            url: "/content.do",
             data: {"id": node.id, "iconCls": node.iconCls},
             success: function (obj) {
                 $(noteTitle).text(node.text);
@@ -128,7 +98,7 @@ function uploadImage(base64) {
     };
     $.ajax({
         type : "post",
-        url : "/portfolio/image",
+        url : "/portfolio/image.do",
         data : data,
         success : function(obj) {
             insertAtCursor(document.getElementById('note_content'),obj);
@@ -154,7 +124,7 @@ function buttonHandler(btn) {
         switch (btn) {
             case "save": {
                 $.ajax({
-                    url: "/content",
+                    url: "/content.do",
                     method: 'put',
                     data: {id: node.id, text: $(noteContent).val()},
                     success: function () {

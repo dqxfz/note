@@ -1,6 +1,6 @@
 package site.dqxfz.portal.pojo.po;
 
-import site.dqxfz.portal.constant.IconClsType;
+import site.dqxfz.portal.constant.IconClsEnum;
 
 /**
  * @Description: 文件或者文件夹所对应的实体类
@@ -12,13 +12,13 @@ public class Portfolio {
     private String id;
     private String name;
     private String type;
-    private IconClsType iconCls;
+    private IconClsEnum iconCls;
     private String fatherId;
 
     public Portfolio() {
     }
 
-    public Portfolio(String name, String type, IconClsType iconCls, String fatherId) {
+    public Portfolio(String name, String type, IconClsEnum iconCls, String fatherId) {
         this.name = name;
         this.type = type;
         this.iconCls = iconCls;
@@ -49,11 +49,11 @@ public class Portfolio {
         this.type = type;
     }
 
-    public IconClsType getIconCls() {
+    public IconClsEnum getIconCls() {
         return iconCls;
     }
 
-    public void setIconCls(IconClsType iconCls) {
+    public void setIconCls(IconClsEnum iconCls) {
         this.iconCls = iconCls;
     }
 

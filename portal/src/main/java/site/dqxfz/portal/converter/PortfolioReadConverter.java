@@ -2,7 +2,7 @@ package site.dqxfz.portal.converter;
 
 import org.bson.Document;
 import org.springframework.core.convert.converter.Converter;
-import site.dqxfz.portal.constant.IconClsType;
+import site.dqxfz.portal.constant.IconClsEnum;
 import site.dqxfz.portal.pojo.po.Portfolio;
 
 /**
@@ -18,7 +18,7 @@ public class PortfolioReadConverter implements Converter<Document, Portfolio> {
         portfolio.setName(document.getString("name"));
         portfolio.setType(document.getString("type"));
         // 根据枚举类型属性值转换为对应的枚举类
-        portfolio.setIconCls(IconClsType.getValueOf(document.getString("iconCls")));
+        portfolio.setIconCls(IconClsEnum.getValueOf(document.getString("iconCls")));
         portfolio.setFatherId(document.getString("fatherId"));
         return portfolio;
     }

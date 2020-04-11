@@ -1,41 +1,33 @@
-package site.dqxfz.sso.interceptor;
+package site.dqxfz.portal.interceptor;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
+import site.dqxfz.portal.service.SsoService;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Arrays;
 
 /**
+ * 权限拦截器，用于验证用户是否登录
  * @author WENG Yang
  * @date 2020年04月10日
  **/
+@Component
 public class LoginInterceptor implements HandlerInterceptor {
     private final Logger logger = LogManager.getLogger(this.getClass());
+    private final SsoService ssoService;
+
+    public LoginInterceptor(SsoService ssoService) {
+        this.ssoService = ssoService;
+    }
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        String name = request.getParameter("name");
-        Cookie[] cookies = request.getCookies();
-        if(cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals("cookiename") && cookie.getValue().equals("cookieValue")) {
-                    logger.info("有cookie了");
-                    break;
-                }
-            }
-        }
-        if("wy".equals(name)) {
-            logger.info("设置了cookie");
-            Cookie cookie = new Cookie("cookiename","cookieValue");
-            cookie.setDomain("a.common.site");
-//            cookie.setPath("/");
-            response.addCookie(cookie);
-        }
-        return false;
+        boolean isLogin = ssoService.isLogin(request,response);
+        return isLogin;
     }
 
     @Override

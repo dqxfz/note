@@ -25,9 +25,19 @@ function transferFileComplete(ws) {
     }
     ws.send(JSON.stringify(fileDTO));
 }
-function closeFileUpload(ws) {
-    ws.session.process.parent().remove();
+function closeFileUpload(ws,commandType) {
     ws.close(1000,"正常关闭");
+    ws.session.process.parent().remove();
+    switch (commandType) {
+        case CommandType.RESPONSE_ERROR: {
+            $.messager.alert('异常','上传失败','error');
+            break;
+        }
+        case CommandType.CONNECT_ERROR: {
+            $.messager.alert('异常','连接中断','error');
+            break;
+        }
+    }
 }
 
 function messageCallback(e) {
@@ -52,15 +62,14 @@ function messageCallback(e) {
         }
         // 整个上传文件以及保存文件元信息过程完成
         case CommandType.RESPONSE_COMPLETE: {
-            closeFileUpload(ws);
+            closeFileUpload(ws,CommandType.RESPONSE_COMPLETE);
             let obj = resp.data;
             appendNode(obj.id,obj.state,obj.text, obj.iconCls, obj.fatherId);
             break;
         }
         // 上传失败
         case CommandType.RESPONSE_ERROR: {
-            closeFileUpload(ws);
-            $.messager.alert('异常','上传失败','error');
+            closeFileUpload(ws,CommandType.RESPONSE_ERROR);
             break;
         }
     }
@@ -70,6 +79,9 @@ function messageCallback(e) {
 
 function closeCallback(e) {
     console.log(e);
+}
+function errorCallback(e) {
+    closeFileUpload(e.target, CommandType.CONNECT_ERROR);
 }
 function openCallback(e) {
     // 传输文件元信息
@@ -81,6 +93,7 @@ function initWebsocket() {
     ws.onopen = openCallback;
     ws.onmessage = messageCallback;
     ws.onclose = closeCallback;
+    ws.onerror = errorCallback;
     return ws;
 }
 

@@ -1,6 +1,6 @@
 package site.dqxfz.portal.pojo.vo;
 
-import site.dqxfz.portal.constant.IconClsType;
+import site.dqxfz.portal.constant.IconClsEnum;
 
 /**
  * @Description: 返回给EasyUI Tree控件的数据类
@@ -11,13 +11,13 @@ public class EasyUiTreeNode {
     private String id;
     private String text;
     private String state;
-    private IconClsType iconCls;
+    private IconClsEnum iconCls;
     private String fatherId;
 
     public EasyUiTreeNode() {
     }
 
-    public EasyUiTreeNode(String id, String text, String state, IconClsType iconCls, String fatherId) {
+    public EasyUiTreeNode(String id, String text, String state, IconClsEnum iconCls, String fatherId) {
         this.id = id;
         this.text = text;
         this.state = state;
@@ -49,11 +49,11 @@ public class EasyUiTreeNode {
         this.state = state;
     }
 
-    public IconClsType getIconCls() {
+    public IconClsEnum getIconCls() {
         return iconCls;
     }
 
-    public void setIconCls(IconClsType iconCls) {
+    public void setIconCls(IconClsEnum iconCls) {
         this.iconCls = iconCls;
     }
 

@@ -56,7 +56,7 @@ function changeMenuState(node) {
 
 function addPortfolio(node) {
     $.ajax({
-        url: "/portfolio",
+        url: "/portfolio.do",
         method: 'post',
         data: {"fatherId":node.fatherId,"name":node.text,"iconCls":node.iconCls},
         success: function (obj) {
@@ -71,7 +71,7 @@ function addPortfolio(node) {
 
 function renamePortfolio(node) {
     $.ajax({
-        url: "/portfolio",
+        url: "/portfolio.do",
         method: 'put',
         data: {"id":node.id,"name":node.text},
         success: function () {
@@ -91,7 +91,7 @@ function renamePortfolio(node) {
 
 function initPortfolio() {
     $(portfolio).tree({
-        url: '/portfolio?id=wy',
+        url: '/portfolio.do?id=wy',
         method: 'get',
         onContextMenu: function(e, node){
             displayContent(node);
@@ -118,7 +118,7 @@ function initPortfolio() {
         onClick: function(node){
             displayContent(node);
         }
-    }).tree('options').url = "/portfolio";
+    }).tree('options').url = "/portfolio.do";
 }
 
 function appendNode(idValue,stateValue, textValue, iconClsVlaue, fatherId) {
@@ -163,7 +163,7 @@ function menuHandler(item){
                 text: ''
             });
             $.ajax({
-                url: "/portfolio",
+                url: "/portfolio.do",
                 method: "delete",
                 data: {"id": node.id},
                 success: function () {
@@ -181,9 +181,9 @@ function menuHandler(item){
             break;
         }
         case 'download': {
-            let downloadUrl = '/portfolio/note/download';
+            let downloadUrl = '/portfolio/note/download.do';
             if(node.iconCls != markdown) {
-                downloadUrl = '/portfolio/file/download'
+                downloadUrl = '/portfolio/file/download.do'
             }
             $.ajax({
                 url: downloadUrl,

@@ -1,32 +1,15 @@
-package site.dqxfz.portal.config;
+package site.dqxfz.portal.config.web;
 
-import com.mongodb.MongoClient;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.format.FormatterRegistry;
-import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.web.servlet.ViewResolver;
-import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.spring5.SpringTemplateEngine;
-import org.thymeleaf.spring5.templateresolver.SpringResourceTemplateResolver;
-import org.thymeleaf.spring5.view.ThymeleafViewResolver;
-import org.thymeleaf.templatemode.TemplateMode;
-import site.dqxfz.portal.constant.IconClsType;
+import org.springframework.web.servlet.config.annotation.*;
 import site.dqxfz.portal.converter.IconClsTypeConverter;
+import site.dqxfz.portal.interceptor.LoginInterceptor;
 
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -35,12 +18,22 @@ import java.util.List;
  * @Date 2020年04月01日
  **/
 @EnableWebMvc
-@ComponentScan({"site.dqxfz.portal.controller"})
+@ComponentScan({
+        "site.dqxfz.portal.controller",
+        "site.dqxfz.portal.config.web",
+        "site.dqxfz.portal.interceptor"})
+@PropertySource({"classpath:properties/config.properties"})
 public class WebConfig implements WebMvcConfigurer {
+    private final LoginInterceptor loginInterceptor;
+
+    public WebConfig(LoginInterceptor loginInterceptor) {
+        this.loginInterceptor = loginInterceptor;
+    }
+
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/**")
-                .addResourceLocations("classpath:/static/");
+                .addResourceLocations("classpath:static/ui/");
     }
 
     @Override
@@ -58,5 +51,10 @@ public class WebConfig implements WebMvcConfigurer {
         MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter = new MappingJackson2HttpMessageConverter();
         mappingJackson2HttpMessageConverter.setDefaultCharset(StandardCharsets.UTF_8);
         converters.add(mappingJackson2HttpMessageConverter);
+    }
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        // Ant path匹配规则
+        registry.addInterceptor(loginInterceptor).addPathPatterns("/**/*.do","/html/**");
     }
 }

@@ -1,7 +1,5 @@
 package site.dqxfz.portal.pojo.vo;
 
-import site.dqxfz.portal.constant.CommandType;
-
 /**
  * websocket上传消息内容格式
  * @author WENG Yang

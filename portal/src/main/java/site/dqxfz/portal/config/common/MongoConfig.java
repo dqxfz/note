@@ -1,4 +1,4 @@
-package site.dqxfz.portal.config;
+package site.dqxfz.portal.config.common;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
@@ -21,7 +21,7 @@ import site.dqxfz.portal.converter.PortfolioWriteConverter;
 import java.util.*;
 
 /**
- * @Description:
+ * @Description: Mogo配置
  * @Author wengyang
  * @Date 2020年04月03日
  **/

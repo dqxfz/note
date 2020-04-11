@@ -3,7 +3,7 @@ package site.dqxfz.portal.service.impl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import site.dqxfz.portal.constant.IconClsType;
+import site.dqxfz.portal.constant.IconClsEnum;
 import site.dqxfz.portal.dao.ContentDao;
 import site.dqxfz.portal.dao.PortfolioDao;
 import site.dqxfz.portal.pojo.po.Content;
@@ -42,7 +42,7 @@ public class PortfolioServiceImpl implements PortfolioService {
                 .map(portfolio -> new EasyUiTreeNode(
                         portfolio.getId(),
                         portfolio.getName(),
-                        portfolio.getIconCls().equals(IconClsType.FOLDER) ? "closed" : "open",
+                        portfolio.getIconCls().equals(IconClsEnum.FOLDER) ? "closed" : "open",
                         portfolio.getIconCls(),
                         portfolio.getFatherId())
                 )
@@ -54,7 +54,7 @@ public class PortfolioServiceImpl implements PortfolioService {
     public Portfolio savePortfolio(Portfolio portfolio) {
         Portfolio result = portfolioDao.savePortfolio(portfolio);
         // 如果是创建markdown文件，则初始化markdown文件的内容
-        if (result.getIconCls() == IconClsType.MARKDOWN) {
+        if (result.getIconCls() == IconClsEnum.MARKDOWN) {
             contentDao.saveContent(new Content(result.getId(), null));
         }
         return result;

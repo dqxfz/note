@@ -5,7 +5,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
-import site.dqxfz.portal.constant.IconClsType;
+import site.dqxfz.portal.constant.IconClsEnum;
 import site.dqxfz.portal.dao.ContentDao;
 import site.dqxfz.portal.dao.PortfolioDao;
 import site.dqxfz.portal.pojo.vo.NoteFile;
@@ -113,19 +113,19 @@ public class FileServiceImpl implements FileService {
     private EasyUiTreeNode savePortfolio(NoteFile noteFile) {
         String type = noteFile.getType();
         int endIndex = type.indexOf('/');
-        IconClsType iconClsType = null;
+        IconClsEnum iconCls = null;
         if(endIndex != -1) {
-            iconClsType = IconClsType.getValueOf(type.substring(0, endIndex));
+            iconCls = IconClsEnum.getValueOf(type.substring(0, endIndex));
         }
-        if(iconClsType == null) {
-            iconClsType = IconClsType.UNKNOWN;
-            type = iconClsType.getValue();
+        if(iconCls == null) {
+            iconCls = IconClsEnum.UNKNOWN;
+            type = iconCls.getValue();
         }
         // 保存元信息到数据库
         Portfolio portfolio = portfolioDao.savePortfolio(new Portfolio(
                 noteFile.getName(),
                 type,
-                iconClsType,
+                iconCls,
                 noteFile.getFatherId()
         ));
         // 保存文件的地址到数据库
@@ -133,7 +133,7 @@ public class FileServiceImpl implements FileService {
         EasyUiTreeNode easyUiTreeNode = new EasyUiTreeNode(
                 portfolio.getId(),
                 portfolio.getName(),
-                portfolio.getIconCls().equals(IconClsType.FOLDER) ? "closed" : "open",
+                portfolio.getIconCls().equals(IconClsEnum.FOLDER) ? "closed" : "open",
                 portfolio.getIconCls(),
                 portfolio.getFatherId());
         return easyUiTreeNode;

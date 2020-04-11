@@ -9,7 +9,7 @@ import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.AbstractWebSocketHandler;
-import site.dqxfz.portal.constant.CommandType;
+import site.dqxfz.portal.constant.CommandEnum;
 import site.dqxfz.portal.pojo.vo.FileDTO;
 import site.dqxfz.portal.pojo.vo.NoteFile;
 import site.dqxfz.portal.pojo.vo.EasyUiTreeNode;
@@ -37,17 +37,17 @@ public class WebsocketFileHandler extends AbstractWebSocketHandler {
         FileDTO fileDTO = mapper.readValue(message.getPayload(), FileDTO.class);
         if(fileDTO != null) {
             Map<String, Object> sessionAttributes = session.getAttributes();
-            switch (CommandType.getValueOf(fileDTO.getCommand())) {
+            switch (CommandEnum.getValueOf(fileDTO.getCommand())) {
                 case UPLOAD_START: {
                     NoteFile noteFile = mapper.readValue(fileDTO.getData(), NoteFile.class);
                     sessionAttributes.put("noteFile",noteFile);
                     fileService.createFile(noteFile,sessionAttributes);
-                    sendMessage(session,CommandType.RESPONSE_CONTINUE,null);
+                    sendMessage(session, CommandEnum.RESPONSE_CONTINUE,null);
                     break;
                 }
                 case UPLOAD_COMPLETE: {
                     EasyUiTreeNode easyUiTreeNode = fileService.saveFileMetaData(sessionAttributes,fileDTO.getData());
-                    sendMessage(session, easyUiTreeNode == null ? CommandType.RESPONSE_ERROR : CommandType.RESPONSE_COMPLETE, easyUiTreeNode);
+                    sendMessage(session, easyUiTreeNode == null ? CommandEnum.RESPONSE_ERROR : CommandEnum.RESPONSE_COMPLETE, easyUiTreeNode);
                     break;
                 }
             }
@@ -58,14 +58,14 @@ public class WebsocketFileHandler extends AbstractWebSocketHandler {
     protected void handleBinaryMessage(WebSocketSession session, BinaryMessage message) throws Exception {
         try{
             fileService.uploadFile(message.getPayload().array(),session.getAttributes());
-            sendMessage(session,CommandType.RESPONSE_CONTINUE,null);
+            sendMessage(session, CommandEnum.RESPONSE_CONTINUE,null);
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
         }
     }
-    private void sendMessage(WebSocketSession session, CommandType commandType, Object data) throws Exception {
+    private void sendMessage(WebSocketSession session, CommandEnum command, Object data) throws Exception {
         Map<String,Object> map = new HashMap(2);
-        map.put("command", commandType.getValue());
+        map.put("command", command.getValue());
         map.put("data", data);
         ObjectMapper mapper = new ObjectMapper();
         String response = mapper.writeValueAsString(map);

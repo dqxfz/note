@@ -3,13 +3,9 @@ package site.dqxfz.portal.config;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
-import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.filter.FormContentFilter;
-import org.springframework.web.filter.HiddenHttpMethodFilter;
-import org.springframework.web.filter.HttpPutFormContentFilter;
 import org.springframework.web.servlet.DispatcherServlet;
-import site.dqxfz.portal.config.RootConfig;
-import site.dqxfz.portal.config.WebConfig;
+import site.dqxfz.portal.config.web.WebConfig;
 
 import javax.servlet.*;
 
@@ -29,7 +25,8 @@ public class AppWebInitializer implements WebApplicationInitializer {
         webContext.register(WebConfig.class);
         ServletRegistration.Dynamic dispatcher = servletContext.addServlet("dispatcher", new DispatcherServlet(webContext));
         dispatcher.setLoadOnStartup(1);
-        dispatcher.addMapping("/");
+        // 允许通过以'.do'结尾的请求和'/ui/'开头的请求
+        dispatcher.addMapping("*.do","/ui/*","/note");
         // 添加FormContentFilter，使spring mvc能够接受put请求和delete请求
         FilterRegistration.Dynamic FormContentFilter = servletContext.addFilter("formContentFilter", new FormContentFilter());
         FormContentFilter.addMappingForUrlPatterns(null,false,"/*");

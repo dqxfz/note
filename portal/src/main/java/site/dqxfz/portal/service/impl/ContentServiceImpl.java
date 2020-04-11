@@ -2,11 +2,9 @@ package site.dqxfz.portal.service.impl;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.Context;
-import site.dqxfz.portal.constant.IconClsType;
+import site.dqxfz.common.util.ResourceUtils;
+import site.dqxfz.portal.constant.IconClsEnum;
 import site.dqxfz.portal.dao.ContentDao;
 import site.dqxfz.portal.pojo.po.Content;
 import site.dqxfz.portal.service.ContentService;
@@ -23,24 +21,25 @@ public class ContentServiceImpl implements ContentService {
     private String fileServerUrl;
 
     private final ApplicationContext ac;
-    private final TemplateEngine templateEngine;
     private final ContentDao contentDao;
 
-    public ContentServiceImpl(ApplicationContext ac, TemplateEngine templateEngine, ContentDao contentDao) {
+    public ContentServiceImpl(ApplicationContext ac, ContentDao contentDao) {
         this.ac = ac;
-        this.templateEngine = templateEngine;
         this.contentDao = contentDao;
     }
 
     @Override
     public String getContent(String id, String iconCls) {
         String text = contentDao.getContentById(id);
-        IconClsType iconClsType = IconClsType.getValueOf(iconCls);
-        if(!(iconClsType == IconClsType.FOLDER || iconClsType == IconClsType.MARKDOWN)) {
+        IconClsEnum iconClsType = IconClsEnum.getValueOf(iconCls);
+        // 如果是上传的文件，则返回文件链接
+        if(!(iconClsType == IconClsEnum.FOLDER || iconClsType == IconClsEnum.MARKDOWN)) {
             text = fileServerUrl + "/" + text;
         }
-        String render = templateEngine.process(iconCls, new Context());
-        render = render.replace(contentTemplatePlaceholder,text == null ? "" : text);
+        // 获取模板文件，然后填充内容到模板文件中
+        String sourcePath = "static/template/" + iconCls + ".html";
+        String resource = ResourceUtils.getResource(ac, sourcePath);
+        String render = resource.replace(contentTemplatePlaceholder,text == null ? "" : text);
         return render;
     }
 
