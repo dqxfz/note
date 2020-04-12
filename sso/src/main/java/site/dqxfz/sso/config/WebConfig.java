@@ -15,7 +15,7 @@ import java.util.List;
  * @Date 2020年04月01日
  **/
 @EnableWebMvc
-@ComponentScan({"site.dqxfz.sso.controller"})
+@ComponentScan({"site.dqxfz.sso"})
 public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
@@ -38,6 +38,6 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         // Ant path匹配规则
-        registry.addInterceptor(new LoginInterceptor()).addPathPatterns("/**/*.do","/html/**");
+//        registry.addInterceptor(new LoginInterceptor()).addPathPatterns("/**/*.do","/html/**");
     }
 }
