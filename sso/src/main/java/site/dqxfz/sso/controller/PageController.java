@@ -3,9 +3,9 @@ package site.dqxfz.sso.controller;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import site.dqxfz.sso.service.UserService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -16,11 +16,11 @@ import java.io.IOException;
  * @author WENG Yang
  * @date 2020年04月12日
  **/
-@Controller
+@RestController
 @RequestMapping("/page")
 public class PageController {
     private final Logger logger = LogManager.getLogger(this.getClass());
-    @Value("page.login.url")
+    @Value("${page.login.url}")
     private String pageLoginUrl;
     private final UserService userService;
 
@@ -30,15 +30,15 @@ public class PageController {
 
     @RequestMapping("/login")
     public void login(HttpServletRequest request, HttpServletResponse response, String service){
-        String  st = userService.getServiceToken(request);
-        String redirectUrl = pageLoginUrl + "?service=" + request.getRequestURL();
-        if(!StringUtils.isEmpty(st)) {
-            redirectUrl = service + "?serviceToken=" + st;
-        }
         try {
+            String  serviceTicket = userService.isLogin(request);
+            String redirectUrl = pageLoginUrl + "?service=" + service;
+            if(!StringUtils.isEmpty(serviceTicket)) {
+                redirectUrl = service + "?serviceTicket=" + serviceTicket;
+            }
             response.sendRedirect(redirectUrl);
         } catch (IOException e) {
-            logger.error(e);
+            logger.error(e.getMessage(), e);
         }
     }
 }

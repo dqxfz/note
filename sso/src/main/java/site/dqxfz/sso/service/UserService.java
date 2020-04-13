@@ -1,9 +1,11 @@
 package site.dqxfz.sso.service;
 
-import site.dqxfz.sso.pojo.dto.UserDTO;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import site.dqxfz.sso.pojo.po.User;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
  * @author WENG Yang
@@ -11,11 +13,30 @@ import javax.servlet.http.HttpServletResponse;
  **/
 public interface UserService {
     /**
-     * 判断是否登录，如果登录就生成一个ServiceTicket，然后返回它
-     * @param request HttpServletRequest
-     * @return ServiceTicket
+     * 验证是否已经登录过
+     * @param request HttpServletRequest请求
+     * @return 如果已经登录过就返回ServiceTicket，否则返回null
      */
-    String getServiceToken(HttpServletRequest request);
+    String isLogin(HttpServletRequest request) throws IOException;
 
-    UserDTO getUserDTO(String serviceToken);
+    /**
+     * 根据serviceTicket获取username
+     * @param serviceTicket 将要获取的username的key
+     * @return 返回username
+     */
+    String getUserName(String serviceTicket);
+
+    /**
+     * 执行登录身份验证
+     *
+     * @param response
+     * @param user 将要验证的用户
+     * @return 登录成功返回serviceTicket,登录失败返回null
+     */
+    String login(HttpServletResponse response, User user) throws JsonProcessingException;
+
+    void logout(HttpServletRequest request, HttpServletResponse response, User user) throws IOException;
+
+    void register(User user);
+
 }

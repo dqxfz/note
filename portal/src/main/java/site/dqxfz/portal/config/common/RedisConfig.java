@@ -7,6 +7,7 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 
 /**
  * Redis配置
@@ -22,9 +23,7 @@ public class RedisConfig {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(redisUrl,6379);
         return new JedisConnectionFactory(config);
     }
-    public @Bean RedisTemplate redisTemplate(RedisConnectionFactory redisConnectionFactory){
-        RedisTemplate redisTemplate = new RedisTemplate();
-        redisTemplate.setConnectionFactory(redisConnectionFactory);
-        return redisTemplate;
+    public @Bean StringRedisTemplate stringRedisTemplate(RedisConnectionFactory redisConnectionFactory){
+        return new StringRedisTemplate(redisConnectionFactory);
     }
 }

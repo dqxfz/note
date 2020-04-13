@@ -140,10 +140,6 @@ function buttonHandler(btn) {
                 node.iconCls == markdown ? changeEditState(true) : changeEditState(false);
                 break;
             }
-            case "more": {
-                alert("more");
-                break;
-            }
         }
     }
 };

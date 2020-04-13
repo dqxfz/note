@@ -1,10 +1,12 @@
 package site.dqxfz.portal.config.web;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.*;
 import site.dqxfz.portal.converter.IconClsConverter;
 import site.dqxfz.portal.interceptor.LoginInterceptor;

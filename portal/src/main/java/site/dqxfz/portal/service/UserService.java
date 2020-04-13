@@ -8,6 +8,6 @@ import java.io.IOException;
  * @author WENG Yang
  * @date 2020年04月11日
  **/
-public interface SsoService {
+public interface UserService {
     boolean isLogin(HttpServletRequest request, HttpServletResponse response) throws IOException;
 }

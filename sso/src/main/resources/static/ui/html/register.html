@@ -6,26 +6,14 @@
     <link href="../css/style.css" rel="stylesheet" type="text/css"/>
     <script src="../js/easyui/jquery.min.js"></script>
     <script>
-        let service = getUrlParam('service');
-        $(function () {
-            console.log(service);
-        });
-        function getUrlParam(name) {
-            let reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
-            let r = location.search.substr(1).match(reg);
-            if (r != null) return unescape(r[2]); return null;
-        }
-        function login() {
+
+        function register() {
             $.ajax({
-                url: '/user/login.do',
+                url: '/user/register.do',
                 method: 'post',
                 data: $('#login_info').serialize(),
-                success: function (obj) {
-                    if(service) {
-                        location.href = service + '?serviceTicket=' + obj;
-                    } else {
-                        location.href = "/ui/html/success.html";
-                    }
+                success: function () {
+                    location.href = "/ui/html/login.html";
                 },
                 error: function () {
                     alert('登录失败');
@@ -43,12 +31,11 @@
             <input name="password" type="password" value="password" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'password';}">
         </form>
         <div class="forgot">
-<!--            <a href="8">忘记密码</a>-->
-            <input type="submit" value="登录" onclick="login()" >
+            <input type="submit" value="注册" onclick="register()" >
         </div>
     </div>
     <div class="login-bottom">
-        <h3>新用户 &nbsp;<a href="/ui/html/register.html">注册</a></h3>
+        <h3>已有账号？ &nbsp;<a href="/ui/html/login.html">登录</a></h3>
     </div>
 </div>
 </body>

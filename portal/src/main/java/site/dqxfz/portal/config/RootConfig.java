@@ -1,7 +1,9 @@
 package site.dqxfz.portal.config;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * @author WENG Yang
@@ -13,4 +15,7 @@ import org.springframework.context.annotation.PropertySource;
         "site.dqxfz.portal.config.common"})
 @PropertySource({"classpath:properties/config.properties"})
 public class RootConfig {
+    public @Bean RestTemplate restTemplate(){
+        return new RestTemplate();
+    }
 }

@@ -2,6 +2,7 @@ package site.dqxfz.common.util;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * Cookie工具类
@@ -19,5 +20,23 @@ public class CookieUtils {
             }
         }
         return null;
+    }
+
+    public static String getCookieValue(HttpServletRequest request, String cookieName) {
+        Cookie cookie = getCookie(request, cookieName);
+        if(cookie != null) {
+            return cookie.getValue();
+        }
+        return null;
+    }
+
+    public static void setCookie(HttpServletResponse response, String cookieName, String cookieValue) {
+        Cookie cookie = new Cookie(cookieName,cookieValue);
+        cookie.setPath("/");
+        response.addCookie(cookie);
+    }
+
+    public static void deleteCookie(HttpServletResponse response, String cookieName) {
+        setCookie(response,cookieName,"");
     }
 }

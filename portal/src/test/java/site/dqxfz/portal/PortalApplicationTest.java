@@ -9,12 +9,12 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.mongodb.core.MongoOperations;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import site.dqxfz.common.util.JsonUtils;
 import site.dqxfz.common.util.ResourceUtils;
 import site.dqxfz.portal.config.RootConfig;
-import site.dqxfz.portal.config.web.WebConfig;
 import site.dqxfz.portal.constant.CommandEnum;
 import site.dqxfz.portal.constant.IconClsEnum;
 import site.dqxfz.portal.pojo.po.Portfolio;
@@ -48,10 +48,8 @@ public class PortalApplicationTest {
     ContentServiceImpl contentService;
 
     @Autowired
-    RedisTemplate<String, User> redisTemplate;
-    /**
-     * 初始化数据库
-     */
+    StringRedisTemplate stringRedisTemplate;
+
     @Test
     public void test01() throws IOException {
         Portfolio portfolio = mongoOperations.insert(new Portfolio("我的文件夹", null, IconClsEnum.FOLDER,"wy"));
@@ -98,13 +96,40 @@ public class PortalApplicationTest {
         logger.info(response);
     }
     @Test
-    public void test07(){
-        redisTemplate.boundValueOps("user").set(new User("1","2","3"));
+    public void test07() throws JsonProcessingException {
+        String key = "";
+        stringRedisTemplate.boundValueOps(key).set(JsonUtils.objectToJson(new User("1","3")));
     }
     @Test
-    public void test08(){
-        User user = redisTemplate.boundValueOps("user").get();
+    public void test08() throws IOException {
+        String userJson = stringRedisTemplate.boundValueOps("1dd05fa5-9c20-453f-9811-c08a57ac187e").get();
+        User user = JsonUtils.jsonToObject(userJson, User.class);
         logger.info(user);
     }
+    @Test
+    public void test09(){
+        stringRedisTemplate.boundValueOps("name").set("wy",Duration.ofSeconds(10));
+    }
+    @Test
+    public void test10(){
+        String name = stringRedisTemplate.boundValueOps("name").get();
+        logger.info(name);
+    }
+    @Test
+    public void test11() throws IOException {
+        User user1 = new User("1", "3");
+        String json = JsonUtils.objectToJson(null);
+        logger.info(json);
+        User user = JsonUtils.jsonToObject(json, User.class);
+        logger.info(user);
+    }
+    @Test
+    public void test12(){
+        String sessionId02 = "\"a4b12a15-8e4a-4d54-ba8d-c5cfe1ab3e92\"";
+        logger.info(sessionId02);
+        String userJson = stringRedisTemplate.boundValueOps(sessionId02).get();
+        logger.info(userJson);
+    }
+
 
 }
