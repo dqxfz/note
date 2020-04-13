@@ -67,20 +67,28 @@
         let wsArray = new Object();
         let xhrArray = new Object();
 
+        function initUserInfo() {
+            $.ajax({
+                url: '/portfolio/rootId',
+                method: 'get',
+                success: function (obj) {
+                    let url = '/portfolio.do?id=' + obj;
+                    initPortfolio(url);
+                }
+            })
+        }
+
         $(function () {
-            initPortfolio();
+            initUserInfo();
             initContent();
         });
-        function logout() {
-            alert('logout');
-        }
     </script>
 </head>
 <body>
 <div class="easyui-layout" style="width:100%;height:100%;">
-    <div region="west" split="true" title="导航栏" noheader="true" style="width:15%;">
+    <div region="west" split="true" noheader="true" style="width:15%;">
         <div style="text-align:center;line-height:50px;height:50px;width: 100%;background: linear-gradient(to bottom,#EFF5FF 0,#E0ECFF 100%)">
-            <p style="padding:0;margin:0;font-weight: bold;font-size: 20px;">导航栏</p>
+            <p id="user" style="padding:0;margin:0;font-weight: bold;font-size: 20px;">导航栏</p>
         </div>
         <div>
             <ul id="portfolio">
@@ -95,7 +103,6 @@
             </div>
             <div style="height: 100%;width: 30%;float: right">
                 <div style="padding:5px;width:100%;height:100%;">
-<!--                    <a href="#" class="btn easyui-linkbutton" iconCls="icon-more" plain="true" onclick="buttonHandler('more')" style="">更多</a>-->
                     <a href="http://127.0.0.1:8081/user/logout.do" class="btn easyui-linkbutton" plain="true">退出</a>
                     <a href="#" class="btn easyui-linkbutton" plain="true" onclick="buttonHandler('edit')" >编辑</a>
                     <a href="#" class="btn easyui-linkbutton" iconCls="icon-save" plain="true" onclick="buttonHandler('save')">保存</a>

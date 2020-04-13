@@ -6,10 +6,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import site.dqxfz.portal.pojo.po.Portfolio;
+import site.dqxfz.portal.pojo.po.User;
 import site.dqxfz.portal.pojo.vo.EasyUiTreeNode;
 import site.dqxfz.portal.service.FileService;
 import site.dqxfz.portal.service.PortfolioService;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
@@ -115,6 +117,22 @@ public class PortfolioController {
         try {
             String downloadUrl = fileService.uploadImage(uuidName, base64);
             return new ResponseEntity(downloadUrl, HttpStatus.OK);
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
+        }
+        return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    /**
+     * 根据request中的cookie获取user的根文件夹id
+     * @param request 前端请求
+     * @return 根文件夹id
+     */
+    @GetMapping("/rootId")
+    public ResponseEntity rootId(HttpServletRequest request) {
+        try {
+            User user = portfolioService.getRootId(request);
+            return new ResponseEntity(user.getUsername(), HttpStatus.OK);
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
         }

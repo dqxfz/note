@@ -1,17 +1,23 @@
 package site.dqxfz.portal.service.impl;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import site.dqxfz.common.util.CookieUtils;
+import site.dqxfz.common.util.JsonUtils;
 import site.dqxfz.portal.constant.IconClsEnum;
 import site.dqxfz.portal.dao.ContentDao;
 import site.dqxfz.portal.dao.PortfolioDao;
 import site.dqxfz.portal.pojo.po.Content;
 import site.dqxfz.portal.pojo.po.Portfolio;
+import site.dqxfz.portal.pojo.po.User;
 import site.dqxfz.portal.pojo.vo.EasyUiTreeNode;
 import site.dqxfz.portal.service.PortfolioService;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,12 +33,17 @@ public class PortfolioServiceImpl implements PortfolioService {
     private String filePath;
     @Value("${file.server.url}")
     private String fileServerUrl;
+    @Value("${cookie.name}")
+    private String cookieName;
+
     private final PortfolioDao portfolioDao;
     private final ContentDao contentDao;
+    private final StringRedisTemplate stringRedisTemplate;
 
-    public PortfolioServiceImpl(PortfolioDao portfolioDao, ContentDao contentDao) {
+    public PortfolioServiceImpl(PortfolioDao portfolioDao, ContentDao contentDao, StringRedisTemplate stringRedisTemplate) {
         this.portfolioDao = portfolioDao;
         this.contentDao = contentDao;
+        this.stringRedisTemplate = stringRedisTemplate;
     }
 
     @Override
@@ -106,9 +117,16 @@ public class PortfolioServiceImpl implements PortfolioService {
         return downloadUrl;
     }
 
+    @Override
+    public User getRootId(HttpServletRequest request) throws IOException {
+        String sessionId = CookieUtils.getCookieValue(request, cookieName);
+        String userJson = stringRedisTemplate.boundValueOps(sessionId).get();
+        User user = JsonUtils.jsonToObject(userJson, User.class);
+        return user;
+    }
+
     /**
      * 根据fatherId递归查找子节点
-     *
      * @param idList   将查询到的子节点保存在idList
      * @param fatherId 将要查找的父节点
      */

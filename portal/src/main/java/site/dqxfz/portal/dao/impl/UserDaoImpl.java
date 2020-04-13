@@ -2,6 +2,7 @@ package site.dqxfz.portal.dao.impl;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.stereotype.Service;
 import site.dqxfz.portal.constant.IconClsEnum;
 import site.dqxfz.portal.dao.UserDao;
 import site.dqxfz.portal.pojo.po.Portfolio;
@@ -11,6 +12,7 @@ import site.dqxfz.portal.pojo.po.User;
  * @author WENG Yang
  * @date 2020年04月13日
  **/
+@Service
 public class UserDaoImpl implements UserDao {
     @Value("${portfolio.root.name}")
     private String portfolioRootName;

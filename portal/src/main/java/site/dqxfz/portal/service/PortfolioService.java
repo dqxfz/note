@@ -2,8 +2,11 @@ package site.dqxfz.portal.service;
 
 
 import site.dqxfz.portal.pojo.po.Portfolio;
+import site.dqxfz.portal.pojo.po.User;
 import site.dqxfz.portal.pojo.vo.EasyUiTreeNode;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.List;
 
 public interface PortfolioService {
@@ -16,4 +19,12 @@ public interface PortfolioService {
     void detePortfolio(String id);
 
     String getDownloadUrl(String id);
+
+    /**
+     * 根据请求中的cookie获取user信息
+     * @param request 前端请求
+     * @return user
+     * @throws IOException
+     */
+    User getRootId(HttpServletRequest request) throws IOException;
 }

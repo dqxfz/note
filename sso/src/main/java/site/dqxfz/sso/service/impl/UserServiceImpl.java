@@ -16,6 +16,7 @@ import site.dqxfz.sso.service.UserService;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.time.Duration;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -67,6 +68,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String login(HttpServletResponse response, User user) throws JsonProcessingException {
+        User user02 = userDao.selectUserByUserName(user.getUsername());
+        if(user02 == null && !user02.getPassword().equals(user.getPassword())) {
+            // 登录失败，用户名或密码错误
+            return null;
+        }
         // 生成sessionId
         String sessionId = UUID.randomUUID().toString();
         String userJson = JsonUtils.objectToJson(user);
@@ -89,7 +95,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void register(User user) {
-
+        userDao.insertUser(user);
     }
 
     private String createServiceTicket(String sessionId, String username) {

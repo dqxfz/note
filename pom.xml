@@ -24,6 +24,8 @@
         <jedis.version>3.1.0</jedis.version>
         <mybatis-spring.version>2.0.4</mybatis-spring.version>
         <mybatis.version>3.5.4</mybatis.version>
+        <mysql.version>8.0.19</mysql.version>
+        <common-dbcp.version>1.4</common-dbcp.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -88,7 +90,16 @@
                 <artifactId>mybatis</artifactId>
                 <version>${mybatis.version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>${mysql.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-dbcp</groupId>
+                <artifactId>commons-dbcp</artifactId>
+                <version>${common-dbcp.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 </project>

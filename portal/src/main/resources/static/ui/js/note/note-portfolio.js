@@ -89,9 +89,9 @@ function renamePortfolio(node) {
     });
 }
 
-function initPortfolio() {
+function initPortfolio(url) {
     $(portfolio).tree({
-        url: '/portfolio.do?id=wy',
+        url: url,
         method: 'get',
         onContextMenu: function(e, node){
             displayContent(node);
