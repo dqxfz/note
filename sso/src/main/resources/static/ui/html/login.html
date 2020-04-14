@@ -3,8 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <title>登录-良笔记</title>
+    <link rel="stylesheet" href="../js/easyui/themes/default/easyui.css">
+    <link rel="stylesheet" href="../js/easyui/themes/icon.css">
     <link href="../css/style.css" rel="stylesheet" type="text/css"/>
     <script src="../js/easyui/jquery.min.js"></script>
+    <script src="../js/easyui/jquery.easyui.min.js"></script>
+    <script src="../js/dqxfz-util.js"></script>
+    <style>
+        body{
+            background-image: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);
+        }
+    </style>
     <script>
         let service = getUrlParam('service');
         $(function () {
@@ -24,11 +33,11 @@
                     if(service) {
                         location.href = service + '?serviceTicket=' + obj;
                     } else {
-                        location.href = "/ui/html/success.html";
+                        showPrompt('登录成功，你可以访问网站了',3000);
                     }
                 },
                 error: function () {
-                    alert('登录失败');
+                    showError('登录失败',3000);
                 }
             })
         }

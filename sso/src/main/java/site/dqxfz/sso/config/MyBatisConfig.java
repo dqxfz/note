@@ -18,8 +18,8 @@ import javax.sql.DataSource;
  * @date 2020年04月13日
  **/
 @Configuration
-//@MapperScan("site.dqxfz.sso.dao")
-public class MyBatisConfig implements EnvironmentAware {
+@MapperScan("site.dqxfz.sso.dao")
+public class MyBatisConfig {
     @Value("${jdbc.driver}")
     private String driver;
     @Value("${jdbc.url}")
@@ -28,27 +28,27 @@ public class MyBatisConfig implements EnvironmentAware {
     private String user;
     @Value("${jdbc.password}")
     private String password;
-    private Environment environment;
+    @Value("${jdbc.initial.size}")
+    private Integer initialSize;
+    @Value("${jdbc.max.active}")
+    private Integer maxActive;
 
-
-//    public @Bean MapperScannerConfigurer mapperScannerConfigurer() throws Exception {
-//        MapperScannerConfigurer configurer = new MapperScannerConfigurer();
-//        configurer.setBasePackage("site.dqxfz.sso.dao");
-//        configurer.setSqlSessionFactoryBeanName("sqlSessionFactory");
-//        return configurer;
-//    }
-//    public @Bean SqlSessionFactory sqlSessionFactory() throws Exception {
-//        SqlSessionFactoryBean factoryBean = new SqlSessionFactoryBean();
-//        factoryBean.setDataSource(dataSource());
-//        SqlSessionFactory sqlSessionFactory = factoryBean.getObject();
-//        return sqlSessionFactory;
-//    }
-
-
-
-    @Override
-    public void setEnvironment(Environment environment) {
-        this.environment = environment;
+    @Bean
+    public SqlSessionFactoryBean sqlSessionFactory(DataSource dataSource) {
+        SqlSessionFactoryBean factoryBean = new SqlSessionFactoryBean();
+        factoryBean.setDataSource(dataSource);
+        return factoryBean;
     }
 
+    @Bean
+    public DataSource dataSource(){
+        BasicDataSource dataSource = new BasicDataSource();
+        dataSource.setDriverClassName(driver);
+        dataSource.setUrl(url);
+        dataSource.setUsername(user);
+        dataSource.setPassword(password);
+        dataSource.setInitialSize(initialSize);
+        dataSource.setMaxActive(maxActive);
+        return dataSource;
+    }
 }

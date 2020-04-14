@@ -33,10 +33,10 @@ public interface UserService {
      * @param user 将要验证的用户
      * @return 登录成功返回serviceTicket,登录失败返回null
      */
-    String login(HttpServletResponse response, User user) throws JsonProcessingException;
+    String login(HttpServletResponse response, User user) throws Exception;
 
-    void logout(HttpServletRequest request, HttpServletResponse response, User user) throws IOException;
+    void logout(HttpServletRequest request, HttpServletResponse response, User user) throws Exception;
 
-    void register(User user);
+    void register(User user) throws Exception;
 
 }

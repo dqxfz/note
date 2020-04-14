@@ -18,16 +18,13 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 public class RedisConfig {
     @Value("${redis.url}")
     private String redisUrl;
+    @Value("${redis.port}")
+    private Integer redisPort;
 
     public @Bean JedisConnectionFactory redisConnectionFactory(){
-        RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(redisUrl,6379);
+        RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(redisUrl,redisPort);
         return new JedisConnectionFactory(config);
     }
-//    public @Bean RedisTemplate redisTemplate(RedisConnectionFactory redisConnectionFactory){
-//        RedisTemplate redisTemplate = new RedisTemplate();
-//        redisTemplate.setConnectionFactory(redisConnectionFactory);
-//        return redisTemplate;
-//    }
     public @Bean StringRedisTemplate stringRedisTemplate(RedisConnectionFactory redisConnectionFactory){
         return new StringRedisTemplate(redisConnectionFactory);
     }

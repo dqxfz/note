@@ -3,8 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <title>登录-良笔记</title>
+    <link rel="stylesheet" href="../js/easyui/themes/default/easyui.css">
+    <link rel="stylesheet" href="../js/easyui/themes/icon.css">
     <link href="../css/style.css" rel="stylesheet" type="text/css"/>
     <script src="../js/easyui/jquery.min.js"></script>
+    <script src="../js/easyui/jquery.easyui.min.js"></script>
+    <script src="../js/dqxfz-util.js"></script>
+    <style>
+        body{
+            background-image: linear-gradient(to top, #5ee7df 0%, #b490ca 100%);
+        }
+
+    </style>
     <script>
 
         function register() {
@@ -13,10 +23,17 @@
                 method: 'post',
                 data: $('#login_info').serialize(),
                 success: function () {
-                    location.href = "/ui/html/login.html";
+                    showPrompt('注册成功，请登录',3000);
                 },
-                error: function () {
-                    alert('注册失败');
+                error: function (jqXHR) {
+                    let responseText = jqXHR.responseText;
+                    if(responseText != null && responseText != '') {
+                        let start = responseText.indexOf('"');
+                        let end = responseText.lastIndexOf('"');
+                        showError(responseText.substring(start + 1,end),3000);
+                    } else {
+                        showError('服务器异常', 3000);
+                    }
                 }
             })
         }
@@ -24,7 +41,7 @@
 </head>
 <body>
 <div class="login">
-    <h2>登录良笔记</h2>
+    <h2>注册良笔记</h2>
     <div class="login-top">
         <form id="login_info">
             <input name="username" type="text" value="User Id" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'User Id';}">

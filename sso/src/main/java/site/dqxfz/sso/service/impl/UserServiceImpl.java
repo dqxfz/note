@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import site.dqxfz.common.util.CookieUtils;
 import site.dqxfz.common.util.JsonUtils;
+import site.dqxfz.common.util.Md5Utils;
 import site.dqxfz.sso.dao.UserDao;
 import site.dqxfz.sso.pojo.po.User;
 import site.dqxfz.sso.service.UserService;
@@ -67,9 +68,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String login(HttpServletResponse response, User user) throws JsonProcessingException {
+    public String login(HttpServletResponse response, User user) throws Exception {
         User user02 = userDao.selectUserByUserName(user.getUsername());
-        if(user02 == null && !user02.getPassword().equals(user.getPassword())) {
+        if(user02 == null || !Md5Utils.crypt(user.getPassword()).equals(user02.getPassword())) {
             // 登录失败，用户名或密码错误
             return null;
         }
@@ -85,7 +86,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void logout(HttpServletRequest request, HttpServletResponse response, User user) throws IOException {
+    public void logout(HttpServletRequest request, HttpServletResponse response, User user) throws Exception {
         String sessionId = CookieUtils.getCookieValue(request, cookieName);
         stringRedisTemplate.delete(sessionId);
         CookieUtils.deleteCookie(response,cookieName);
@@ -94,7 +95,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void register(User user) {
+    public void register(User user) throws Exception{
+        user.setPassword(Md5Utils.crypt(user.getPassword()));
         userDao.insertUser(user);
     }
 

@@ -21,6 +21,15 @@ import javax.servlet.http.HttpServletResponse;
 @RestController
 @RequestMapping("/user")
 public class UserController {
+    /**
+     * SQL执行异常中，键重复异常的关键词
+     */
+    private final String DUPLICATE_KEY_WORD = "Duplicate";
+    /**
+     * 重复键的索引名
+     */
+    private final String USER_INDEX_NAME = "user.PRIMARY";
+
     private final Logger logger = LogManager.getLogger(this.getClass());
     private final UserService userService;
 
@@ -53,7 +62,13 @@ public class UserController {
             userService.register(user);
             return new ResponseEntity(HttpStatus.OK);
         } catch ( Exception e) {
-            logger.error(e.getMessage(), e);
+            String errorMsg = e.getMessage();
+            logger.error(errorMsg, e);
+            if(errorMsg.contains(DUPLICATE_KEY_WORD)) {
+                if(errorMsg.contains(USER_INDEX_NAME)){
+                    return new ResponseEntity("账号已存在", HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+            }
         }
         return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
     }

@@ -9,6 +9,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 import site.dqxfz.common.util.CookieUtils;
 import site.dqxfz.common.util.JsonUtils;
+import site.dqxfz.common.util.Md5Utils;
 import site.dqxfz.portal.dao.UserDao;
 import site.dqxfz.portal.pojo.po.User;
 import site.dqxfz.portal.service.UserService;
@@ -16,6 +17,7 @@ import site.dqxfz.portal.service.UserService;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -48,14 +50,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean isLogin(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public boolean isLogin(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String sessionId = CookieUtils.getCookieValue(request,cookieName);
         if(!StringUtils.isEmpty(sessionId)) {
             String userJson = stringRedisTemplate.boundValueOps(sessionId).get();
             User user = JsonUtils.jsonToObject(userJson, User.class);
             // session未过期，返回true
             if(user != null) {
-                stringRedisTemplate.boundValueOps(sessionId).expire(sessionExpireTime, TimeUnit.SECONDS);
                 return true;
             }
             // session已经过期，删除已经失效的cookie
@@ -74,11 +75,13 @@ public class UserServiceImpl implements UserService {
                     // 创建笔记用户信息
                     user = userDao.saveUser(username);
                 }
-                sessionId = UUID.randomUUID().toString();
+                // 使用加密后的username作为sessionId
+                sessionId = Md5Utils.crypt(username);
                 String userJson = JsonUtils.objectToJson(user);
                 stringRedisTemplate.boundValueOps(sessionId).set(userJson, Duration.ofSeconds(sessionExpireTime));
                 CookieUtils.setCookie(response,cookieName,sessionId);
-                return true;
+                // 权限验证成功后重定向到请求页面,删除'serviceTicket'等属性
+                response.sendRedirect(request.getRequestURL().toString());
             }
         } else {
             // 跳到登录页面

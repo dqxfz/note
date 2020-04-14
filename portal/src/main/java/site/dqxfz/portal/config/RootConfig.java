@@ -13,7 +13,7 @@ import org.springframework.web.client.RestTemplate;
         "site.dqxfz.portal.service",
         "site.dqxfz.portal.dao",
         "site.dqxfz.portal.config.common"})
-@PropertySource({"classpath:properties/config.properties"})
+@PropertySource(value = {"classpath:properties/config.properties"}, encoding = "utf-8")
 public class RootConfig {
     public @Bean RestTemplate restTemplate(){
         return new RestTemplate();

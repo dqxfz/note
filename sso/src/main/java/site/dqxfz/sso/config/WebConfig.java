@@ -17,7 +17,7 @@ import java.util.List;
  **/
 @EnableWebMvc
 @ComponentScan({"site.dqxfz.sso"})
-@PropertySource({"classpath:properties/config.properties"})
+@PropertySource(value = {"classpath:properties/config.properties"}, encoding = "utf-8")
 public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
