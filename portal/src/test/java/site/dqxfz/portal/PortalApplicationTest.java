@@ -6,6 +6,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -49,6 +50,9 @@ public class PortalApplicationTest {
 
     @Autowired
     StringRedisTemplate stringRedisTemplate;
+
+    @Autowired
+    AmqpTemplate template;
 
     @Test
     public void test01() throws IOException {
@@ -130,6 +134,14 @@ public class PortalApplicationTest {
         String userJson = stringRedisTemplate.boundValueOps(sessionId02).get();
         logger.info(userJson);
     }
-
+    @Test
+    public void test13(){
+        template.convertAndSend("myqueue","foo");
+    }
+    @Test
+    public void test14(){
+        String foo = (String) template.receiveAndConvert("myqueue");
+        logger.info(foo);
+    }
 
 }

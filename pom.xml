@@ -26,6 +26,7 @@
         <mybatis.version>3.5.4</mybatis.version>
         <mysql.version>8.0.19</mysql.version>
         <common-dbcp.version>1.4</common-dbcp.version>
+        <spring-rabbit.version>2.2.5.RELEASE</spring-rabbit.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -99,6 +100,11 @@
                 <groupId>commons-dbcp</groupId>
                 <artifactId>commons-dbcp</artifactId>
                 <version>${common-dbcp.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.amqp</groupId>
+                <artifactId>spring-rabbit</artifactId>
+                <version>${spring-rabbit.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
