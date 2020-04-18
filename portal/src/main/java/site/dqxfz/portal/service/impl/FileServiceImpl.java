@@ -1,10 +1,11 @@
 package site.dqxfz.portal.service.impl;
 
+import org.apache.commons.net.ftp.FTPClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.util.DigestUtils;
+import site.dqxfz.common.util.FtpUtils;
 import site.dqxfz.portal.constant.IconClsEnum;
 import site.dqxfz.portal.dao.ContentDao;
 import site.dqxfz.portal.dao.PortfolioDao;
@@ -15,7 +16,6 @@ import site.dqxfz.portal.pojo.vo.EasyUiTreeNode;
 import site.dqxfz.portal.service.FileService;
 import sun.misc.BASE64Decoder;
 
-import java.io.*;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
@@ -28,10 +28,14 @@ import java.util.Map;
 public class FileServiceImpl implements FileService {
     Logger logger = LogManager.getLogger(this.getClass());
 
-    @Value("${file.path}")
-    private String filePath;
-    @Value("${file.server.url}")
-    private String fileServerUrl;
+    @Value("${file.ftp.url}")
+    private String fileFtpUrl;
+    @Value("${file.ftp.port}")
+    private Integer fileFtpPort;
+    @Value("${file.ftp.user}")
+    String fileFtpUser;
+    @Value("${file.ftp.password}")
+    String fileFtpPassword;
 
     private final PortfolioDao portfolioDao;
     private final ContentDao contentDao;
@@ -42,35 +46,30 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public void uploadFile(byte[] bytes, Map<String, Object> sessionAttributes) throws IOException {
-        String filePathName = (String) sessionAttributes.get("filePathName");
-        FileOutputStream outputStream = new FileOutputStream(filePathName, true);
-        outputStream.write(bytes);
-        outputStream.close();
+    public void uploadFile(byte[] bytes, Map<String, Object> sessionAttributes) throws Exception {
+        NoteFile noteFile = (NoteFile) sessionAttributes.get("noteFile");
+        FTPClient ftpClient = (FTPClient) sessionAttributes.get("ftpClient");
+        FtpUtils.uploadBytes(bytes, noteFile.getUuidName(), "./", ftpClient);
     }
 
     @Override
-    public void createFile(NoteFile noteFile, Map<String, Object> sessionAttributes) throws IOException {
+    public void createFile(NoteFile noteFile, Map<String, Object> sessionAttributes) throws Exception {
         logger.info(noteFile.getName() + "创建时间：" + Instant.now());
         sessionAttributes.put("start", Instant.now());
-        String filePathName = filePath + noteFile.getUuidName();
-        File file = new File(filePathName);
-        if(!file.exists()) {
-            file.createNewFile();
-        }
-        sessionAttributes.put("filePathName", filePathName);
+        FTPClient ftpClient = FtpUtils.getFTPClient(fileFtpUrl, fileFtpPort, fileFtpUser, fileFtpPassword);
+        sessionAttributes.put("ftpClient", ftpClient);
     }
 
     @Override
-    public EasyUiTreeNode saveFileMetaData(Map<String, Object> sessionAttributes, String md5) throws IOException {
-        String filePathName = (String) sessionAttributes.get("filePathName");
-        String endFileMd5 = DigestUtils.md5DigestAsHex(new FileInputStream(filePathName));
+    public EasyUiTreeNode saveFileMetaData(Map<String, Object> sessionAttributes) throws Exception {
+        NoteFile noteFile = (NoteFile) sessionAttributes.get("noteFile");
+        FTPClient ftpClient = (FTPClient) sessionAttributes.get("ftpClient");
+        long fileSize = FtpUtils.getFileSize(noteFile.getUuidName(), ftpClient);
         // 文件上传出错
-        if(!endFileMd5.equals(md5)) {
+        if(fileSize != noteFile.getSize()) {
             return null;
         }
         // 保存文件元信息
-        NoteFile noteFile = (NoteFile) sessionAttributes.get("noteFile");
         EasyUiTreeNode easyUiTreeNode = savePortfolio(noteFile);
         Instant start = (Instant) sessionAttributes.get("start");
         Duration duration = Duration.between(start, Instant.now());
@@ -80,29 +79,26 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public void clearFile(String filePathName, String uuidName) {
-
-        Content content = contentDao.getContentBytext(uuidName);
+    public void closeFtp(Map<String, Object> sessionAttributes) throws Exception {
+        NoteFile noteFile = (NoteFile) sessionAttributes.get("noteFile");
+        FTPClient ftpClient = (FTPClient) sessionAttributes.get("ftpClient");
+        Content content = contentDao.getContentBytext(noteFile.getUuidName());
         // 如果数据库没有已经保存好了的文件信息，说明文件没有上传完成
         if(content == null) {
-            File file = new File(filePathName);
-            file.delete();
+            FtpUtils.deleteFile(noteFile.getUuidName(), ftpClient);
         }
+        FtpUtils.closeFTP(ftpClient);
     }
 
     @Override
-    public String uploadImage(String uuidName, String base64) throws IOException {
+    public String uploadImage(String uuidName, String base64) throws Exception {
         String imageBase64 = base64.substring(base64.indexOf(',') + 1);
         BASE64Decoder d = new BASE64Decoder();
-        byte[] buf = d.decodeBuffer(imageBase64);
-        File file = new File(filePath + "image/" + uuidName);
-        if(!file.exists()) {
-            file.createNewFile();
-        }
-        FileOutputStream out = new FileOutputStream(file);
-        out.write(buf);
-        out.close();
-        return "![](" + fileServerUrl + "/image/" + uuidName + ")";
+        byte[] bytes = d.decodeBuffer(imageBase64);
+        FTPClient ftpClient = FtpUtils.getFTPClient(fileFtpUrl, fileFtpPort, fileFtpUser, fileFtpPassword);
+        FtpUtils.uploadBytes(bytes, uuidName, "image", ftpClient);
+        FtpUtils.closeFTP(ftpClient);
+        return "![](http://" + fileFtpUrl + "/image/" + uuidName + ")";
     }
 
     /**

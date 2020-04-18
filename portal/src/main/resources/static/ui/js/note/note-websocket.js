@@ -7,7 +7,7 @@ function transferSnippet(ws) {
     reader.readAsArrayBuffer(blob);
     reader.onload = function (e) {
         let blob = e.target.result;
-        ws.session.spark.append(blob);
+        // ws.session.spark.append(blob);
         ws.send(blob);
     }
 }
@@ -21,7 +21,7 @@ function transferFileMetaData(ws) {
 function transferFileComplete(ws) {
     let fileDTO = {
         command: CommandType.UPLOAD_COMPLETE,
-        data: ws.session.spark.end()
+        data: ""
     }
     ws.send(JSON.stringify(fileDTO));
 }

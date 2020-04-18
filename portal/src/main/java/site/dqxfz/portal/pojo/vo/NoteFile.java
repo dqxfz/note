@@ -26,13 +26,13 @@ public class NoteFile {
     /**
      * 文件大小
      */
-    private String size;
+    private Long size;
 
-    public String getSize() {
+    public Long getSize() {
         return size;
     }
 
-    public void setSize(String size) {
+    public void setSize(Long size) {
         this.size = size;
     }
 

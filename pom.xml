@@ -27,6 +27,7 @@
         <mysql.version>8.0.19</mysql.version>
         <common-dbcp.version>1.4</common-dbcp.version>
         <spring-rabbit.version>2.2.5.RELEASE</spring-rabbit.version>
+        <commons-net.version>3.6</commons-net.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -105,6 +106,11 @@
                 <groupId>org.springframework.amqp</groupId>
                 <artifactId>spring-rabbit</artifactId>
                 <version>${spring-rabbit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-net</groupId>
+                <artifactId>commons-net</artifactId>
+                <version>${commons-net.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

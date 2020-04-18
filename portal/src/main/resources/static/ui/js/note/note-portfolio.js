@@ -36,7 +36,7 @@ $.extend($.fn.filebox.defaults.rules, {
     }
 });
 function changeMenuState(node) {
-    if(node.fatherId == 'wy') {
+    if(node.fatherId == $('#user').text()) {
         $('#rename').hide();
         $('#remove').hide();
     } else {
@@ -255,7 +255,7 @@ function updateProgress(e) {
 function transferComplete(e) {
     let xhr = e.target;
     if (xhr.status === 200) {
-        saveAs(xhr.response, xhr.metadata);
+        saveAs(xhr.response, xhr.metadata.node.text);
     }
     xhr.metadata.process.parent().remove();
 }

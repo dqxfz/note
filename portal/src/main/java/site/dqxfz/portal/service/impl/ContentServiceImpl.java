@@ -17,8 +17,8 @@ import site.dqxfz.portal.service.ContentService;
 public class ContentServiceImpl implements ContentService {
     @Value("${content.template.placeholder}")
     private String contentTemplatePlaceholder;
-    @Value("${file.server.url}")
-    private String fileServerUrl;
+    @Value("${file.ftp.url}")
+    private String fileFtpUrl;
 
     private final ApplicationContext ac;
     private final ContentDao contentDao;
@@ -34,7 +34,7 @@ public class ContentServiceImpl implements ContentService {
         IconClsEnum iconClsType = IconClsEnum.getValueOf(iconCls);
         // 如果是上传的文件，则返回文件链接
         if(!(iconClsType == IconClsEnum.FOLDER || iconClsType == IconClsEnum.MARKDOWN)) {
-            text = fileServerUrl + "/" + text;
+            text = "http://" + fileFtpUrl + "/" + text;
         }
         // 获取模板文件，然后填充内容到模板文件中
         String sourcePath = "static/template/" + iconCls + ".html";

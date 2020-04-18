@@ -16,7 +16,7 @@ public interface PortfolioService {
 
     void updatePortfolio(String id, String name);
 
-    void detePortfolio(String id);
+    void detePortfolio(String id) throws Exception;
 
     String getDownloadUrl(String id);
 

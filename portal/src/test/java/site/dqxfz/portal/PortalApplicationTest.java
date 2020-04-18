@@ -2,18 +2,21 @@ package site.dqxfz.portal;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPFile;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.amqp.core.AmqpTemplate;
-import org.springframework.amqp.core.Message;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import site.dqxfz.common.util.FtpUtils;
 import site.dqxfz.common.util.JsonUtils;
 import site.dqxfz.common.util.ResourceUtils;
 import site.dqxfz.portal.config.RootConfig;
@@ -23,7 +26,7 @@ import site.dqxfz.portal.pojo.po.Portfolio;
 import site.dqxfz.portal.pojo.po.User;
 import site.dqxfz.portal.service.impl.ContentServiceImpl;
 
-import java.io.IOException;
+import java.io.*;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
@@ -40,6 +43,16 @@ import java.util.concurrent.TimeUnit;
 @ContextConfiguration(classes = RootConfig.class)
 public class PortalApplicationTest {
     Logger logger = LogManager.getLogger(this.getClass());
+
+    @Value("${file.ftp.url}")
+    private String fileFtpUrl;
+    @Value("${file.ftp.port}")
+    private Integer fileFtpPort;
+    @Value("${file.ftp.user}")
+    String fileFtpUser;
+    @Value("${file.ftp.password}")
+    String fileFtpPassword;
+
     @Autowired
     MongoOperations mongoOperations;
 
@@ -137,6 +150,41 @@ public class PortalApplicationTest {
     }
     @Test
     public void test13(){
-        sendAmqpTemplate.convertAndSend("logout","false");
+//        sendAmqpTemplate.convertAndSend(AmqpConsts.SESSION_ROUTING_KEY_NAME,"false");
+        sendAmqpTemplate.convertAndSend("test","false");
+        sendAmqpTemplate.convertAndSend("session","false");
+    }
+    @Test
+    public void test14() throws Exception {
+        FtpUtils ftp = new FtpUtils();
+        FTPClient ftpClient = ftp.getFTPClient(fileFtpUrl, fileFtpPort, fileFtpUser, fileFtpPassword);
+        OutputStream outputStream = ftpClient.appendFileStream("hello.txt");
+        String hello_world = new String("Hello World");
+        outputStream.write(hello_world.getBytes());
+        outputStream.close();
+        boolean completePendingCommand = ftpClient.completePendingCommand();
+        logger.info(completePendingCommand);
+        InputStream inputStream = ftpClient.retrieveFileStream("hello.txt");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        String line = reader.readLine();
+        logger.info(line);
+    }
+    @Test
+    public void test15() throws Exception {
+        FTPClient ftpClient = FtpUtils.getFTPClient(fileFtpUrl, fileFtpPort, fileFtpUser, fileFtpPassword);
+        InputStream inputStream = ftpClient.retrieveFileStream("c5d13159-5291-492c-9e11-14fa75a4d871");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        String line = reader.readLine();
+        logger.info(line);
+//        String endFileMd5 = DigestUtils.md5DigestAsHex(inputStream);
+//        logger.info(endFileMd5);
+    }
+    @Test
+    public void test16() throws Exception {
+        FTPClient ftpClient = FtpUtils.getFTPClient(fileFtpUrl, fileFtpPort, fileFtpUser, fileFtpPassword);
+        FTPFile[] ftpFiles = ftpClient.listFiles();
+        for(FTPFile ftpFile : ftpFiles) {
+            logger.info(ftpFile.getName() + "  size: " + ftpFile.getSize());
+        }
     }
 }

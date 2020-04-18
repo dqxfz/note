@@ -1,10 +1,12 @@
 package site.dqxfz.portal.service.impl;
 
+import org.apache.commons.net.ftp.FTPClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import site.dqxfz.common.util.CookieUtils;
+import site.dqxfz.common.util.FtpUtils;
 import site.dqxfz.common.util.JsonUtils;
 import site.dqxfz.portal.constant.IconClsEnum;
 import site.dqxfz.portal.dao.ContentDao;
@@ -29,10 +31,14 @@ import java.util.stream.Collectors;
  **/
 @Service
 public class PortfolioServiceImpl implements PortfolioService {
-    @Value("${file.path}")
-    private String filePath;
-    @Value("${file.server.url}")
-    private String fileServerUrl;
+    @Value("${file.ftp.url}")
+    private String fileFtpUrl;
+    @Value("${file.ftp.port}")
+    private Integer fileFtpPort;
+    @Value("${file.ftp.user}")
+    String fileFtpUser;
+    @Value("${file.ftp.password}")
+    String fileFtpPassword;
     @Value("${cookie.name}")
     private String cookieName;
 
@@ -77,7 +83,7 @@ public class PortfolioServiceImpl implements PortfolioService {
     }
 
     @Override
-    public void detePortfolio(String id) {
+    public void detePortfolio(String id) throws Exception {
         // 查询出所有要删除的portfolio
         List<Portfolio> portfolios = new ArrayList<>();
         portfolios.add(portfolioDao.getPortfolioById(id));
@@ -103,17 +109,17 @@ public class PortfolioServiceImpl implements PortfolioService {
         portfolioDao.deleteListByIdList(portfolioIdList);
         // 删除content
         contentDao.deleteListByIdList(portfolioIdList);
+        FTPClient ftpClient = FtpUtils.getFTPClient(fileFtpUrl, fileFtpPort, fileFtpUser, fileFtpPassword);
         // 删除文件
         for (String uuidName : uuidNameList) {
-            File file = new File(filePath + uuidName);
-            file.delete();
+            FtpUtils.deleteFile(uuidName, ftpClient);
         }
     }
 
     @Override
     public String getDownloadUrl(String id) {
         String uuidName = contentDao.getContentById(id);
-        String downloadUrl = fileServerUrl + "/" + uuidName;
+        String downloadUrl = "http://" + fileFtpUrl + "/" + uuidName;
         return downloadUrl;
     }
 

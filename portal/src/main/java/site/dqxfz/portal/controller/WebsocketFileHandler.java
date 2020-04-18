@@ -24,7 +24,7 @@ import java.util.Map;
  **/
 @Component
 public class WebsocketFileHandler extends AbstractWebSocketHandler {
-    Logger logger = LogManager.getLogger(this.getClass());
+    private final Logger logger = LogManager.getLogger(this.getClass());
     private final FileService fileService;
 
     public WebsocketFileHandler(FileService fileService) {
@@ -46,7 +46,7 @@ public class WebsocketFileHandler extends AbstractWebSocketHandler {
                     break;
                 }
                 case UPLOAD_COMPLETE: {
-                    EasyUiTreeNode easyUiTreeNode = fileService.saveFileMetaData(sessionAttributes,fileDTO.getData());
+                    EasyUiTreeNode easyUiTreeNode = fileService.saveFileMetaData(sessionAttributes);
                     sendMessage(session, easyUiTreeNode == null ? CommandEnum.RESPONSE_ERROR : CommandEnum.RESPONSE_COMPLETE, easyUiTreeNode);
                     break;
                 }
@@ -74,9 +74,7 @@ public class WebsocketFileHandler extends AbstractWebSocketHandler {
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-        // 清理没有上传完成的文件
-        NoteFile noteFile = (NoteFile) session.getAttributes().get("noteFile");
-        String filePathName = (String) session.getAttributes().get("filePathName");
-        fileService.clearFile(filePathName, noteFile.getUuidName());
+        // close ftp
+        fileService.closeFtp(session.getAttributes());
     }
 }

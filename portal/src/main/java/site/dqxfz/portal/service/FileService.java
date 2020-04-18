@@ -11,13 +11,13 @@ import java.util.Map;
  * @date 2020年04月05日
  **/
 public interface FileService {
-    void uploadFile(byte[] array, Map<String, Object> attributes) throws IOException;
+    void uploadFile(byte[] array, Map<String, Object> attributes) throws Exception;
 
-    void createFile(NoteFile noteFile, Map<String, Object> sessionAttributes) throws IOException;
+    void createFile(NoteFile noteFile, Map<String, Object> sessionAttributes) throws Exception;
 
-    EasyUiTreeNode saveFileMetaData(Map<String, Object> sessionAttributes, String md5) throws IOException;
+    EasyUiTreeNode saveFileMetaData(Map<String, Object> sessionAttributes) throws Exception;
 
-    void clearFile(String filePathName, String uuidName);
+    void closeFtp(Map<String, Object> attributes) throws Exception;
 
-    String uploadImage(String uuidName, String base64) throws IOException;
+    String uploadImage(String uuidName, String base64) throws Exception;
 }
