@@ -1,6 +1,5 @@
 package site.dqxfz.sso.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import site.dqxfz.sso.pojo.po.User;
 
 import javax.servlet.http.HttpServletRequest;
@@ -15,9 +14,11 @@ public interface UserService {
     /**
      * 验证是否已经登录过
      * @param request HttpServletRequest请求
+     * @param serviceUrl
+     * @param serviceTicketUrl
      * @return 如果已经登录过就返回ServiceTicket，否则返回null
      */
-    String isLogin(HttpServletRequest request) throws IOException;
+    String isLogin(HttpServletRequest request, String serviceUrl, String serviceTicketUrl) throws IOException;
 
     /**
      * 根据serviceTicket获取username
@@ -35,7 +36,7 @@ public interface UserService {
      */
     String login(HttpServletResponse response, User user) throws Exception;
 
-    void logout(HttpServletRequest request, HttpServletResponse response, User user) throws Exception;
+    void logout(HttpServletRequest request, HttpServletResponse response, String userName) throws Exception;
 
     void register(User user) throws Exception;
 

@@ -1,26 +1,32 @@
 package site.dqxfz.portal.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 import site.dqxfz.common.util.CookieUtils;
+import site.dqxfz.common.util.HttpUtils;
 import site.dqxfz.common.util.JsonUtils;
 import site.dqxfz.common.util.Md5Utils;
+import site.dqxfz.portal.constant.ResponseConsts;
 import site.dqxfz.portal.dao.UserDao;
 import site.dqxfz.portal.pojo.po.User;
 import site.dqxfz.portal.service.UserService;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.URLEncoder;
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 单点登录服务
@@ -34,8 +40,8 @@ public class UserServiceImpl implements UserService {
     private String cookieName;
     @Value("${session.expire.time}")
     private Long sessionExpireTime;
-    @Value("${sso.page.login.url}")
-    private String ssoPageLoginUrl;
+    @Value("${sso.user.isLogin.url}")
+    private String ssoUserIsLoginUrl;
     @Value("${sso.user.info.url}")
     private String ssoUserInfoUrl;
 
@@ -62,7 +68,23 @@ public class UserServiceImpl implements UserService {
             // session已经过期，删除已经失效的cookie
             CookieUtils.deleteCookie(response,cookieName);
         }
-        String serviceTicket = request.getParameter("serviceTicket");
+        String wholeRequestUrl = HttpUtils.getWholeRequestUrl(request);
+        String serviceTicketUrl = HttpUtils.getServletAndPort(request) + "/user/serviceTicket.do";
+        // 跳到登录页面
+        response.sendRedirect(ssoUserIsLoginUrl
+                + "?serviceUrl=" + URLEncoder.encode(wholeRequestUrl, "UTF-8")
+                + "&serviceTicketUrl=" + URLEncoder.encode(serviceTicketUrl, "UTF-8"));
+        return false;
+    }
+
+    @Override
+    public void deleteSession(String user) throws NoSuchAlgorithmException {
+        String sessionId = Md5Utils.crypt(user);
+        stringRedisTemplate.delete(sessionId);
+    }
+
+    @Override
+    public void validateServiceTicket(String serviceTicket, String serviceUrl, HttpServletResponse response) throws Exception {
         // 如果有serviceToken,则通过serviceToken向sso服务器获取user信息
         if(!StringUtils.isEmpty(serviceTicket)) {
             String username = restTemplate.getForObject(ssoUserInfoUrl + "?serviceTicket=" + serviceTicket, String.class);
@@ -76,17 +98,17 @@ public class UserServiceImpl implements UserService {
                     user = userDao.saveUser(username);
                 }
                 // 使用加密后的username作为sessionId
-                sessionId = Md5Utils.crypt(username);
+                String sessionId = Md5Utils.crypt(username);
                 String userJson = JsonUtils.objectToJson(user);
                 stringRedisTemplate.boundValueOps(sessionId).set(userJson, Duration.ofSeconds(sessionExpireTime));
                 CookieUtils.setCookie(response,cookieName,sessionId);
-                // 权限验证成功后重定向到请求页面,删除'serviceTicket'等属性
-                response.sendRedirect(request.getRequestURL().toString());
+                // 权限验证成功后重定向到请求页面
+                response.sendRedirect(serviceUrl);
+            } else {
+                ServletOutputStream outputStream = response.getOutputStream();
+                ResponseEntity responseEntity = new ResponseEntity(ResponseConsts.LOGIN_FAILED, HttpStatus.UNAUTHORIZED);
+                outputStream.print(JsonUtils.objectToJson(responseEntity));
             }
-        } else {
-            // 跳到登录页面
-            response.sendRedirect(ssoPageLoginUrl + "?service=" + request.getRequestURL());
         }
-        return false;
     }
 }

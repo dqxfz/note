@@ -67,13 +67,15 @@
         let current_file;
         let wsArray = new Object();
         let xhrArray = new Object();
-
+        // console.log('host: ' + window.location.host);
         function initUserInfo() {
             $.ajax({
                 url: '/portfolio/rootId.do',
                 method: 'get',
                 success: function (obj) {
                     $('#user').text(obj);
+                    let logoutUrl = 'http://sso.dqxfz.site:8081/user/logout.do?userName=' + obj;
+                    $('#logout_btn').attr('href',logoutUrl);
                     let url = '/portfolio.do?id=' + obj;
                     initPortfolio(url);
                 }
@@ -105,7 +107,7 @@
             </div>
             <div style="height: 100%;width: 30%;float: right">
                 <div style="padding:5px;width:100%;height:100%;">
-                    <a href="http://sso.dqxfz.site:8081/user/logout.do" class="btn easyui-linkbutton" plain="true">退出</a>
+                    <a id="logout_btn" href="#" class="btn easyui-linkbutton" plain="true">退出</a>
                     <a href="#" class="btn easyui-linkbutton" plain="true" onclick="buttonHandler('edit')" >编辑</a>
                     <a href="#" class="btn easyui-linkbutton" iconCls="icon-save" plain="true" onclick="buttonHandler('save')">保存</a>
                 </div>

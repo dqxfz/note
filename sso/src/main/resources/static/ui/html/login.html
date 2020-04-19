@@ -15,14 +15,25 @@
         }
     </style>
     <script>
-        let service = getUrlParam('service');
+        let serviceUrl = getQueryVariable('serviceUrl');
+        let serviceTicketUrl = getQueryVariable('serviceTicketUrl');
+        if(serviceTicketUrl) {
+            serviceTicketUrl = unescape(serviceTicketUrl);
+        }
+        // console.log('host: ' + window.location.host);
         $(function () {
-            console.log(service);
+            console.log("serviceUrl: " + serviceUrl);
+            console.log("serviceTicketUrl: " + serviceTicketUrl);
         });
-        function getUrlParam(name) {
-            let reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
-            let r = location.search.substr(1).match(reg);
-            if (r != null) return unescape(r[2]); return null;
+        function getQueryVariable(variable)
+        {
+            let query = window.location.search.substring(1);
+            let vars = query.split("&");
+            for (let i=0;i<vars.length;i++) {
+                let pair = vars[i].split("=");
+                if(pair[0] == variable){return pair[1];}
+            }
+            return null;
         }
         function login() {
             if($('#login_info').form('validate')) {
@@ -31,8 +42,8 @@
                     method: 'post',
                     data: $('#login_info').serialize(),
                     success: function (obj) {
-                        if(service) {
-                            location.href = service + '?serviceTicket=' + obj;
+                        if(serviceTicketUrl) {
+                            location.href = serviceTicketUrl + '?serviceTicket=' + obj + '&serviceUrl=' + serviceUrl;
                         } else {
                             showPrompt('登录成功，你可以访问网站了',3000);
                         }

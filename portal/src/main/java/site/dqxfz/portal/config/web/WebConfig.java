@@ -57,6 +57,6 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         // Ant path匹配规则
-        registry.addInterceptor(loginInterceptor).addPathPatterns("/**/*.do","/html/**");
+        registry.addInterceptor(loginInterceptor).addPathPatterns("/**/*.do","/html/**").excludePathPatterns("/user/serviceTicket.do");
     }
 }

@@ -1,8 +1,8 @@
 package site.dqxfz.sso.service.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -10,14 +10,16 @@ import org.springframework.util.StringUtils;
 import site.dqxfz.common.util.CookieUtils;
 import site.dqxfz.common.util.JsonUtils;
 import site.dqxfz.common.util.Md5Utils;
+import site.dqxfz.sso.constant.AmqpConsts;
 import site.dqxfz.sso.dao.UserDao;
+import site.dqxfz.sso.pojo.dto.AmqpUser;
 import site.dqxfz.sso.pojo.po.User;
 import site.dqxfz.sso.service.UserService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.lang.reflect.Method;
+import java.net.URLEncoder;
 import java.time.Duration;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -38,27 +40,30 @@ public class UserServiceImpl implements UserService {
     @Value("${page.login.url}")
     private String pageLoginUrl;
 
+    private final AmqpTemplate amqpTemplate;
     private final StringRedisTemplate stringRedisTemplate;
     private final UserDao userDao;
 
-    public UserServiceImpl(StringRedisTemplate stringRedisTemplate, UserDao userDao) {
+    public UserServiceImpl(AmqpTemplate amqpTemplate, StringRedisTemplate stringRedisTemplate, UserDao userDao) {
+        this.amqpTemplate = amqpTemplate;
         this.stringRedisTemplate = stringRedisTemplate;
         this.userDao = userDao;
     }
 
 
     @Override
-    public String isLogin(HttpServletRequest request) throws IOException {
+    public String isLogin(HttpServletRequest request, String serviceUrl, String serviceTicketUrl) throws IOException {
+        String redirectUrl = pageLoginUrl + "?" + request.getQueryString();
         String sessionId = CookieUtils.getCookieValue(request, cookieName);
         if(!StringUtils.isEmpty(sessionId)) {
             String userJson = stringRedisTemplate.boundValueOps(sessionId).get();
             User user = JsonUtils.jsonToObject(userJson, User.class);
             if(user != null) {
                 String serviceTicket = createServiceTicket(sessionId, user.getUsername());
-                return serviceTicket;
+                redirectUrl = serviceTicketUrl + "?serviceTicket=" + serviceTicket + "&serviceUrl=" + URLEncoder.encode(serviceUrl, "UTF-8");
             }
         }
-        return null;
+        return redirectUrl;
     }
 
     @Override
@@ -74,21 +79,27 @@ public class UserServiceImpl implements UserService {
             // 登录失败，用户名或密码错误
             return null;
         }
-        // 生成sessionId
-        String sessionId = UUID.randomUUID().toString();
+        // 使用加密后的username作为sessionId
+        String sessionId = Md5Utils.crypt(user.getUsername());
         String userJson = JsonUtils.objectToJson(user);
         // 保存session到redis并设置生存时间
-        stringRedisTemplate.boundValueOps(sessionId).set(userJson,Duration.ofSeconds(sessionExpireTime));
+        Boolean absent = stringRedisTemplate.boundValueOps(sessionId).setIfAbsent(userJson, Duration.ofSeconds(sessionExpireTime));
         // 设置cookie
         CookieUtils.setCookie(response,cookieName,sessionId);
         logger.info("为用户" + user.getUsername() + "生成sessionId: " + sessionId);
-        return createServiceTicket(sessionId, user.getUsername());
+        // 如果还未登录过，则生成serviceTicket返回到登录页面
+        if(absent) {
+            return createServiceTicket(sessionId, user.getUsername());
+        }
+        return "";
     }
 
     @Override
-    public void logout(HttpServletRequest request, HttpServletResponse response, User user) throws Exception {
+    public void logout(HttpServletRequest request, HttpServletResponse response, String userName) throws Exception {
         String sessionId = CookieUtils.getCookieValue(request, cookieName);
         stringRedisTemplate.delete(sessionId);
+        AmqpUser amqpUser = new AmqpUser(userName, "logout");
+        amqpTemplate.convertAndSend(AmqpConsts.SESSION_ROUTING_KEY_NAME,JsonUtils.objectToJson(amqpUser));
         CookieUtils.deleteCookie(response,cookieName);
         String redirectUrl = pageLoginUrl;
         response.sendRedirect(redirectUrl);

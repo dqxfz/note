@@ -6,6 +6,7 @@ import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.listener.MessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
+import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -42,19 +43,24 @@ public class AmqpConfig {
         SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
         container.setQueueNames(AmqpConsts.SESSION_QUEUE_NAME);
-        container.setMessageListener(userMessageListener);
+
+        MessageListenerAdapter adapter = new MessageListenerAdapter(userMessageListener);
+        //设置处理器的消费消息的默认方法
+        adapter.setDefaultListenerMethod("onMessage");
+        container.setMessageListener(adapter);
+        container.setMessageListener(adapter);
         return container;
     }
     @Bean
-    public DirectExchange sessionExchangeTopic(){
-        return new DirectExchange(AmqpConsts.SESSION_EXCHANGE_TOPIC_NAME);
+    public TopicExchange sessionExchangeTopic(){
+        return new TopicExchange(AmqpConsts.SESSION_EXCHANGE_TOPIC_NAME);
     }
     @Bean
     public Queue sessionQueue(){
         return new Queue(AmqpConsts.SESSION_QUEUE_NAME);
     }
     @Bean
-    public Binding binding(DirectExchange sessionExchangeTopic, Queue sessionQueue){
+    public Binding binding(TopicExchange sessionExchangeTopic, Queue sessionQueue){
         return BindingBuilder
                 .bind(sessionQueue)
                 .to(sessionExchangeTopic)
