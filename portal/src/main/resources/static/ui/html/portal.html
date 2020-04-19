@@ -74,7 +74,7 @@
                 method: 'get',
                 success: function (obj) {
                     $('#user').text(obj);
-                    let logoutUrl = 'http://sso.dqxfz.site:8081/user/logout.do?userName=' + obj;
+                    let logoutUrl = 'http://sso.dqxfz.site:9000/user/logout.do?userName=' + obj;
                     $('#logout_btn').attr('href',logoutUrl);
                     let url = '/portfolio.do?id=' + obj;
                     initPortfolio(url);

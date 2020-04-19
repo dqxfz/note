@@ -30,11 +30,11 @@ function closeFileUpload(ws,commandType) {
     ws.session.process.parent().remove();
     switch (commandType) {
         case CommandType.RESPONSE_ERROR: {
-            $.messager.alert('异常','上传失败','error');
+            showError('上传失败',3000);
             break;
         }
         case CommandType.CONNECT_ERROR: {
-            $.messager.alert('异常','连接中断','error');
+            showError('连接中断',3000);
             break;
         }
     }

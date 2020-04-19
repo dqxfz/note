@@ -63,7 +63,7 @@ function addPortfolio(node) {
             node.id = obj;
         },
         error: function () {
-            alert(errorMessage);
+            showError(errorMessage, 3000);
             $(portfolio).tree('remove',node.target);
         }
     });
@@ -80,7 +80,7 @@ function renamePortfolio(node) {
             }
         },
         error: function () {
-            alert(errorMessage);
+            showError(errorMessage,3000);
             $(portfolio).tree('update', {
                 target: node.target,
                 text: node_text
@@ -192,7 +192,7 @@ function menuHandler(item){
                     downloadFile(obj,node);
                 },
                 error: function () {
-                    alert('下载失败');
+                    showError(errorMessage,3000);
                 }
             });
             break;
@@ -239,7 +239,6 @@ function uploadFile() {
                 type: file.type,
                 size: file.size
             },
-            spark: new SparkMD5.ArrayBuffer()
         }
         // 创建进度条
         createProcessBar(ws.session);
@@ -260,7 +259,8 @@ function transferComplete(e) {
     xhr.metadata.process.parent().remove();
 }
 function transferFailed(e) {
-    alert('下载失败');
+    e.target.metadata.process.parent().remove();
+    showError(errorMessage,3000);
 }
 function transferCanceled(e) {
     e.target.metadata.process.parent().remove();

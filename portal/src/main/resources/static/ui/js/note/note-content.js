@@ -104,7 +104,7 @@ function uploadImage(base64) {
             insertAtCursor(document.getElementById('note_content'),obj);
         },
         error : function() {
-            alert("由于网络原因，上传失败。");
+            showError(errorMessage,3000);
         }
     });
 }
@@ -128,10 +128,9 @@ function buttonHandler(btn) {
                     method: 'put',
                     data: {id: node.id, text: $(noteContent).val()},
                     success: function () {
-                        // alert(sucessMessage);
                     },
                     error: function () {
-                        alert(errorMessage);
+                        showError(errorMessage,3000);
                     }
                 });
                 break;
