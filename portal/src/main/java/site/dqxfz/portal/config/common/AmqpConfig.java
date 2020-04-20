@@ -12,14 +12,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import site.dqxfz.portal.constant.AmqpConsts;
-import site.dqxfz.portal.listener.UserMessageListener;
+import site.dqxfz.portal.web.amqp.UserMessageListener;
 
 /**
  * @author WENG Yang
  * @date 2020年04月14日
  **/
 @Configuration
-@ComponentScan({"site.dqxfz.portal.listener"})
+@ComponentScan({"site.dqxfz.portal.web.amqp"})
 public class AmqpConfig {
     @Value("${rabbit.url}")
     private String rabbitUrl;

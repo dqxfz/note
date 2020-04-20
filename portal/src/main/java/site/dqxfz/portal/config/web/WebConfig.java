@@ -1,15 +1,13 @@
 package site.dqxfz.portal.config.web;
 
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.*;
 import site.dqxfz.portal.converter.IconClsConverter;
-import site.dqxfz.portal.interceptor.LoginInterceptor;
+import site.dqxfz.portal.web.interceptor.LoginInterceptor;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -21,10 +19,9 @@ import java.util.List;
  **/
 @EnableWebMvc
 @ComponentScan({
-        "site.dqxfz.portal.controller",
         "site.dqxfz.portal.config.web",
-        "site.dqxfz.portal.interceptor"})
-@PropertySource({"classpath:properties/config.properties"})
+        "site.dqxfz.portal.web.controller",
+        "site.dqxfz.portal.web.interceptor"})
 public class WebConfig implements WebMvcConfigurer {
     private final LoginInterceptor loginInterceptor;
 

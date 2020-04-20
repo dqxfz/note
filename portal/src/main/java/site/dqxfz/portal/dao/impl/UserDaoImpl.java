@@ -16,6 +16,8 @@ import site.dqxfz.portal.pojo.po.User;
 public class UserDaoImpl implements UserDao {
     @Value("${portfolio.root.name}")
     private String portfolioRootName;
+    @Value("${portfolio.coordination.name}")
+    private String portfolioCoordinationName;
 
     private final MongoOperations mongoOperations;
 
@@ -31,8 +33,11 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public User saveUser(String username) {
-        Portfolio portfolio = mongoOperations.insert(new Portfolio(portfolioRootName, null, IconClsEnum.FOLDER,username));
-        User user = new User(username, portfolio.getId());
+        // 添加根目录
+        Portfolio portfolioRoot = mongoOperations.insert(new Portfolio(portfolioRootName, null, IconClsEnum.FOLDER,username));
+        // 添加协同文件夹
+        mongoOperations.insert(new Portfolio(portfolioCoordinationName, null, IconClsEnum.COORDINATION,portfolioRoot.getId() ));
+        User user = new User(username, portfolioRoot.getId());
         User user02 = mongoOperations.insert(user);
         return user02;
     }

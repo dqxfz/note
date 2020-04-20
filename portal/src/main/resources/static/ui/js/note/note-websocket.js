@@ -89,7 +89,7 @@ function openCallback(e) {
 }
 
 function initWebsocket() {
-    let ws = new WebSocket(socketUrl);
+    let ws = new WebSocket(fileSocketUrl);
     ws.onopen = openCallback;
     ws.onmessage = messageCallback;
     ws.onclose = closeCallback;

@@ -1,4 +1,4 @@
-package site.dqxfz.portal.controller;
+package site.dqxfz.portal.web.controller;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

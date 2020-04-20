@@ -1,4 +1,4 @@
-package site.dqxfz.portal.controller;
+package site.dqxfz.portal.web.websocket;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
@@ -23,11 +23,11 @@ import java.util.Map;
  * @date 2020年04月08日
  **/
 @Component
-public class WebsocketFileHandler extends AbstractWebSocketHandler {
+public class FileHandler extends AbstractWebSocketHandler {
     private final Logger logger = LogManager.getLogger(this.getClass());
     private final FileService fileService;
 
-    public WebsocketFileHandler(FileService fileService) {
+    public FileHandler(FileService fileService) {
         this.fileService = fileService;
     }
 

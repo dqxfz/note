@@ -27,6 +27,7 @@
             text-align: center;
             background: white;
         }
+
     </style>
     <script>
         /**
@@ -55,7 +56,8 @@
         /**
          * socket相关配置参数
          */
-        let socketUrl = 'ws://' + window.location.host + "/note";
+        let fileSocketUrl = 'ws://' + window.location.host + "/file";
+        let noteSocketUrl = 'ws://' + window.location.host + "/note";
         // 单位为1MB
         let sizeUnit = 1024 * 1024;
         // 限制分段上传大小为10MB
@@ -67,7 +69,6 @@
         let current_file;
         let wsArray = new Object();
         let xhrArray = new Object();
-        // console.log('host: ' + window.location.host);
         function initUserInfo() {
             $.ajax({
                 url: '/portfolio/rootId.do',
@@ -80,6 +81,9 @@
                     initPortfolio(url);
                 }
             })
+        }
+        function issueCoordinationPeople(){
+            console.log($('#coordination_people').val());
         }
 
         $(function () {
@@ -134,7 +138,9 @@
     <div id="remove" data-options="iconCls:'icon-remove',name:'remove'">删除</div>
     <div id="upload" data-options="iconCls:'',name:'upload'">上传文件</div>
     <div id="download" data-options="iconCls:'',name:'download'">下载</div>
+    <div id="coordination" data-options="iconCls:'',name:'coordination'">设置协同</div>
 </div>
+<!-- 上传文件框 -->
 <div id="upload_dlg" class="easyui-dialog" data-options="closed:true,closable:false,modal:true,buttons:'#upload_dlg_buttons'"
      style="width: 300px; height: 150px; padding: 10px 20px; text-align: center;">
     <input id="note_file" class="easyui-filebox" style="width:100%" required="true" validType="fileSize[500,'MB']">
@@ -143,6 +149,7 @@
         <a href="javascript:void(0);" class="easyui-linkbutton" style="float: left" data-options="iconCls:'icon-cancel'" onclick="$('#upload_dlg').dialog('close')">取消</a>
     </div>
 </div>
+<!-- 进度条 -->
 <div id="process_template" style="display: none">
     <button style="width:20px;height: 20px;border: none;float: left;margin-right: 10px" disabled="disabled"></button>
     <span  style="float: left; width: 100px; height: 20px; overflow:hidden;margin-right: 10px"></span>
@@ -150,5 +157,14 @@
     <button class="note-icon-cancel" style="width:20px;height: 20px;border: none;" onclick="cancel(this)"/>
 </div>
 <div id="process_div" />
+<!-- 协同编辑框 -->
+<div id="coordinate_div" class="easyui-dialog" data-options="closed:true,closable:false,modal:true,buttons:'#coordinate_div_buttons'"
+     style="width: 400px; height: 150px; padding: 10px 20px; text-align: center;">
+    <input id="coordination_people" class="easyui-textbox" data-options="iconCls:'icon-search'" style="width:300px">
+    <div id="coordinate_div_buttons">
+        <a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon-ok'" onclick="issueCoordinationPeople()">确定</a>
+        <a href="javascript:void(0);" class="easyui-linkbutton" style="float: left" data-options="iconCls:'icon-cancel'" onclick="$('#coordinate_div').dialog('close')">取消</a>
+    </div>
+</div>
 </body>
 </html>

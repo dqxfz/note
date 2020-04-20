@@ -18,6 +18,10 @@ public enum IconClsEnum {
      */
     FOLDER("folder"),
     /**
+     * 协同文件夹
+     */
+    COORDINATION("coordination"),
+    /**
      * MIME类型为application
      */
     APPLICATION("application"),

@@ -1,4 +1,4 @@
-package site.dqxfz.portal.listener;
+package site.dqxfz.portal.web.amqp;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

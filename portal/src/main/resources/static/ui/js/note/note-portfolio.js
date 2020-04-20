@@ -197,6 +197,10 @@ function menuHandler(item){
             });
             break;
         }
+        case 'coordination': {
+            $('#coordinate_div').dialog('open').dialog('setTitle','填写协同账户');
+            break;
+        }
     }
 };
 function generateUUID() {
