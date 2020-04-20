@@ -1,2 +1,2 @@
 # note
-write note with spring
+Using spring to build Notes website

@@ -28,10 +28,20 @@ public class MyBatisConfig {
     private String user;
     @Value("${jdbc.password}")
     private String password;
-    @Value("${jdbc.initial.size}")
+    @Value("${jdbc.initial-size}")
     private Integer initialSize;
-    @Value("${jdbc.max.active}")
+    @Value("${jdbc.max-idle}")
+    private Integer maxIdle;
+    @Value("${jdbc.max-active}")
     private Integer maxActive;
+    @Value("${jdbc.validation-query}")
+    private String validationQuery;
+    @Value("${jdbc.test-on-borrow}")
+    private Boolean testOnBorrow;
+    @Value("${jdbc.test-while-idle}")
+    private Boolean testWhileIdle;
+    @Value("${jdbc.max-wait}")
+    private Long maxWait;
 
     @Bean
     public SqlSessionFactoryBean sqlSessionFactory(DataSource dataSource) {
@@ -48,7 +58,12 @@ public class MyBatisConfig {
         dataSource.setUsername(user);
         dataSource.setPassword(password);
         dataSource.setInitialSize(initialSize);
+        dataSource.setMaxIdle(maxIdle);
         dataSource.setMaxActive(maxActive);
+        dataSource.setMaxWait(maxWait);
+        dataSource.setValidationQuery(validationQuery);
+        dataSource.setTestOnBorrow(testOnBorrow);
+        dataSource.setTestWhileIdle(testWhileIdle);
         return dataSource;
     }
 }

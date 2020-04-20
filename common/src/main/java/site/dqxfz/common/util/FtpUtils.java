@@ -6,9 +6,8 @@ import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 import org.springframework.util.DigestUtils;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 简单操作FTP工具类 ,此工具类支持中文文件名，不支持中文目录
@@ -25,13 +24,12 @@ public class FtpUtils {
                 throw new Exception("ftp changeWorkingDirectory failed");
             }
         }
-
         OutputStream outputStream = ftpClient.appendFileStream(uuidName);
         outputStream.write(bytes);
         outputStream.close();
         if (!ftpClient.completePendingCommand()) {
             ftpClient.disconnect();
-            throw new Exception("ftp write failed");
+            throw new Exception("ftp appendFileStream failed");
         }
     }
 
@@ -52,6 +50,8 @@ public class FtpUtils {
         ftpClient.login(ftpUserName, ftpPassword);
         //设置上传文件的类型为二进制类型
         ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+        // 设置为本地被动模式
+//        ftpClient.enterLocalPassiveMode();
         if (!FTPReply.isPositiveCompletion(ftpClient.getReplyCode())) {
             ftpClient.disconnect();
             throw new Exception("ftp connection failed");
@@ -85,7 +85,7 @@ public class FtpUtils {
         inputStream.close();
         if (!ftpClient.completePendingCommand()) {
             ftpClient.disconnect();
-            throw new Exception("ftp file retrieve failed");
+            throw new Exception("ftp getFileMd5 failed");
         }
         return endFileMd5;
     }

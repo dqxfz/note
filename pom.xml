@@ -15,6 +15,7 @@
     </modules>
     <properties>
         <failOnMissingWebXml>false</failOnMissingWebXml>
+        <!-- dependency version -->
         <spring.version>5.2.5.RELEASE</spring.version>
         <spring-data.version>Moore-SR6</spring-data.version>
         <log4j.version>2.13.1</log4j.version>
@@ -29,6 +30,9 @@
         <common-dbcp.version>1.4</common-dbcp.version>
         <spring-rabbit.version>2.2.5.RELEASE</spring-rabbit.version>
         <commons-net.version>3.6</commons-net.version>
+        <!-- plugin version-->
+        <tomcat7-maven.version>2.2</tomcat7-maven.version>
+        <docker-maven.version>1.0.0</docker-maven.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -122,7 +126,13 @@
                 <plugin>
                     <groupId>org.apache.tomcat.maven</groupId>
                     <artifactId>tomcat7-maven-plugin</artifactId>
-                    <version>2.2</version>
+                    <version>${tomcat7-maven.version}</version>
+                </plugin>
+                <!-- maven docker插件部署 -->
+                <plugin>
+                    <groupId>com.spotify</groupId>
+                    <artifactId>docker-maven-plugin</artifactId>
+                    <version>${docker-maven.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
