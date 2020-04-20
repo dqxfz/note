@@ -12,6 +12,7 @@ import site.dqxfz.portal.service.FileService;
 import site.dqxfz.portal.service.PortfolioService;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -111,6 +112,14 @@ public class PortfolioController {
             logger.error(e.getMessage(),e);
         }
         return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    @GetMapping("/note/download")
+    public void downloadNote(String id, HttpServletResponse response) {
+        try {
+            portfolioService.downloadNote(id, response);
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
+        }
     }
     @PostMapping("/image")
     public ResponseEntity uploadImage(String base64, String uuidName){

@@ -17,9 +17,12 @@ import site.dqxfz.portal.pojo.po.User;
 import site.dqxfz.portal.pojo.vo.EasyUiTreeNode;
 import site.dqxfz.portal.service.PortfolioService;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -59,7 +62,7 @@ public class PortfolioServiceImpl implements PortfolioService {
                 .map(portfolio -> new EasyUiTreeNode(
                         portfolio.getId(),
                         portfolio.getName(),
-                        portfolio.getIconCls().equals(IconClsEnum.FOLDER) ? "closed" : "open",
+                        portfolio.getIconCls().equals(IconClsEnum.FOLDER) || portfolio.getIconCls().equals(IconClsEnum.COORDINATION) ? "closed" : "open",
                         portfolio.getIconCls(),
                         portfolio.getFatherId())
                 )
@@ -129,6 +132,21 @@ public class PortfolioServiceImpl implements PortfolioService {
         String userJson = stringRedisTemplate.boundValueOps(sessionId).get();
         User user = JsonUtils.jsonToObject(userJson, User.class);
         return user;
+    }
+
+    @Override
+    public void downloadNote(String id, HttpServletResponse response) throws IOException {
+        String content = contentDao.getContentById(id);
+        // 防止content为null
+        content += "";
+        ServletOutputStream outputStream = null;
+        try {
+            outputStream = response.getOutputStream();
+            outputStream.write(content.getBytes());
+        } finally {
+            outputStream.flush();
+            outputStream.close();
+        }
     }
 
     /**

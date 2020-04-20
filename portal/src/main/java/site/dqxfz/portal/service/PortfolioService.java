@@ -6,6 +6,7 @@ import site.dqxfz.portal.pojo.po.User;
 import site.dqxfz.portal.pojo.vo.EasyUiTreeNode;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
@@ -27,4 +28,6 @@ public interface PortfolioService {
      * @throws IOException
      */
     User getRootId(HttpServletRequest request) throws IOException;
+
+    void downloadNote(String id, HttpServletResponse response) throws IOException;
 }

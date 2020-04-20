@@ -19,7 +19,7 @@ function changeEditState(edit) {
 
 function displayContent(node) {
     // 如果不是文件夹则执行操作
-    if(node.iconCls != folder) {
+    if(!isFolder(node)) {
         // 如果node节点是当前正在显示或者正在编辑的节点，则设置为视图状态后返回
         if(node.id == current_file) {
             changeEditState(false);

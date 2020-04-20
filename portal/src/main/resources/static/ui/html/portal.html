@@ -43,6 +43,7 @@
         let modelEdit = '#model_edit';
         let markdown = 'markdown';
         let folder = 'folder';
+        let coordination = 'coordination';
         let CommandType = {
             UPLOAD_START: "upload_start",
             UPLOAD_COMPLETE: "upload_complete",
@@ -79,11 +80,39 @@
                     $('#logout_btn').attr('href',logoutUrl);
                     let url = '/portfolio.do?id=' + obj;
                     initPortfolio(url);
+                },
+                error: function () {
+                    showError('获取文件目录失败', 3000);
                 }
             })
         }
         function issueCoordinationPeople(){
-            console.log($('#coordination_people').val());
+            // let userNameStr = $('#coordination_people').val() + "," + $('#user').text();
+            // userList = userList.split(',');
+            // let userNames = new Array();
+            // let i = 0;
+            // for (let userName of userList) {
+            //     if(userName) {
+            //         userNames[i++] = userName;
+            //     }
+            // }
+
+            let node = $(portfolio).tree('getSelected');
+            let data = {
+                id: node.id,
+                userNameStr: $('#coordination_people').val() + "," + $('#user').text()
+            }
+            $.ajax({
+                url: '/coordination/set.do',
+                method: 'get',
+                data: data,
+                success: function (obj) {
+                    showPrompt(obj, 3000);
+                },
+                error: function () {
+                    showError(errorMessage, 3000);
+                }
+            })
         }
 
         $(function () {

@@ -41,4 +41,12 @@ public class User {
     public void setPofolioId(String pofolioId) {
         this.pofolioId = pofolioId;
     }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "username='" + username + '\'' +
+                ", pofolioId='" + pofolioId + '\'' +
+                '}';
+    }
 }

@@ -35,6 +35,11 @@ $.extend($.fn.filebox.defaults.rules, {
         message : '文件大小必须小于 {0}{1}'
     }
 });
+
+function isFolder(node) {
+    return node.iconCls == folder || node.iconCls == coordination;
+}
+
 function changeMenuState(node) {
     if(node.fatherId == $('#user').text()) {
         $('#rename').hide();
@@ -43,7 +48,7 @@ function changeMenuState(node) {
         $('#rename').show();
         $('#remove').show();
     }
-    if(node.iconCls != folder) {
+    if(!isFolder(node)) {
         $('#add').hide();
         $('#upload').hide();
         $('#download').show();
@@ -52,6 +57,7 @@ function changeMenuState(node) {
         $('#upload').show();
         $('#download').hide();
     }
+    node.iconCls == markdown ? $('#coordination').show() : $('#coordination').hide();
 }
 
 function addPortfolio(node) {
@@ -75,7 +81,7 @@ function renamePortfolio(node) {
         method: 'put',
         data: {"id":node.id,"name":node.text},
         success: function () {
-            if(node.iconCls != folder) {
+            if(!isFolder(node)) {
                 $(noteTitle).text(node.text)
             }
         },
@@ -98,10 +104,12 @@ function initPortfolio(url) {
             e.preventDefault();
             $(portfolio).tree('select', node.target);
             changeMenuState(node);
-            $('#mm').menu('show', {
-                left: e.pageX,
-                top: e.pageY
-            });
+            if(node.iconCls != coordination) {
+                $('#mm').menu('show', {
+                    left: e.pageX,
+                    top: e.pageY
+                });
+            }
         },
         onBeforeEdit: function(node) {
             node_text = node.text;
@@ -181,12 +189,13 @@ function menuHandler(item){
             break;
         }
         case 'download': {
-            let downloadUrl = '/portfolio/note/download.do';
-            if(node.iconCls != markdown) {
-                downloadUrl = '/portfolio/file/download.do'
+            console.log(window.location.href);
+            if(node.iconCls == markdown) {
+                downloadFile('/portfolio/note/download.do?id=' + node.id,node);
+                return;
             }
             $.ajax({
-                url: downloadUrl,
+                url: '/portfolio/file/download.do',
                 data: {"id": node.id},
                 success: function (obj) {
                     downloadFile(obj,node);
@@ -258,7 +267,12 @@ function updateProgress(e) {
 function transferComplete(e) {
     let xhr = e.target;
     if (xhr.status === 200) {
-        saveAs(xhr.response, xhr.metadata.node.text);
+        let node = xhr.metadata.node;
+        let fileName = node.text;
+        if(node.iconCls == markdown) {
+            fileName += '.md';
+        }
+        saveAs(xhr.response, fileName);
     }
     xhr.metadata.process.parent().remove();
 }

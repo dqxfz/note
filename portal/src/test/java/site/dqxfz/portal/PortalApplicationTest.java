@@ -8,6 +8,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.omg.SendingContext.RunTime;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,9 +30,7 @@ import site.dqxfz.portal.service.impl.ContentServiceImpl;
 import java.io.*;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -65,8 +64,6 @@ public class PortalApplicationTest {
     @Autowired
     StringRedisTemplate stringRedisTemplate;
 
-    @Autowired
-    AmqpTemplate sendAmqpTemplate;
 
     @Test
     public void test01() throws IOException {
@@ -150,9 +147,29 @@ public class PortalApplicationTest {
     }
     @Test
     public void test13(){
-//        sendAmqpTemplate.convertAndSend(AmqpConsts.SESSION_ROUTING_KEY_NAME,"false");
-        sendAmqpTemplate.convertAndSend("test","false");
-        sendAmqpTemplate.convertAndSend("session","false");
+        List<String> users = new ArrayList<>();
+        users.add("wy01");
+        users.add("wy02");
+        users.forEach(logger::info);
+
+        logger.info("========================");
+        java.lang.String[] users1 = users.toArray(new String[0]);
+//        users1 = users1.clone();
+        users1[0]="www";
+        logger.info(users1.length);
+        Arrays.stream(users1)
+                .forEach(logger::info);
+        logger.info("========================");
+        users.forEach(logger::info);
+//        Arrays.stream(strings)
+//                .forEach(logger::info);
+//        User[] array = users.toArray(new User[users.size()]);
+//        Arrays.stream(array)
+//                .forEach(logger::info);
+//        logger.info(array);
+//        for(String string : strings) {
+//            logger.info(string);
+//        }
     }
     @Test
     public void test14() throws Exception {
