@@ -61,8 +61,8 @@
     <h2>登录良笔记</h2>
     <div class="login-top">
         <form id="login_info">
-            <input name="username" type="text" value="User Id" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'User Id';}">
-            <input name="password" type="password" value="password" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'password';}">
+            <input name="username" type="text" class="easyui-validatebox" data-options="required:true, validType:'numberAndLetter'">
+            <input name="password" type="password" class="easyui-validatebox" data-options="required:true, validType:'numberAndLetter'">
         </form>
         <div class="forgot">
 <!--            <a href="8">忘记密码</a>-->

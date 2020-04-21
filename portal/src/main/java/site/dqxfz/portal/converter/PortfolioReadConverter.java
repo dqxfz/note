@@ -20,6 +20,7 @@ public class PortfolioReadConverter implements Converter<Document, Portfolio> {
         // 根据枚举类型属性值转换为对应的枚举类
         portfolio.setIconCls(IconClsEnum.getValueOf(document.getString("iconCls")));
         portfolio.setFatherId(document.getString("fatherId"));
+        portfolio.setChildList(document.getList("childList", String.class));
         return portfolio;
     }
 }

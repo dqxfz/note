@@ -78,6 +78,16 @@
                     </resources>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.tomcat.maven</groupId>
+                <artifactId>tomcat7-maven-plugin</artifactId>
+                <configuration>
+                    <path>/</path>
+                    <url>http://sso.dqxfz.site/manager/text</url>
+                    <username>tomcat</username>
+                    <password>tomcat</password>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 </project>

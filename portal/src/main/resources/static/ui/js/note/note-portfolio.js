@@ -57,7 +57,12 @@ function changeMenuState(node) {
         $('#upload').show();
         $('#download').hide();
     }
-    node.iconCls == markdown ? $('#coordination').show() : $('#coordination').hide();
+    if(node.iconCls == markdown) {
+        node.fatherId ? $('#coordination').show() : $('#coordination').hide();
+    } else {
+        $('#coordination').hide();
+    }
+
 }
 
 function addPortfolio(node) {
@@ -126,7 +131,7 @@ function initPortfolio(url) {
         onClick: function(node){
             displayContent(node);
         }
-    }).tree('options').url = "/portfolio.do";
+    });
 }
 
 function appendNode(idValue,stateValue, textValue, iconClsVlaue, fatherId) {
@@ -189,7 +194,6 @@ function menuHandler(item){
             break;
         }
         case 'download': {
-            console.log(window.location.href);
             if(node.iconCls == markdown) {
                 downloadFile('/portfolio/note/download.do?id=' + node.id,node);
                 return;

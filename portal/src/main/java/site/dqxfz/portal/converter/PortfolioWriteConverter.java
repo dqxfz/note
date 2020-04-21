@@ -20,7 +20,7 @@ public class PortfolioWriteConverter implements Converter<Portfolio, Document> {
         // 将枚举类的value值存入数据库
         document.put("iconCls", portfolio.getIconCls().getValue());
         document.put("fatherId", portfolio.getFatherId());
-//        document.put("fatherId", new ObjectId(portfolio.getFatherId()));
+        document.put("childList", portfolio.getChildList());
         return document;
     }
 }

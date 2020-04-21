@@ -8,10 +8,12 @@ import site.dqxfz.portal.dao.PortfolioDao;
 import site.dqxfz.portal.dao.UserDao;
 import site.dqxfz.portal.pojo.po.Portfolio;
 import site.dqxfz.portal.pojo.po.User;
+import site.dqxfz.portal.pojo.vo.EasyUiTreeNode;
 import site.dqxfz.portal.service.CoordinationService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author WENG Yang
@@ -31,7 +33,6 @@ public class CoordinationServiceImpl implements CoordinationService {
 
     @Override
     public String setCoordination(String id, String[] userNames) {
-        Portfolio coordinationPortfolio = portfolioDao.getPortfolioById(id);
         List<User> users = new ArrayList<>();
         for(String userName : userNames) {
             User user = userDao.getUserByUserName(userName);
@@ -42,25 +43,34 @@ public class CoordinationServiceImpl implements CoordinationService {
         if(users.size() <= 1) {
             return ResponseConsts.COORDINATION_USER_LESS_TWO;
         }
-
+        // 设置协同文件的fatherId为null
+        portfolioDao.updateFatherIdById(id, null);
         for(User user : users) {
             List<Portfolio> portfolios = portfolioDao.listByFatherId(user.getPofolioId());
             // 查找用户的协同文件夹对象
             for (Portfolio portfolio : portfolios) {
                 if (portfolio.getIconCls().equals(IconClsEnum.COORDINATION)) {
-                    // 克隆协同文件为新的文件，插入到协同文件夹下
-//                        Portfolio newPortfolio = new Portfolio(coordinationPortfolio.getName(),
-//                                coordinationPortfolio.getType(),
-//                                coordinationPortfolio.getIconCls(),
-//                                portfolio.getId());
-//                        portfolioDao.savePortfolio(newPortfolio);
-//                        // 复制协同文件的内容为新文件的内容
-//                        String content = contentDao.getContentById(coordinationPortfolio.getId());
-//                        contentDao.saveContent(new Content(newPortfolio.getId(), content));
+                    portfolioDao.addChild(portfolio.getId(), id);
                     break;
                 }
             }
         }
-        return ResponseConsts.COORDINATION_SET_SUCCESS;
+        return null;
+    }
+
+    @Override
+    public List<EasyUiTreeNode> getChildren(String id) {
+        Portfolio coordinationPortfolio = portfolioDao.getPortfolioById(id);
+        List<Portfolio> portfolios = portfolioDao.listByIdList(coordinationPortfolio.getChildList());
+        List<EasyUiTreeNode> nodes = portfolios.stream()
+                .map(portfolio -> new EasyUiTreeNode(
+                        portfolio.getId(),
+                        portfolio.getName(),
+                        "open",
+                        portfolio.getIconCls(),
+                        portfolio.getFatherId())
+                )
+                .collect(Collectors.toList());
+        return nodes;
     }
 }

@@ -37,6 +37,7 @@ function displayContent(node) {
             }
         });
     } else {
+        $(portfolio).tree('options').url= (node.iconCls == coordination) ? '/coordination/children.do' : '/portfolio.do';
         $(portfolio).tree('expand',node.target);
     }
 }

@@ -34,3 +34,11 @@ function showError(msg, timeOut) {
     $('.panel-body').css('background-image','linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%)');
     $('.panel-htop').css('background-image','linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%)');
 }
+$.extend($.fn.textbox.defaults.rules, {
+    numberAndLetter: {
+        validator: function(value, param) {
+            return /^[0-9a-zA-Z]*$/.test(value);
+        },
+        message: '只能输入数字和字母'
+    },
+});

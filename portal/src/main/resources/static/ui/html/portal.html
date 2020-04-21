@@ -87,16 +87,6 @@
             })
         }
         function issueCoordinationPeople(){
-            // let userNameStr = $('#coordination_people').val() + "," + $('#user').text();
-            // userList = userList.split(',');
-            // let userNames = new Array();
-            // let i = 0;
-            // for (let userName of userList) {
-            //     if(userName) {
-            //         userNames[i++] = userName;
-            //     }
-            // }
-
             let node = $(portfolio).tree('getSelected');
             let data = {
                 id: node.id,
@@ -107,7 +97,11 @@
                 method: 'get',
                 data: data,
                 success: function (obj) {
-                    showPrompt(obj, 3000);
+                    if(obj) {
+                        showError(obj, 3000);
+                    } else {
+                        showPrompt(sucessMessage, 3000);
+                    }
                 },
                 error: function () {
                     showError(errorMessage, 3000);

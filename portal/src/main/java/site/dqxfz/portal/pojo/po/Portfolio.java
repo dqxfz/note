@@ -2,6 +2,9 @@ package site.dqxfz.portal.pojo.po;
 
 import site.dqxfz.portal.constant.IconClsEnum;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @Description: 文件或者文件夹所对应的实体类
  * @Author wengyang
@@ -14,6 +17,7 @@ public class Portfolio {
     private String type;
     private IconClsEnum iconCls;
     private String fatherId;
+    private List<String> childList = new ArrayList<>();
 
     public Portfolio() {
     }
@@ -63,5 +67,13 @@ public class Portfolio {
 
     public void setFatherId(String fatherId) {
         this.fatherId = fatherId;
+    }
+
+    public List<String> getChildList() {
+        return childList;
+    }
+
+    public void setChildList(List<String> childList) {
+        this.childList = childList;
     }
 }

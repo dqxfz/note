@@ -54,4 +54,25 @@ public class PortfolioDaoImpl implements PortfolioDao {
     public void deleteListByIdList(List<String> portfolioIdList) {
         mongoOperations.remove(query(where("id").in(portfolioIdList)),Portfolio.class);
     }
+
+    @Override
+    public void updateFatherIdById(String id, String fatherId) {
+        Update update = new Update().set("fatherId", fatherId);
+        Query query = query(where("id").is(id));
+        mongoOperations.updateFirst(query, update, Portfolio.class);
+    }
+
+    @Override
+    public void addChild(String id, String childId) {
+        Update update = new Update().push("childList", childId);
+        Query query = query(where("id").is(id));
+        mongoOperations.updateFirst(query, update, Portfolio.class);
+    }
+
+    @Override
+    public List<Portfolio> listByIdList(List<String> childList) {
+        Query query = query(where("id").in(childList));
+        List<Portfolio> portfolios = mongoOperations.find(query, Portfolio.class);
+        return portfolios;
+    }
 }

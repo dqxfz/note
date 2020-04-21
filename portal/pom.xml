@@ -51,7 +51,7 @@
                 <artifactId>tomcat7-maven-plugin</artifactId>
                 <configuration>
                     <path>/</path>
-                    <url>http://note.dqxfz.site:8080/manager/text</url>
+                    <url>http://note.dqxfz.site/manager/text</url>
                     <username>tomcat</username>
                     <password>tomcat</password>
                 </configuration>

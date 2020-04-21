@@ -16,4 +16,10 @@ public interface PortfolioDao {
     Portfolio getPortfolioById(String id);
 
     void deleteListByIdList(List<String> portfolioIdList);
+
+    void updateFatherIdById(String id, String fatherId);
+
+    void addChild(String id, String childId);
+
+    List<Portfolio> listByIdList(List<String> childList);
 }

@@ -18,25 +18,28 @@
     <script>
 
         function register() {
-            $.ajax({
-                url: '/user/register.do',
-                method: 'post',
-                data: $('#login_info').serialize(),
-                success: function () {
-                    showPrompt('注册成功，请登录',3000);
-                },
-                error: function (jqXHR) {
-                    let responseText = jqXHR.responseText;
-                    if(responseText != null && responseText != '') {
-                        let start = responseText.indexOf('"');
-                        let end = responseText.lastIndexOf('"');
-                        showError(responseText.substring(start + 1,end),3000);
-                    } else {
-                        showError('服务器异常', 3000);
+            if($('#login_info').form('validate')) {
+                $.ajax({
+                    url: '/user/register.do',
+                    method: 'post',
+                    data: $('#login_info').serialize(),
+                    success: function () {
+                        showPrompt('注册成功，请登录', 3000);
+                    },
+                    error: function (jqXHR) {
+                        let responseText = jqXHR.responseText;
+                        if (responseText != null && responseText != '') {
+                            let start = responseText.indexOf('"');
+                            let end = responseText.lastIndexOf('"');
+                            showError(responseText.substring(start + 1, end), 3000);
+                        } else {
+                            showError('服务器异常', 3000);
+                        }
                     }
-                }
-            })
+                })
+            }
         }
+
     </script>
 </head>
 <body>
@@ -44,8 +47,8 @@
     <h2>注册良笔记</h2>
     <div class="login-top">
         <form id="login_info">
-            <input name="username" type="text" value="User Id" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'User Id';}">
-            <input name="password" type="password" value="password" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'password';}">
+            <input name="username" type="text" class="easyui-validatebox" data-options="required:true, validType:'numberAndLetter'">
+            <input name="password" type="password" class="easyui-validatebox" data-options="required:true, validType:'numberAndLetter'">
         </form>
         <div class="forgot">
             <input type="submit" value="注册" onclick="register()" >
