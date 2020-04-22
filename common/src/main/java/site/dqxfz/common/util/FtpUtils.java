@@ -42,7 +42,7 @@ public class FtpUtils {
      * @return FTPClient
      */
     public static FTPClient getFTPClient(String ftpHost, int ftpPort,
-            String ftpUserName, String ftpPassword) throws Exception {
+            String ftpUserName, String ftpPassword, boolean isPassive) throws Exception {
         FTPClient ftpClient = new FTPClient();
         // 连接FPT服务器,设置IP及端口
         ftpClient.connect(ftpHost, ftpPort);
@@ -51,7 +51,9 @@ public class FtpUtils {
         //设置上传文件的类型为二进制类型
         ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
         // 设置为本地被动模式
-//        ftpClient.enterLocalPassiveMode();
+        if(isPassive) {
+            ftpClient.enterLocalPassiveMode();
+        }
         if (!FTPReply.isPositiveCompletion(ftpClient.getReplyCode())) {
             ftpClient.disconnect();
             throw new Exception("ftp connection failed");

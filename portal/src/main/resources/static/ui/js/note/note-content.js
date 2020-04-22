@@ -65,7 +65,7 @@ function insertAtCursor(myField, myValue) {
     //IE 浏览器
     if (document.selection) {
         myField.focus();
-        sel = document.selection.createRange();
+        let sel = document.selection.createRange();
         sel.text = myValue;
         sel.select();
     }
@@ -110,7 +110,21 @@ function uploadImage(base64) {
     });
 }
 
+function getChar(myField) {
+    if (myField.selectionStart || myField.selectionStart == '0') {
+        var startPos = myField.selectionStart;
+        var endPos = myField.selectionEnd;
+
+        // 保存滚动条
+        // var restoreTop = myField.scrollTop;
+        console.log(myField.value.substring(startPos - 1, startPos));
+        // myField.value = myField.value.substring(0, startPos) + myValue + myField.value.substring(endPos, myField.value.length);
+
+    }
+}
+
 function convert(){
+    getChar(document.getElementById('note_content'));
     let text = $(noteContent).val();
     let converter = new showdown.Converter();
     let html = converter.makeHtml(text);
@@ -137,7 +151,14 @@ function buttonHandler(btn) {
                 break;
             }
             case "edit": {
-                node.iconCls == markdown ? changeEditState(true) : changeEditState(false);
+                changeEditState(false);
+                if(node.iconCls == markdown) {
+                    if(node.fatherId) {
+                        changeEditState(true);
+                    } else {
+                        changeEditState(false);
+                    }
+                }
                 break;
             }
         }

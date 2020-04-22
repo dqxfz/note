@@ -7,7 +7,6 @@ function transferSnippet(ws) {
     reader.readAsArrayBuffer(blob);
     reader.onload = function (e) {
         let blob = e.target.result;
-        // ws.session.spark.append(blob);
         ws.send(blob);
     }
 }
@@ -88,7 +87,7 @@ function openCallback(e) {
     transferFileMetaData(e.target);
 }
 
-function initWebsocket() {
+function createWebsocket() {
     let ws = new WebSocket(fileSocketUrl);
     ws.onopen = openCallback;
     ws.onmessage = messageCallback;

@@ -34,7 +34,7 @@
          * 常量
          */
         let errorMessage = '执行失败';
-        let sucessMessage = '执行成功';
+        let successMessage = '执行成功';
         let portfolio = '#portfolio';
         let noteContent = '#note_content';
         let nodeDisplay = '#note_display';
@@ -59,6 +59,7 @@
          */
         let fileSocketUrl = 'ws://' + window.location.host + "/file";
         let noteSocketUrl = 'ws://' + window.location.host + "/note";
+        let noteWS;
         // 单位为1MB
         let sizeUnit = 1024 * 1024;
         // 限制分段上传大小为10MB
@@ -70,49 +71,36 @@
         let current_file;
         let wsArray = new Object();
         let xhrArray = new Object();
-        function initUserInfo() {
-            $.ajax({
-                url: '/portfolio/rootId.do',
-                method: 'get',
-                success: function (obj) {
-                    $('#user').text(obj);
-                    let logoutUrl = 'http://sso.dqxfz.site:9000/user/logout.do?userName=' + obj;
-                    $('#logout_btn').attr('href',logoutUrl);
-                    let url = '/portfolio.do?id=' + obj;
-                    initPortfolio(url);
-                },
-                error: function () {
-                    showError('获取文件目录失败', 3000);
-                }
-            })
-        }
-        function issueCoordinationPeople(){
-            let node = $(portfolio).tree('getSelected');
-            let data = {
-                id: node.id,
-                userNameStr: $('#coordination_people').val() + "," + $('#user').text()
-            }
-            $.ajax({
-                url: '/coordination/set.do',
-                method: 'get',
-                data: data,
-                success: function (obj) {
-                    if(obj) {
-                        showError(obj, 3000);
-                    } else {
-                        showPrompt(sucessMessage, 3000);
-                    }
-                },
-                error: function () {
-                    showError(errorMessage, 3000);
-                }
-            })
-        }
 
         $(function () {
             initUserInfo();
             initContent();
+            initNoteWebsocket();
         });
+
+        function noteMessageCallback(e) {
+            console.log(e.data);
+        }
+
+        function noteCloseCallback(e) {
+            noteWS = null;
+            console.log('noteWS: ' + e);
+        }
+        function noteErrorCallback(e) {
+            noteWS = null;
+            console.log('noteWS: ' + e);
+        }
+        function noteOpenCallback(e) {
+
+        }
+
+        function initNoteWebsocket() {
+            noteWS = new WebSocket(noteSocketUrl);
+            noteWS.onopen = noteOpenCallback;
+            noteWS.onmessage = noteMessageCallback;
+            noteWS.onclose = noteCloseCallback;
+            noteWS.onerror = noteErrorCallback;
+        }
     </script>
 </head>
 <body>

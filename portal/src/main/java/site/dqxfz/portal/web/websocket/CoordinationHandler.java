@@ -1,5 +1,7 @@
 package site.dqxfz.portal.web.websocket;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.CloseStatus;
@@ -19,6 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class CoordinationHandler extends AbstractWebSocketHandler {
     private final Map<String, List<WebSocketSession>> sessionMap = new ConcurrentHashMap();
+    private final Logger logger = LogManager.getLogger(this.getClass());
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         super.afterConnectionEstablished(session);
@@ -26,11 +29,13 @@ public class CoordinationHandler extends AbstractWebSocketHandler {
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+        logger.info(message.getPayload());
         super.handleTextMessage(session, message);
     }
 
     @Override
     protected void handleBinaryMessage(WebSocketSession session, BinaryMessage message) throws Exception {
+        logger.info(message.getPayload());
         super.handleBinaryMessage(session, message);
     }
 

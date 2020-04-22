@@ -33,9 +33,11 @@ public class FileServiceImpl implements FileService {
     @Value("${file.ftp.port}")
     private Integer fileFtpPort;
     @Value("${file.ftp.user}")
-    String fileFtpUser;
+    private String fileFtpUser;
     @Value("${file.ftp.password}")
-    String fileFtpPassword;
+    private String fileFtpPassword;
+    @Value("${file.ftp.passive}")
+    private Boolean passive;
 
     private final PortfolioDao portfolioDao;
     private final ContentDao contentDao;
@@ -56,7 +58,7 @@ public class FileServiceImpl implements FileService {
     public void createFile(NoteFile noteFile, Map<String, Object> sessionAttributes) throws Exception {
         logger.info(noteFile.getName() + "创建时间：" + Instant.now());
         sessionAttributes.put("start", Instant.now());
-        FTPClient ftpClient = FtpUtils.getFTPClient(fileFtpUrl, fileFtpPort, fileFtpUser, fileFtpPassword);
+        FTPClient ftpClient = FtpUtils.getFTPClient(fileFtpUrl, fileFtpPort, fileFtpUser, fileFtpPassword, passive);
         sessionAttributes.put("ftpClient", ftpClient);
     }
 
@@ -95,7 +97,7 @@ public class FileServiceImpl implements FileService {
         String imageBase64 = base64.substring(base64.indexOf(',') + 1);
         BASE64Decoder d = new BASE64Decoder();
         byte[] bytes = d.decodeBuffer(imageBase64);
-        FTPClient ftpClient = FtpUtils.getFTPClient(fileFtpUrl, fileFtpPort, fileFtpUser, fileFtpPassword);
+        FTPClient ftpClient = FtpUtils.getFTPClient(fileFtpUrl, fileFtpPort, fileFtpUser, fileFtpPassword, passive);
         FtpUtils.uploadBytes(bytes, uuidName, "image", ftpClient);
         FtpUtils.closeFTP(ftpClient);
         return "![](http://" + fileFtpUrl + "/image/" + uuidName + ")";

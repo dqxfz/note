@@ -245,7 +245,7 @@ function uploadFile() {
         let file = $('#note_file').filebox('files')[0];
         let selectedNode = $(portfolio).tree('getSelected');
         file.snippetNum = 0;
-        let ws = initWebsocket();
+        let ws = createWebsocket();
         wsArray[uuidName] = ws;
         ws.session = {
             file: file,
@@ -348,4 +348,42 @@ function downloadFile(url,node) {
         process: process
     }
     getBlob(downloadMetadata);
+}
+function initUserInfo() {
+    $.ajax({
+        url: '/portfolio/rootId.do',
+        method: 'get',
+        success: function (obj) {
+            $('#user').text(obj);
+            let logoutUrl = 'http://sso.dqxfz.site:9000/user/logout.do?userName=' + obj;
+            $('#logout_btn').attr('href',logoutUrl);
+            let url = '/portfolio.do?id=' + obj;
+            initPortfolio(url);
+        },
+        error: function () {
+            showError('获取文件目录失败', 3000);
+        }
+    })
+}
+function issueCoordinationPeople(){
+    let node = $(portfolio).tree('getSelected');
+    let data = {
+        id: node.id,
+        userNameStr: $('#coordination_people').val() + "," + $('#user').text()
+    }
+    $.ajax({
+        url: '/coordination/set.do',
+        method: 'get',
+        data: data,
+        success: function (obj) {
+            if(obj) {
+                showError(obj, 3000);
+            } else {
+                showPrompt(successMessage, 3000);
+            }
+        },
+        error: function () {
+            showError(errorMessage, 3000);
+        }
+    })
 }

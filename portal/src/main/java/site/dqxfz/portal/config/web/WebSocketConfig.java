@@ -30,7 +30,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(fileHandler, "/file");
-        registry.addHandler(coordinationHandler, "/coordination");
+        registry.addHandler(coordinationHandler, "/note");
     }
     @Bean
     public ServletServerContainerFactoryBean createWebSocketContainer() {

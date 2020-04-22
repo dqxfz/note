@@ -44,6 +44,8 @@ public class PortfolioServiceImpl implements PortfolioService {
     String fileFtpPassword;
     @Value("${cookie.name}")
     private String cookieName;
+    @Value("${file.ftp.passive}")
+    private Boolean passive;
 
     private final PortfolioDao portfolioDao;
     private final ContentDao contentDao;
@@ -112,7 +114,7 @@ public class PortfolioServiceImpl implements PortfolioService {
         portfolioDao.deleteListByIdList(portfolioIdList);
         // 删除content
         contentDao.deleteListByIdList(portfolioIdList);
-        FTPClient ftpClient = FtpUtils.getFTPClient(fileFtpUrl, fileFtpPort, fileFtpUser, fileFtpPassword);
+        FTPClient ftpClient = FtpUtils.getFTPClient(fileFtpUrl, fileFtpPort, fileFtpUser, fileFtpPassword, passive);
         // 删除文件
         for (String uuidName : uuidNameList) {
             FtpUtils.deleteFile(uuidName, ftpClient);

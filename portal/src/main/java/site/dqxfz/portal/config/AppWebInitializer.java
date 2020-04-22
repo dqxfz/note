@@ -27,7 +27,8 @@ public class AppWebInitializer implements WebApplicationInitializer {
         dispatcher.setLoadOnStartup(1);
         // 允许通过以'.do'结尾的请求和'/ui/'开头的请求
         dispatcher.addMapping("*.do","/ui/*","/note","/file");
-        // 添加FormContentFilter，使spring mvc能够接受put请求和delete请求
+//        dispatcher.addMapping("/");
+        // 添加FormContentFilter，使spring mvc能够  接受put请求和delete请求
         FilterRegistration.Dynamic FormContentFilter = servletContext.addFilter("formContentFilter", new FormContentFilter());
         FormContentFilter.addMappingForUrlPatterns(null,false,"/*");
     }
