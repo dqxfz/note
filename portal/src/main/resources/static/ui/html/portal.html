@@ -30,7 +30,8 @@
 
     </style>
     <script>
-        /**
+
+    /**
          * 常量
          */
         let errorMessage = '执行失败';
@@ -52,7 +53,11 @@
             RESPONSE_COMPLETE: "response_complete",
             UPLOAD: 'upload',
             DOWNLOAD: 'download',
-            CONNECT_ERROR: 'connect_error'
+            CONNECT_ERROR: 'connect_error',
+            COORDINATION_ADD: 'coordination_add',
+            COORDINATION_DELETE: 'coordination_delete',
+            COORDINATION_RESPONSE_ALL: 'coordination_response_all',
+            COORDINATION_RESPONSE_PART: 'coordination_response_part'
         }
         /**
          * socket相关配置参数
@@ -71,6 +76,11 @@
         let current_file;
         let wsArray = new Object();
         let xhrArray = new Object();
+        let lastTextArea = new Object();
+        let noteText = new Object();
+        let principal = new Object();
+        let currentNode;
+        let noteContentObject;
 
         $(function () {
             initUserInfo();
@@ -78,8 +88,41 @@
             initNoteWebsocket();
         });
 
-        function noteMessageCallback(e) {
-            console.log(e.data);
+    function dealPart(data) {
+        let notePart = JSON.parse(data);
+        if(notePart.id == currentNode.id) {
+            switch (notePart.type) {
+                case CommandType.COORDINATION_ADD: {
+                    noteContentObject.value = noteContentObject.value.substring(0, notePart.start) + notePart.value + noteContentObject.value.substring(notePart.start, noteContentObject.value.length);
+                    lastTextArea.start = noteContentObject.selectionStart;
+                    lastTextArea.end = noteContentObject.selectionEnd;
+                    lastTextArea.length += notePart.value.length;
+                    break;
+                }
+                case CommandType.COORDINATION_DELETE: {
+                    noteContentObject.value = noteContentObject.value.substring(0, notePart.start) + noteContentObject.value.substring(notePart.end, noteContentObject.value.length);
+                    lastTextArea.start = noteContentObject.selectionStart;
+                    lastTextArea.end = noteContentObject.selectionEnd;
+                    lastTextArea.length -= (notePart.end - notePart.start);
+                    break;
+                }
+            }
+        }
+    }
+
+    function noteMessageCallback(e) {
+            let resp = JSON.parse(e.data);
+            console.log(resp);
+            // switch (resp.command) {
+            //     case CommandType.COORDINATION_RESPONSE_ALL: {
+            //         $(noteContent).val(resp.data);
+            //         break;
+            //     }
+            //     case CommandType.COORDINATION_RESPONSE_PART: {
+            //         dealPart(resp.data);
+            //         break;
+            //     }
+            // }
         }
 
         function noteCloseCallback(e) {
@@ -100,6 +143,48 @@
             noteWS.onmessage = noteMessageCallback;
             noteWS.onclose = noteCloseCallback;
             noteWS.onerror = noteErrorCallback;
+        }
+
+
+        function refreshTextArea() {
+            lastTextArea.start = noteContentObject.selectionStart;
+            lastTextArea.end = noteContentObject.selectionEnd;
+            lastTextArea.length = noteContentObject.value.length;
+        }
+
+        function refreshCursorPos() {
+            refreshTextArea(noteContentObject);
+        }
+
+        function sendSync(noteText) {
+            noteWS.send(JSON.stringify(noteText));
+        }
+
+        function textKeyup() {
+            if(noteContentObject.value.length < lastTextArea.length) {
+                noteText.type = CommandType.COORDINATION_DELETE;
+                noteText.value = null;
+                noteText.start = noteContentObject.selectionStart;
+                noteText.end = lastTextArea.end;
+                sendSync(noteText);
+                refreshTextArea(noteContentObject);
+            } else if(noteContentObject.value.length > lastTextArea.length){
+                // 添加了内容
+                if(noteContentObject.selectionStart > lastTextArea.start) {
+                    // 获取输入内容
+                    let inputText = noteContentObject.value.substring(lastTextArea.start, noteContentObject.selectionStart);
+                    noteText.type = CommandType.COORDINATION_ADD;
+                    noteText.value = inputText;
+                    noteText.start = lastTextArea.start;
+                    noteText.end = null;
+                    sendSync(noteText);
+                    refreshTextArea();
+                }
+            } else {
+                if(noteContentObject.selectionStart != lastTextArea.start) {
+                    refreshTextArea();
+                }
+            }
         }
     </script>
 </head>
@@ -129,7 +214,7 @@
             </div>
         </div>
         <div id="model_edit" style="width: 100%;height: 100%;">
-            <textarea id="note_content" onkeyup="convert()"></textarea>
+            <textarea id="note_content" onclick="refreshCursorPos()" onkeyup="textKeyup()"></textarea>
             <div id="note_display"></div>
         </div>
         <div id="model_view" style="width: 100%;height: 100%; padding-bottom: 70px">

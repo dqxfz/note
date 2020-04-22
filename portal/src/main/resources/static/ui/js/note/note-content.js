@@ -1,4 +1,5 @@
 
+
 function initContent() {
     changeEditState(false);
     convert();
@@ -16,7 +17,11 @@ function changeEditState(edit) {
         $(modelEdit).hide();
     }
 }
-
+function setContent(text,title) {
+    $(noteTitle).text(text);
+    $(noteContent).val(title);
+    convert();
+}
 function displayContent(node) {
     // 如果不是文件夹则执行操作
     if(!isFolder(node)) {
@@ -31,12 +36,11 @@ function displayContent(node) {
             url: "/content.do",
             data: {"id": node.id, "iconCls": node.iconCls},
             success: function (obj) {
-                $(noteTitle).text(node.text);
-                $(noteContent).val(obj);
-                convert();
+                setContent(node.text, obj);
             }
         });
     } else {
+        setContent('', '日记');
         $(portfolio).tree('options').url= (node.iconCls == coordination) ? '/coordination/children.do' : '/portfolio.do';
         $(portfolio).tree('expand',node.target);
     }
@@ -110,21 +114,7 @@ function uploadImage(base64) {
     });
 }
 
-function getChar(myField) {
-    if (myField.selectionStart || myField.selectionStart == '0') {
-        var startPos = myField.selectionStart;
-        var endPos = myField.selectionEnd;
-
-        // 保存滚动条
-        // var restoreTop = myField.scrollTop;
-        console.log(myField.value.substring(startPos - 1, startPos));
-        // myField.value = myField.value.substring(0, startPos) + myValue + myField.value.substring(endPos, myField.value.length);
-
-    }
-}
-
 function convert(){
-    getChar(document.getElementById('note_content'));
     let text = $(noteContent).val();
     let converter = new showdown.Converter();
     let html = converter.makeHtml(text);
@@ -134,7 +124,7 @@ function convert(){
     hljs.highlightBlock(document.getElementById("model_view"));
 }
 function buttonHandler(btn) {
-    let node = $(portfolio).tree('getSelected');
+    let node = currentNode;
     if(node.iconCls == markdown) {
         switch (btn) {
             case "save": {
@@ -151,12 +141,16 @@ function buttonHandler(btn) {
                 break;
             }
             case "edit": {
+                noteContentObject = document.getElementById('note_content');
                 changeEditState(false);
                 if(node.iconCls == markdown) {
-                    if(node.fatherId) {
+                    changeEditState(true);
+                    if(!node.fatherId) {
                         changeEditState(true);
-                    } else {
-                        changeEditState(false);
+                        principal.userName = $('#user').text();
+                        principal.id = node.id;
+                        noteText.id = node.id;
+                        noteWS.send(JSON.stringify(principal));
                     }
                 }
                 break;

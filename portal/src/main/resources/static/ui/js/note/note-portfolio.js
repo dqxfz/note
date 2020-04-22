@@ -105,9 +105,10 @@ function initPortfolio(url) {
         url: url,
         method: 'get',
         onContextMenu: function(e, node){
+            $(portfolio).tree('select', node.target);
+            currentNode = node;
             displayContent(node);
             e.preventDefault();
-            $(portfolio).tree('select', node.target);
             changeMenuState(node);
             if(node.iconCls != coordination) {
                 $('#mm').menu('show', {
@@ -129,6 +130,7 @@ function initPortfolio(url) {
             }
         },
         onClick: function(node){
+            currentNode = node;
             displayContent(node);
         }
     });
@@ -154,8 +156,7 @@ function appendNode(idValue,stateValue, textValue, iconClsVlaue, fatherId) {
 }
 
 function menuHandler(item){
-    let node = $(portfolio).tree('getSelected');
-
+    let node = currentNode;
     switch(item.name) {
         case 'folder': {
             appendNode(0,'closed','新文件夹', folder, node.id);
@@ -243,7 +244,7 @@ function uploadFile() {
         $('#upload_dlg').dialog('close');
         let uuidName = generateUUID();
         let file = $('#note_file').filebox('files')[0];
-        let selectedNode = $(portfolio).tree('getSelected');
+        let selectedNode = currentNode;
         file.snippetNum = 0;
         let ws = createWebsocket();
         wsArray[uuidName] = ws;
@@ -366,7 +367,7 @@ function initUserInfo() {
     })
 }
 function issueCoordinationPeople(){
-    let node = $(portfolio).tree('getSelected');
+    let node = currentNode;
     let data = {
         id: node.id,
         userNameStr: $('#coordination_people').val() + "," + $('#user').text()

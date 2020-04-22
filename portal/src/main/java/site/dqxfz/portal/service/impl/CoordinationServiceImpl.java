@@ -1,18 +1,28 @@
 package site.dqxfz.portal.service.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketSession;
+import site.dqxfz.portal.constant.CommandEnum;
 import site.dqxfz.portal.constant.IconClsEnum;
 import site.dqxfz.portal.constant.ResponseConsts;
 import site.dqxfz.portal.dao.ContentDao;
 import site.dqxfz.portal.dao.PortfolioDao;
 import site.dqxfz.portal.dao.UserDao;
+import site.dqxfz.portal.pojo.dto.NoteText;
+import site.dqxfz.portal.pojo.dto.Principal;
+import site.dqxfz.portal.pojo.po.Content;
 import site.dqxfz.portal.pojo.po.Portfolio;
 import site.dqxfz.portal.pojo.po.User;
 import site.dqxfz.portal.pojo.vo.EasyUiTreeNode;
 import site.dqxfz.portal.service.CoordinationService;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -73,4 +83,56 @@ public class CoordinationServiceImpl implements CoordinationService {
                 .collect(Collectors.toList());
         return nodes;
     }
+    private void sendMessage(WebSocketSession session, CommandEnum command, Object data) throws Exception {
+        Map<String,Object> map = new HashMap(2);
+        map.put("command", command.getValue());
+        map.put("data", data);
+        ObjectMapper mapper = new ObjectMapper();
+        String response = mapper.writeValueAsString(map);
+        session.sendMessage(new TextMessage(response));
+    }
+    @Override
+    public void startCoordinate(WebSocketSession session, Principal principal, Map<String, String> textMap, Map<String, List<WebSocketSession>> sessionMap) throws Exception {
+        Map<String, Object> sessionAttributes = session.getAttributes();
+        sessionAttributes.put("principal", principal);
+        String id = principal.getId();
+        if(!textMap.containsKey(id)) {
+            String text = contentDao.getContentById(id);
+            textMap.put(id, text);
+        }
+        if(!sessionMap.containsKey(id)) {
+            List<WebSocketSession> list = new ArrayList<>();
+            list.add(session);
+            sessionMap.put(id, list);
+        } else {
+            List<WebSocketSession> list = sessionMap.get(id);
+            list.add(session);
+        }
+        sendMessage(session, CommandEnum.COORDINATION_RESPONSE_ALL, textMap.get(id));
+
+    }
+    @Override
+    public void publishText(WebSocketSession session, NoteText noteText, Map<String, String> textMap, Map<String, List<WebSocketSession>> sessionMap) throws Exception {
+        String id = noteText.getId();
+
+        String text = textMap.get(id);
+        StringBuilder textBuilder = new StringBuilder(text);
+        if(CommandEnum.COORDINATION_ADD.getValue().equals(noteText.getType())) {
+            // 向协同文件添加内容
+            textBuilder.insert(noteText.getStart(), noteText.getValue());
+        } else {
+            // 删除协同文件内容
+            textBuilder.delete(noteText.getStart(), noteText.getEnd());
+        }
+        textMap.put(id, textBuilder.toString());
+
+        List<WebSocketSession> list = sessionMap.get(id);
+        for (WebSocketSession socketSession : list) {
+            if(!session.equals(session)) {
+                sendMessage(socketSession, CommandEnum.COORDINATION_RESPONSE_PART, noteText);
+            }
+        }
+
+    }
+
 }

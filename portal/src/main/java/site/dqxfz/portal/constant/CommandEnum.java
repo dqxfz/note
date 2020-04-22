@@ -26,7 +26,23 @@ public enum CommandEnum {
     /**
      * 文件元信息保存完成，整个上传流程结束
      */
-    RESPONSE_COMPLETE("response_complete");
+    RESPONSE_COMPLETE("response_complete"),
+    /**
+     * 协同命令：添加
+     */
+    COORDINATION_ADD("coordination_add"),
+    /**
+     * 协同命令：删除
+     */
+    COORDINATION_DELETE("coordination_delete"),
+    /**
+     *  传给客户的是笔记的所有内容
+     */
+    COORDINATION_RESPONSE_ALL("coordination_response_all"),
+    /**
+     *  传给客户的是笔记的改变部分
+     */
+    COORDINATION_RESPONSE_PART("coordination_response_part");
 
     private final String value;
 
