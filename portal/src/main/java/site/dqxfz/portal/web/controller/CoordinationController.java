@@ -56,5 +56,15 @@ public class CoordinationController {
         }
         return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
     }
+    @DeleteMapping
+    public ResponseEntity deleteCoordinationChild(String fatherId, String id) {
+        try {
+            coordinationService.deleteChild(fatherId, id);
+            return new ResponseEntity(HttpStatus.OK);
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
+        }
+        return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 
 }

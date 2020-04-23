@@ -22,4 +22,8 @@ public interface PortfolioDao {
     void addChild(String id, String childId);
 
     List<Portfolio> listByIdList(List<String> childList);
+
+    void updateCoordinationNumById(String id, int size);
+
+    void deleteChild(String fatherId, String id);
 }

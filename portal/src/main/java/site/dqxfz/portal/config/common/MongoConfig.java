@@ -11,12 +11,10 @@ import org.springframework.data.mongodb.config.AbstractMongoClientConfiguration;
 import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
 import org.springframework.data.mongodb.config.EnableMongoAuditing;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.convert.MongoConverter;
-import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
+import org.springframework.data.mongodb.core.convert.*;
 import org.springframework.data.mongodb.core.mapping.event.LoggingEventListener;
 import org.springframework.data.mongodb.core.mapping.event.MongoMappingEvent;
-import site.dqxfz.portal.converter.PortfolioReadConverter;
-import site.dqxfz.portal.converter.PortfolioWriteConverter;
+import site.dqxfz.portal.converter.*;
 
 import java.util.*;
 
@@ -42,16 +40,10 @@ public class MongoConfig extends AbstractMongoClientConfiguration {
         return mongoDatabase;
     }
 
-    /**
-     * 添加自定义的Converter
-     * @return
-     */
     @Override
-    public CustomConversions customConversions() {
-        List<Converter<?, ?>> converterList = new ArrayList();
-        converterList.add(new PortfolioWriteConverter());
-        converterList.add(new PortfolioReadConverter());
-        return new MongoCustomConversions(converterList);
+    public MappingMongoConverter mappingMongoConverter() throws Exception {
+        MappingMongoConverter mappingMongoConverter = super.mappingMongoConverter();
+        mappingMongoConverter.setTypeMapper(new DefaultMongoTypeMapper(null));
+        return mappingMongoConverter;
     }
-
 }

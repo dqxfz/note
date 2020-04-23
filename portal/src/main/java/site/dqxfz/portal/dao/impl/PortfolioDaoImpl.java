@@ -1,5 +1,6 @@
 package site.dqxfz.portal.dao.impl;
 
+import com.mongodb.client.result.UpdateResult;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -64,7 +65,7 @@ public class PortfolioDaoImpl implements PortfolioDao {
 
     @Override
     public void addChild(String id, String childId) {
-        Update update = new Update().push("childList", childId);
+        Update update = new Update().addToSet("childList", childId);
         Query query = query(where("id").is(id));
         mongoOperations.updateFirst(query, update, Portfolio.class);
     }
@@ -74,5 +75,25 @@ public class PortfolioDaoImpl implements PortfolioDao {
         Query query = query(where("id").in(childList));
         List<Portfolio> portfolios = mongoOperations.find(query, Portfolio.class);
         return portfolios;
+    }
+
+    @Override
+    public void updateCoordinationNumById(String id, int size) {
+        Update update = new Update().set("coordinationNum", size);
+        Query query = query(where("id").is(id));
+        mongoOperations.updateFirst(query, update, Portfolio.class);
+    }
+
+    @Override
+    public void deleteChild(String fatherId, String id) {
+        // 更新father
+        Update update = new Update().pull("childList", id);
+        Query query = query(where("id").is(fatherId));
+        mongoOperations.updateFirst(query, update, Portfolio.class);
+
+        // 更新child
+        update = new Update().inc("coordinationNum", -1);
+        query = query(where("id").is(id));
+        UpdateResult updateResult = mongoOperations.updateFirst(query, update, Portfolio.class);
     }
 }

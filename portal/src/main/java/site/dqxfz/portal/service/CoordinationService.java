@@ -23,4 +23,6 @@ public interface CoordinationService {
     void publishText(WebSocketSession session, NoteText noteText, Map<String, String> textMap, Map<String, HashSet<WebSocketSession>> sessionMap) throws Exception;
 
     void dealExit(String id, WebSocketSession session, Map<String, String> textMap, Map<String, HashSet<WebSocketSession>> sessionMap);
+
+    void deleteChild(String fatherId, String id);
 }

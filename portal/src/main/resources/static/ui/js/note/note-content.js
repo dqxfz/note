@@ -17,7 +17,7 @@ function changeEditState(edit) {
         $(modelEdit).hide();
     }
 }
-function setContent(text,title) {
+function setContent(title,text) {
     $(noteTitle).text(title);
     $(noteContent).val(text);
     convert();
@@ -53,7 +53,7 @@ function displayContent(node) {
         }
     } else {
         changeEditState(false);
-        setContent('', '日记');
+        setContent('日记', '');
         last_edit_file_id = node.id;
         $(portfolio).tree('expand',node.target);
     }

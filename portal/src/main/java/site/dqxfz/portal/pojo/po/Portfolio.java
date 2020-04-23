@@ -18,6 +18,7 @@ public class Portfolio {
     private IconClsEnum iconCls;
     private String fatherId;
     private List<String> childList = new ArrayList<>();
+    private Integer coordinationNum;
 
     public Portfolio() {
     }
@@ -75,5 +76,13 @@ public class Portfolio {
 
     public void setChildList(List<String> childList) {
         this.childList = childList;
+    }
+
+    public Integer getCoordinationNum() {
+        return coordinationNum;
+    }
+
+    public void setCoordinationNum(Integer coordinationNum) {
+        this.coordinationNum = coordinationNum;
     }
 }

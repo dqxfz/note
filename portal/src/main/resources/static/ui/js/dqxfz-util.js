@@ -13,7 +13,7 @@ function showPrompt(msg, timeOut) {
     });
     $('.panel-tool').hide();
     $('.panel-body').css('border-style','none');
-    $('.panel-body').css('background-image','linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%)');
+    // $('.panel-body').css('background-image','linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%)');
     $('.panel-htop').css('background-image','linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%)');
 }
 function showError(msg, timeOut) {
@@ -31,6 +31,6 @@ function showError(msg, timeOut) {
     });
     $('.panel-tool').hide();
     $('.panel-body').css('border-style','none');
-    $('.panel-body').css('background-image','linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%)');
+    // $('.panel-body').css('background-image','linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%)');
     $('.panel-htop').css('background-image','linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%)');
 }

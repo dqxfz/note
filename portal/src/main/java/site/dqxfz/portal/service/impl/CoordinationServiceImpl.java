@@ -14,6 +14,7 @@ import site.dqxfz.portal.dao.PortfolioDao;
 import site.dqxfz.portal.dao.UserDao;
 import site.dqxfz.portal.pojo.dto.NoteText;
 import site.dqxfz.portal.pojo.dto.Principal;
+import site.dqxfz.portal.pojo.po.Content;
 import site.dqxfz.portal.pojo.po.Portfolio;
 import site.dqxfz.portal.pojo.po.User;
 import site.dqxfz.portal.pojo.vo.EasyUiTreeNode;
@@ -41,8 +42,12 @@ public class CoordinationServiceImpl implements CoordinationService {
 
     @Override
     public String setCoordination(String id, String[] userNames) {
+        HashSet<String> userNameSet = new HashSet<>();
         List<User> users = new ArrayList<>();
         for(String userName : userNames) {
+            userNameSet.add(userName);
+        }
+        for(String userName : userNameSet) {
             User user = userDao.getUserByUserName(userName);
             if (user != null) {
                 users.add(user);
@@ -53,8 +58,9 @@ public class CoordinationServiceImpl implements CoordinationService {
         }
         // 设置协同文件的fatherId为null
         portfolioDao.updateFatherIdById(id, null);
+        portfolioDao.updateCoordinationNumById(id, users.size());
         for(User user : users) {
-            List<Portfolio> portfolios = portfolioDao.listByFatherId(user.getPofolioId());
+            List<Portfolio> portfolios = portfolioDao.listByFatherId(user.getPortfolioId());
             // 查找用户的协同文件夹对象
             for (Portfolio portfolio : portfolios) {
                 if (portfolio.getIconCls().equals(IconClsEnum.COORDINATION)) {
@@ -170,10 +176,21 @@ public class CoordinationServiceImpl implements CoordinationService {
             set.remove(session);
             logger.info("文本" + id + "当前正在编辑人数：" + set.size());
             if(set.size() == 0) {
+                contentDao.updateContentById(new Content(id,textMap.get(id)));
+                logger.info("所有人已经退出协同编辑" + id + "，执行清理");
                 textMap.remove(id);
                 sessionMap.remove(id);
-                logger.info("所有人已经退出协同编辑" + id + "，执行清理");
             }
+        }
+    }
+
+    @Override
+    public void deleteChild(String fatherId, String id) {
+        portfolioDao.deleteChild(fatherId, id);
+        Portfolio portfolio = portfolioDao.getPortfolioById(id);
+        if(portfolio.getCoordinationNum() <= 0) {
+            portfolioDao.deleteListByIdList(Arrays.asList(id));
+            contentDao.deleteListByIdList(Arrays.asList(id));
         }
     }
 

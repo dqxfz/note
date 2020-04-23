@@ -104,6 +104,7 @@ function initPortfolio(url) {
     $(portfolio).tree({
         url: url,
         method: 'get',
+        animate: true,
         onContextMenu: function(e, node){
             $(portfolio).tree('select', node.target);
             currentNode = node;
@@ -191,17 +192,27 @@ function menuHandler(item){
             });
             let url = '/portfolio.do';
             let data = {"id": node.id};
-            // if(!node.fatherId) {
-            //     let parent = $(portfolio).tree('getParent', node.target);
-            //     url = '/coordination.do'
-            //     data = {'fatherId': parent.id, 'id': node.id};
-            // }
+            if(!node.fatherId) {
+                let parent = $(portfolio).tree('getParent', node.target);
+                url = '/coordination.do'
+                data = {'fatherId': parent.id, 'id': node.id};
+            }
             $.ajax({
                 url: url,
                 method: "delete",
                 data: data,
                 success: function () {
                     $(portfolio).tree('remove',node.target);
+                    let root = $(portfolio).tree('getRoot');
+                    $(portfolio).tree('select', root.target);
+                    if(!node.fatherId) {
+                        if (principal.id) {
+                            principal.type = CommandType.COORDINATION_TYPE_EXIT;
+                            sendSync(CommandType.COORDINATION_TYPE_PRINCIPAL, principal);
+                            principal.id = null;
+                        }
+                    }
+                    displayContent(root);
                     $.messager.progress('close');
                 },
                 error: function () {
@@ -400,7 +411,9 @@ function issueCoordinationPeople(){
             if(obj) {
                 showError(obj, 3000);
             } else {
-                showPrompt(successMessage, 3000);
+                $(portfolio).tree('remove',node.target);
+                $('#coordinate_div').dialog('close');
+                showPrompt(successMessage, 2000);
             }
         },
         error: function () {

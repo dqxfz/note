@@ -16,14 +16,14 @@ public class User {
     /**
      * 根文件夹id
      */
-    private String pofolioId;
+    private String portfolioId;
 
     public User() {
     }
 
-    public User(String username, String pofolioId) {
+    public User(String username, String portfolioId) {
         this.username = username;
-        this.pofolioId = pofolioId;
+        this.portfolioId = portfolioId;
     }
 
     public String getUsername() {
@@ -34,19 +34,11 @@ public class User {
         this.username = username;
     }
 
-    public String getPofolioId() {
-        return pofolioId;
+    public String getPortfolioId() {
+        return portfolioId;
     }
 
-    public void setPofolioId(String pofolioId) {
-        this.pofolioId = pofolioId;
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "username='" + username + '\'' +
-                ", pofolioId='" + pofolioId + '\'' +
-                '}';
+    public void setPortfolioId(String portfolioId) {
+        this.portfolioId = portfolioId;
     }
 }
