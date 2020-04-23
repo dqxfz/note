@@ -55,9 +55,14 @@
             DOWNLOAD: 'download',
             CONNECT_ERROR: 'connect_error',
             COORDINATION_ADD: 'coordination_add',
+            COORDINATION_REPLACE: 'coordination_replace',
             COORDINATION_DELETE: 'coordination_delete',
             COORDINATION_RESPONSE_ALL: 'coordination_response_all',
-            COORDINATION_RESPONSE_PART: 'coordination_response_part'
+            COORDINATION_RESPONSE_PART: 'coordination_response_part',
+            COORDINATION_TYPE_PRINCIPAL: 'coordination_type_principal',
+            COORDINATION_TYPE_NOTE_TEXT: 'coordination_type_note_text',
+            COORDINATION_TYPE_ENTER: 'coordination_type_enter',
+            COORDINATION_TYPE_EXIT: 'coordination_type_exit'
         }
         /**
          * socket相关配置参数
@@ -73,7 +78,7 @@
          * 在程序运行时可能会改变值的变量
          */
         let node_text;
-        let current_file;
+        let last_edit_file_id;
         let wsArray = new Object();
         let xhrArray = new Object();
         let lastTextArea = new Object();
@@ -81,48 +86,69 @@
         let principal = new Object();
         let currentNode;
         let noteContentObject;
+        let isChinese = false;
 
         $(function () {
             initUserInfo();
             initContent();
             initNoteWebsocket();
+            noteContentObject = document.getElementById('note_content');
+            noteContentObject.addEventListener('compositionstart', function (e) {
+                isChinese = true;
+            });
+            noteContentObject.addEventListener('compositionend', function (e) {
+                isChinese = false;
+            })
         });
+        // 阻止撤销按钮和恢复按钮
+        $(document).keydown(function(event){
+            if(event.key == 'z' && event.ctrlKey || event.key == 'y' && event.ctrlKey) {
+                return false;
+            }
+        });
+        function updateNote(notePart) {
+            if(notePart.id == currentNode.id) {
+                switch (notePart.type) {
+                    case CommandType.COORDINATION_ADD: {
+                        noteContentObject.value = noteContentObject.value.substring(0, notePart.start) + notePart.value + noteContentObject.value.substring(notePart.start, noteContentObject.value.length);
+                        lastTextArea.start = noteContentObject.selectionStart;
+                        lastTextArea.end = noteContentObject.selectionEnd;
+                        lastTextArea.length += notePart.value.length;
+                        break;
+                    }
+                    case CommandType.COORDINATION_DELETE: {
+                        noteContentObject.value = noteContentObject.value.substring(0, notePart.start) + noteContentObject.value.substring(notePart.end, noteContentObject.value.length);
+                        lastTextArea.start = noteContentObject.selectionStart;
+                        lastTextArea.end = noteContentObject.selectionEnd;
+                        lastTextArea.length -= (notePart.end - notePart.start);
+                        break;
+                    }
+                    case CommandType.COORDINATION_REPLACE: {
+                        noteContentObject.value = noteContentObject.value.substring(0, notePart.start) + notePart.value + noteContentObject.value.substring(notePart.end, noteContentObject.value.length);
+                        lastTextArea.start = noteContentObject.selectionStart;
+                        lastTextArea.end = noteContentObject.selectionEnd;
+                        lastTextArea.length -= (notePart.end - notePart.start);
+                        break;
+                    }
+                }
+                convert();
+            }
+        }
 
-    function dealPart(data) {
-        let notePart = JSON.parse(data);
-        if(notePart.id == currentNode.id) {
-            switch (notePart.type) {
-                case CommandType.COORDINATION_ADD: {
-                    noteContentObject.value = noteContentObject.value.substring(0, notePart.start) + notePart.value + noteContentObject.value.substring(notePart.start, noteContentObject.value.length);
-                    lastTextArea.start = noteContentObject.selectionStart;
-                    lastTextArea.end = noteContentObject.selectionEnd;
-                    lastTextArea.length += notePart.value.length;
+        function noteMessageCallback(e) {
+            let resp = JSON.parse(e.data);
+            switch (resp.command) {
+                case CommandType.COORDINATION_RESPONSE_ALL: {
+                    $(noteContent).val(resp.data);
+                    convert();
                     break;
                 }
-                case CommandType.COORDINATION_DELETE: {
-                    noteContentObject.value = noteContentObject.value.substring(0, notePart.start) + noteContentObject.value.substring(notePart.end, noteContentObject.value.length);
-                    lastTextArea.start = noteContentObject.selectionStart;
-                    lastTextArea.end = noteContentObject.selectionEnd;
-                    lastTextArea.length -= (notePart.end - notePart.start);
+                case CommandType.COORDINATION_RESPONSE_PART: {
+                    // console.log(resp.data);
+                    updateNote(resp.data);
                     break;
                 }
             }
-        }
-    }
-
-    function noteMessageCallback(e) {
-            let resp = JSON.parse(e.data);
-            console.log(resp);
-            // switch (resp.command) {
-            //     case CommandType.COORDINATION_RESPONSE_ALL: {
-            //         $(noteContent).val(resp.data);
-            //         break;
-            //     }
-            //     case CommandType.COORDINATION_RESPONSE_PART: {
-            //         dealPart(resp.data);
-            //         break;
-            //     }
-            // }
         }
 
         function noteCloseCallback(e) {
@@ -137,6 +163,7 @@
 
         }
 
+
         function initNoteWebsocket() {
             noteWS = new WebSocket(noteSocketUrl);
             noteWS.onopen = noteOpenCallback;
@@ -150,40 +177,91 @@
             lastTextArea.start = noteContentObject.selectionStart;
             lastTextArea.end = noteContentObject.selectionEnd;
             lastTextArea.length = noteContentObject.value.length;
+            lastTextArea.value = noteContentObject.value;
         }
 
         function refreshCursorPos() {
             refreshTextArea(noteContentObject);
+            // console.log(lastTextArea);
         }
 
-        function sendSync(noteText) {
-            noteWS.send(JSON.stringify(noteText));
+        function sendSync(type, data) {
+            let coordinateData = {
+                type: type,
+                data: JSON.stringify(data)
+            }
+            // console.log(coordinateData.data);
+            noteWS.send(JSON.stringify(coordinateData));
         }
 
-        function textKeyup() {
-            if(noteContentObject.value.length < lastTextArea.length) {
+        function dealUnSelected() {
+            if (noteContentObject.value.length < lastTextArea.length) {
                 noteText.type = CommandType.COORDINATION_DELETE;
                 noteText.value = null;
                 noteText.start = noteContentObject.selectionStart;
                 noteText.end = lastTextArea.end;
-                sendSync(noteText);
-                refreshTextArea(noteContentObject);
-            } else if(noteContentObject.value.length > lastTextArea.length){
-                // 添加了内容
-                if(noteContentObject.selectionStart > lastTextArea.start) {
-                    // 获取输入内容
-                    let inputText = noteContentObject.value.substring(lastTextArea.start, noteContentObject.selectionStart);
-                    noteText.type = CommandType.COORDINATION_ADD;
-                    noteText.value = inputText;
-                    noteText.start = lastTextArea.start;
-                    noteText.end = null;
-                    sendSync(noteText);
-                    refreshTextArea();
-                }
+                sendSync(CommandType.COORDINATION_TYPE_NOTE_TEXT, noteText);
+                refreshTextArea();
+            } else if (noteContentObject.value.length > lastTextArea.length) {
+                // 获取输入内容
+                let inputText = noteContentObject.value.substring(lastTextArea.start, noteContentObject.selectionStart);
+                noteText.type = CommandType.COORDINATION_ADD;
+                noteText.value = inputText;
+                noteText.start = lastTextArea.start;
+                noteText.end = null;
+                sendSync(CommandType.COORDINATION_TYPE_NOTE_TEXT, noteText);
+                refreshTextArea();
             } else {
-                if(noteContentObject.selectionStart != lastTextArea.start) {
+                if (noteContentObject.selectionStart != lastTextArea.start) {
                     refreshTextArea();
                 }
+            }
+        }
+
+        function dealSelected() {
+        // console.log(noteContentObject.selectionStart + ":" + noteContentObject.selectionEnd);
+        // console.log(lastTextArea);
+        if (noteContentObject.selectionStart != lastTextArea.start) {
+            // 获取输入内容
+            let replaceText = noteContentObject.value.substring(lastTextArea.start, noteContentObject.selectionStart);
+            noteText.type = CommandType.COORDINATION_REPLACE;
+            noteText.value = replaceText;
+            noteText.start = lastTextArea.start;
+            noteText.end = lastTextArea.end;
+            sendSync(CommandType.COORDINATION_TYPE_NOTE_TEXT, noteText);
+            refreshTextArea();
+        } else if(lastTextArea.start != lastTextArea.end){
+            // 获取输入内容
+            // let replaceText = noteContentObject.value.substring(lastTextArea.start, noteContentObject.selectionStart);
+            noteText.type = CommandType.COORDINATION_DELETE;
+            noteText.value = null;
+            noteText.start = lastTextArea.start;
+            noteText.end = lastTextArea.end;
+            sendSync(CommandType.COORDINATION_TYPE_NOTE_TEXT, noteText);
+            refreshTextArea();
+        }
+    }
+
+    function textKeyup() {
+            // console.log(noteContentObject.selectionStart + ":" + noteContentObject.selectionEnd);
+            // console.log(lastTextArea);
+            // console.log("noteContentObject.length: " + noteContentObject.value.length);
+            convert();
+            if(currentNode.fatherId) {
+                return;
+            }
+            if(isChinese) {
+                return;
+            }
+            if(noteContentObject.value == lastTextArea.value) {
+                lastTextArea.start = noteContentObject.selectionStart;
+                lastTextArea.end = noteContentObject.selectionEnd;
+                return;
+            }
+            if(lastTextArea.start == lastTextArea.end) {
+                dealUnSelected();
+            } else {
+                dealSelected();
             }
         }
     </script>

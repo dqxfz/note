@@ -7,6 +7,7 @@ package site.dqxfz.portal.pojo.dto;
 public class Principal {
     private String userName;
     private String id;
+    private String type;
 
     public String getUserName() {
         return userName;
@@ -22,5 +23,22 @@ public class Principal {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    @Override
+    public String toString() {
+        return "Principal{" +
+                "userName='" + userName + '\'' +
+                ", id='" + id + '\'' +
+                ", type='" + type + '\'' +
+                '}';
     }
 }

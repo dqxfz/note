@@ -18,30 +18,43 @@ function changeEditState(edit) {
     }
 }
 function setContent(text,title) {
-    $(noteTitle).text(text);
-    $(noteContent).val(title);
+    $(noteTitle).text(title);
+    $(noteContent).val(text);
     convert();
 }
 function displayContent(node) {
     // 如果不是文件夹则执行操作
     if(!isFolder(node)) {
         // 如果node节点是当前正在显示或者正在编辑的节点，则设置为视图状态后返回
-        if(node.id == current_file) {
+        if(currentNode && node.id == last_edit_file_id) {
             changeEditState(false);
             return;
         }
-        current_file = node.id;
+        last_edit_file_id = node.id;
         changeEditState(false);
-        $.ajax({
-            url: "/content.do",
-            data: {"id": node.id, "iconCls": node.iconCls},
-            success: function (obj) {
-                setContent(node.text, obj);
+        if(node.fatherId) {
+            $.ajax({
+                url: "/content.do",
+                data: {"id": node.id, "iconCls": node.iconCls},
+                success: function (obj) {
+                    setContent(node.text, obj);
+                }
+            });
+        } else {
+            $(noteTitle).text(node.text);
+            if(principal.id == node.id) {
+                return;
             }
-        });
+            principal.userName = $('#user').text();
+            principal.id = node.id;
+            principal.type = CommandType.COORDINATION_TYPE_ENTER;
+            noteText.id = node.id;
+            sendSync(CommandType.COORDINATION_TYPE_PRINCIPAL, principal);
+        }
     } else {
+        changeEditState(false);
         setContent('', '日记');
-        $(portfolio).tree('options').url= (node.iconCls == coordination) ? '/coordination/children.do' : '/portfolio.do';
+        last_edit_file_id = node.id;
         $(portfolio).tree('expand',node.target);
     }
 }
@@ -90,6 +103,7 @@ function insertAtCursor(myField, myValue) {
         myField.focus();
         myField.selectionStart = startPos + myValue.length;
         myField.selectionEnd = startPos + myValue.length;
+        textKeyup();
     } else {
         myField.value += myValue;
         myField.focus();
@@ -141,16 +155,11 @@ function buttonHandler(btn) {
                 break;
             }
             case "edit": {
-                noteContentObject = document.getElementById('note_content');
                 changeEditState(false);
                 if(node.iconCls == markdown) {
                     changeEditState(true);
                     if(!node.fatherId) {
                         changeEditState(true);
-                        principal.userName = $('#user').text();
-                        principal.id = node.id;
-                        noteText.id = node.id;
-                        noteWS.send(JSON.stringify(principal));
                     }
                 }
                 break;

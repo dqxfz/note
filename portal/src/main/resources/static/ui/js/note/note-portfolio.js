@@ -107,6 +107,11 @@ function initPortfolio(url) {
         onContextMenu: function(e, node){
             $(portfolio).tree('select', node.target);
             currentNode = node;
+            if(principal.id && currentNode.id != principal.id) {
+                principal.type = CommandType.COORDINATION_TYPE_EXIT;
+                sendSync(CommandType.COORDINATION_TYPE_PRINCIPAL, principal);
+                principal.id = null;
+            }
             displayContent(node);
             e.preventDefault();
             changeMenuState(node);
@@ -131,7 +136,15 @@ function initPortfolio(url) {
         },
         onClick: function(node){
             currentNode = node;
+            if(principal.id && currentNode.id != principal.id) {
+                principal.type = CommandType.COORDINATION_TYPE_EXIT;
+                sendSync(CommandType.COORDINATION_TYPE_PRINCIPAL, principal);
+                principal.id = null;
+            }
             displayContent(node);
+        },
+        onBeforeExpand: function (node) {
+            $(portfolio).tree('options').url= (node.iconCls == coordination) ? '/coordination/children.do' : '/portfolio.do';
         }
     });
 }
@@ -176,10 +189,17 @@ function menuHandler(item){
                 msg: '正在删除文件，请稍候……',
                 text: ''
             });
+            let url = '/portfolio.do';
+            let data = {"id": node.id};
+            // if(!node.fatherId) {
+            //     let parent = $(portfolio).tree('getParent', node.target);
+            //     url = '/coordination.do'
+            //     data = {'fatherId': parent.id, 'id': node.id};
+            // }
             $.ajax({
-                url: "/portfolio.do",
+                url: url,
                 method: "delete",
-                data: {"id": node.id},
+                data: data,
                 success: function () {
                     $(portfolio).tree('remove',node.target);
                     $.messager.progress('close');

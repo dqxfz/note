@@ -10,10 +10,13 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 import site.dqxfz.common.util.JsonUtils;
+import site.dqxfz.portal.constant.CommandEnum;
+import site.dqxfz.portal.pojo.dto.CoordinateData;
 import site.dqxfz.portal.pojo.dto.NoteText;
 import site.dqxfz.portal.pojo.dto.Principal;
 import site.dqxfz.portal.service.CoordinationService;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -24,7 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
  **/
 @Component
 public class CoordinationHandler extends AbstractWebSocketHandler {
-    private final Map<String, List<WebSocketSession>> sessionMap = new ConcurrentHashMap();
+    private final Map<String, HashSet<WebSocketSession>> sessionMap = new ConcurrentHashMap();
     private final Map<String, String> textMap = new ConcurrentHashMap();
     private final Logger logger = LogManager.getLogger(this.getClass());
     private final CoordinationService coordinationService;
@@ -41,15 +44,21 @@ public class CoordinationHandler extends AbstractWebSocketHandler {
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         String payload = message.getPayload();
-        NoteText noteText = JsonUtils.jsonToObject(payload, NoteText.class);
-        if(noteText != null) {
-            coordinationService.publishText(session, noteText, textMap, sessionMap);
-            return;
+        CoordinateData coordinateData = JsonUtils.jsonToObject(payload, CoordinateData.class);
+        switch (CommandEnum.getValueOf(coordinateData.getType())) {
+            case COORDINATION_TYPE_PRINCIPAL: {
+                Principal principal = JsonUtils.jsonToObject(coordinateData.getData(), Principal.class);
+                coordinationService.dealPrincipal(session, principal, textMap, sessionMap);
+                break;
+            }
+            case COORDINATION_TYPE_NOTE_TEXT: {
+                NoteText noteText = JsonUtils.jsonToObject(coordinateData.getData(), NoteText.class);
+                coordinationService.publishText(session, noteText, textMap, sessionMap);
+                break;
+            }
         }
-        Principal principal = JsonUtils.jsonToObject(payload, Principal.class);
-        if(principal != null) {
-            coordinationService.startCoordinate(session, principal, textMap, sessionMap);
-        }
+
+
     }
 
     @Override
@@ -60,6 +69,11 @@ public class CoordinationHandler extends AbstractWebSocketHandler {
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-        super.afterConnectionClosed(session, status);
+        Map<String, Object> sessionAttributes = session.getAttributes();
+        Principal principal = (Principal) sessionAttributes.get("principal");
+        if(principal != null) {
+            String id = principal.getId();
+            coordinationService.dealExit(id, session, textMap, sessionMap);
+        }
     }
 }

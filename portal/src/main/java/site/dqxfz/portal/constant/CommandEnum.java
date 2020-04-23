@@ -35,6 +35,7 @@ public enum CommandEnum {
      * 协同命令：删除
      */
     COORDINATION_DELETE("coordination_delete"),
+    COORDINATION_REPLACE("coordination_replace"),
     /**
      *  传给客户的是笔记的所有内容
      */
@@ -42,7 +43,17 @@ public enum CommandEnum {
     /**
      *  传给客户的是笔记的改变部分
      */
-    COORDINATION_RESPONSE_PART("coordination_response_part");
+    COORDINATION_RESPONSE_PART("coordination_response_part"),
+    /**
+     * 上传数据是用户信息
+     */
+    COORDINATION_TYPE_PRINCIPAL("coordination_type_principal"),
+    /**
+     * 上传数据是数据信息
+     */
+    COORDINATION_TYPE_NOTE_TEXT("coordination_type_note_text"),
+    COORDINATION_TYPE_ENTER("coordination_type_enter"),
+    COORDINATION_TYPE_EXIT("coordination_type_exit");
 
     private final String value;
 
