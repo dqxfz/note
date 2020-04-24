@@ -3,6 +3,7 @@ package site.dqxfz.portal.config;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
+import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.filter.FormContentFilter;
 import org.springframework.web.servlet.DispatcherServlet;
 import site.dqxfz.portal.config.web.WebConfig;
@@ -26,8 +27,7 @@ public class AppWebInitializer implements WebApplicationInitializer {
         ServletRegistration.Dynamic dispatcher = servletContext.addServlet("dispatcher", new DispatcherServlet(webContext));
         dispatcher.setLoadOnStartup(1);
         // 允许通过以'.do'结尾的请求和'/ui/'开头的请求
-        dispatcher.addMapping("*.do","/ui/*","/note","/file");
-//        dispatcher.addMapping("/");
+        dispatcher.addMapping("*.do","/ui/*","/note","/file","/");
         // 添加FormContentFilter，使spring mvc能够  接受put请求和delete请求
         FilterRegistration.Dynamic FormContentFilter = servletContext.addFilter("formContentFilter", new FormContentFilter());
         FormContentFilter.addMappingForUrlPatterns(null,false,"/*");

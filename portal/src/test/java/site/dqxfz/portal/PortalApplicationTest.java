@@ -19,6 +19,8 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.spring5.SpringTemplateEngine;
 import site.dqxfz.common.util.FtpUtils;
 import site.dqxfz.common.util.JsonUtils;
 import site.dqxfz.common.util.ResourceUtils;
@@ -53,6 +55,8 @@ public class PortalApplicationTest {
     ContentDao contentDao;
     @Autowired
     StringRedisTemplate stringRedisTemplate;
+    @Autowired
+    SpringTemplateEngine springTemplateEngine;
     @Test
     public void test01() throws IOException {
 //        Query query = Query.query(Criteria.where("id").is("12"));
@@ -76,5 +80,10 @@ public class PortalApplicationTest {
     @Test
     public void test03(){
         stringRedisTemplate.boundValueOps("name").set("wy");
+    }
+    @Test
+    public void test04(){
+        String process = springTemplateEngine.process("portal.html", new Context());
+        System.out.println(process);
     }
 }
