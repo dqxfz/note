@@ -20,9 +20,12 @@ public class RedisConfig {
     private String redisUrl;
     @Value("${redis.port}")
     private Integer redisPort;
+    @Value("${redis.password}")
+    private String redisPassword;
 
     public @Bean JedisConnectionFactory redisConnectionFactory(){
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(redisUrl,redisPort);
+        config.setPassword(redisPassword);
         return new JedisConnectionFactory(config);
     }
     public @Bean StringRedisTemplate stringRedisTemplate(RedisConnectionFactory redisConnectionFactory){

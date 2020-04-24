@@ -51,7 +51,8 @@ public class PortalApplicationTest {
     MongoOperations mongoOperations;
     @Autowired
     ContentDao contentDao;
-
+    @Autowired
+    StringRedisTemplate stringRedisTemplate;
     @Test
     public void test01() throws IOException {
 //        Query query = Query.query(Criteria.where("id").is("12"));
@@ -71,5 +72,9 @@ public class PortalApplicationTest {
     public void test02(){
         Content content = mongoOperations.findById("5ea1840481212e4087ecfd84", Content.class);
         System.out.println("content = " + content);
+    }
+    @Test
+    public void test03(){
+        stringRedisTemplate.boundValueOps("name").set("wy");
     }
 }
