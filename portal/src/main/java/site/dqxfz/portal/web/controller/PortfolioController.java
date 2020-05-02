@@ -131,20 +131,4 @@ public class PortfolioController {
         }
         return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
-    /**
-     * 根据request中的cookie获取user的根文件夹id
-     * @param request 前端请求
-     * @return 根文件夹id
-     */
-    @GetMapping("/rootId")
-    public ResponseEntity rootId(HttpServletRequest request) {
-        try {
-            User user = portfolioService.getRootId(request);
-            return new ResponseEntity(user.getUsername(), HttpStatus.OK);
-        } catch (Exception e) {
-            logger.error(e.getMessage(),e);
-        }
-        return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
 }
