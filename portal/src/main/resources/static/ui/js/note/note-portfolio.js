@@ -383,7 +383,7 @@ function downloadFile(url,node) {
 }
 function initUserInfo() {
     $.ajax({
-        url: '/portfolio/rootId.do',
+        url: '/user/info.do',
         method: 'get',
         success: function (obj) {
             $('#user').text(obj);

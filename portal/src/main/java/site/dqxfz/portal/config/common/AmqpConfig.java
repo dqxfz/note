@@ -51,19 +51,19 @@ public class AmqpConfig {
         container.setMessageListener(adapter);
         return container;
     }
-    @Bean
-    public TopicExchange sessionExchangeTopic(){
-        return new TopicExchange(AmqpConsts.SESSION_EXCHANGE_TOPIC_NAME);
-    }
-    @Bean
-    public Queue sessionQueue(){
-        return new Queue(AmqpConsts.SESSION_QUEUE_NAME);
-    }
-    @Bean
-    public Binding binding(TopicExchange sessionExchangeTopic, Queue sessionQueue){
-        return BindingBuilder
-                .bind(sessionQueue)
-                .to(sessionExchangeTopic)
-                .with(AmqpConsts.SESSION_ROUTING_KEY_NAME);
-    }
+//    @Bean
+//    public TopicExchange sessionExchangeTopic(){
+//        return new TopicExchange(AmqpConsts.SESSION_EXCHANGE_TOPIC_NAME);
+//    }
+//    @Bean
+//    public Queue sessionQueue(){
+//        return new Queue(AmqpConsts.SESSION_QUEUE_NAME);
+//    }
+//    @Bean
+//    public Binding binding(TopicExchange sessionExchangeTopic, Queue sessionQueue){
+//        return BindingBuilder
+//                .bind(sessionQueue)
+//                .to(sessionExchangeTopic)
+//                .with(AmqpConsts.SESSION_ROUTING_KEY_NAME);
+//    }
 }
