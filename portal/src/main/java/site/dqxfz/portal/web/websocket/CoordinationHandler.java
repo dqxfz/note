@@ -16,9 +16,7 @@ import site.dqxfz.portal.pojo.dto.NoteText;
 import site.dqxfz.portal.pojo.dto.Principal;
 import site.dqxfz.portal.service.CoordinationService;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -27,8 +25,8 @@ import java.util.concurrent.ConcurrentHashMap;
  **/
 @Component
 public class CoordinationHandler extends AbstractWebSocketHandler {
-    private final Map<String, HashSet<WebSocketSession>> sessionMap = new ConcurrentHashMap();
-    private final Map<String, String> textMap = new ConcurrentHashMap();
+    private final Map<String, Set<WebSocketSession>> sessionMap = new HashMap<>();
+    private final Map<String, String> textMap = new HashMap<>();
     private final Logger logger = LogManager.getLogger(this.getClass());
     private final CoordinationService coordinationService;
 

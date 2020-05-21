@@ -21,7 +21,12 @@ import site.dqxfz.portal.pojo.vo.EasyUiTreeNode;
 import site.dqxfz.portal.service.CoordinationService;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author WENG Yang
@@ -95,31 +100,34 @@ public class CoordinationServiceImpl implements CoordinationService {
         String response = mapper.writeValueAsString(map);
         session.sendMessage(new TextMessage(response));
     }
+
     @Override
-    public void dealPrincipal(WebSocketSession session, Principal principal, Map<String, String> textMap, Map<String, HashSet<WebSocketSession>> sessionMap) throws Exception {
+    public void dealPrincipal(WebSocketSession session, Principal principal, Map<String, String> textMap, Map<String, Set<WebSocketSession>> sessionMap) throws Exception {
         Map<String, Object> sessionAttributes = session.getAttributes();
         String id = principal.getId();
         switch (CommandEnum.getValueOf(principal.getType())) {
             case COORDINATION_TYPE_ENTER: {
                 logger.info(principal.getUserName() + "开始编辑" + principal.getId());
                 sessionAttributes.put("principal", principal);
-                if(!textMap.containsKey(id)) {
-                    String text = contentDao.getContentById(id);
-                    if(text == null) {
-                        text = "";
+                String data = null;
+                synchronized (textMap) {
+                    if (!textMap.containsKey(id)) {
+                        String text = contentDao.getContentById(id);
+                        textMap.put(id, text);
                     }
-                    textMap.put(id, text);
+                    data = textMap.get(id);
                 }
-                HashSet<WebSocketSession> set = sessionMap.get(id);
-                if(set == null) {
-                    set = new HashSet<>();
-                    set.add(session);
-                    sessionMap.put(id, set);
-                } else {
-                    set.add(session);
+                Set<WebSocketSession> set = null;
+                synchronized (sessionMap) {
+                    // if sessionMap not contain id key then put value with id as a key
+                    if (!sessionMap.containsKey(id)) {
+                        sessionMap.put(id, ConcurrentHashMap.newKeySet());
+                    }
+                    set = sessionMap.get(id);
                 }
+                set.add(session);
                 logger.info("文本" + id + "当前正在编辑人数：" + set.size());
-                sendMessage(session, CommandEnum.COORDINATION_RESPONSE_ALL, textMap.get(id));
+                sendMessage(session, CommandEnum.COORDINATION_RESPONSE_ALL, data);
                 break;
             }
             case COORDINATION_TYPE_EXIT: {
@@ -133,11 +141,14 @@ public class CoordinationServiceImpl implements CoordinationService {
 
 
     }
-    @Override
-    public void publishText(WebSocketSession session, NoteText noteText, Map<String, String> textMap, Map<String, HashSet<WebSocketSession>> sessionMap) throws Exception {
-        String id = noteText.getId();
 
-        String text = textMap.get(id);
+    @Override
+    public void publishText(WebSocketSession session, NoteText noteText, Map<String, String> textMap, Map<String, Set<WebSocketSession>> sessionMap) throws Exception {
+        String id = noteText.getId();
+        String text = null;
+        synchronized (textMap) {
+            text = textMap.get(id);
+        }
         StringBuilder textBuilder = new StringBuilder(text);
         CommandEnum.getValueOf(noteText.getType());
         switch (CommandEnum.getValueOf(noteText.getType())) {
@@ -157,30 +168,52 @@ public class CoordinationServiceImpl implements CoordinationService {
             default:
                 break;
         }
-
-        textMap.put(id, textBuilder.toString());
-        HashSet<WebSocketSession> set = sessionMap.get(id);
-        for (WebSocketSession socketSession : set) {
-            if(!socketSession.equals(session)) {
-                sendMessage(socketSession, CommandEnum.COORDINATION_RESPONSE_PART, noteText);
+        synchronized (textMap) {
+            textMap.put(id, textBuilder.toString());
+        }
+        List<WebSocketSession> list = new LinkedList<>();
+        synchronized (sessionMap) {
+            Set<WebSocketSession> set = sessionMap.get(id);
+            for (WebSocketSession socketSession : set) {
+                if (!socketSession.equals(session)) {
+                    list.add(socketSession);
+                }
             }
         }
-
-
+        for(WebSocketSession socketSession : list) {
+            sendMessage(socketSession, CommandEnum.COORDINATION_RESPONSE_PART, noteText);
+        }
     }
 
     @Override
-    public void dealExit(String id, WebSocketSession session, Map<String, String> textMap, Map<String, HashSet<WebSocketSession>> sessionMap) {
-        HashSet<WebSocketSession> set = sessionMap.get(id);
-        if(set != null) {
-            set.remove(session);
-            logger.info("文本" + id + "当前正在编辑人数：" + set.size());
-            if(set.size() == 0) {
-                contentDao.updateContentById(new Content(id,textMap.get(id)));
-                logger.info("所有人已经退出协同编辑" + id + "，执行清理");
-                textMap.remove(id);
-                sessionMap.remove(id);
+    public void dealExit(String id, WebSocketSession session, Map<String, String> textMap, Map<String, Set<WebSocketSession>> sessionMap) {
+        Boolean isSave = false;
+        int numEdit = 0;
+        String text = null;
+        synchronized (sessionMap) {
+            if(sessionMap.containsKey(id)) {
+                Set<WebSocketSession> set = sessionMap.get(id);
+                if (set != null) {
+                    set.remove(session);
+                    // 所有人退出协同文件编辑
+                    if (set.size() == 0) {
+                        sessionMap.remove(id);
+                        synchronized (textMap) {
+                            if(textMap.containsKey(id)) {
+                                text = textMap.get(id);
+                                textMap.remove(id);
+                                isSave = true;
+                            }
+                        }
+                    }
+                    numEdit = set.size();
+                }
             }
+        }
+        logger.info("文本" + id + "当前正在编辑人数：" + numEdit);
+        if(isSave) {
+            contentDao.updateContentById(new Content(id, text));
+            logger.info("所有人已经退出协同编辑" + id + "，执行清理");
         }
     }
 

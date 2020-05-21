@@ -30,7 +30,8 @@ public class ContentDaoImpl implements ContentDao {
     @Override
     public String getContentById(String id) {
         Content content = mongoOperations.findById(id, Content.class);
-        return content.getText();
+        String text = content.getText();
+        return text == null ? "" : text;
     }
 
     @Override
