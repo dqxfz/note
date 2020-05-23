@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * @author WENG Yang
+ * @author Wengyang
  * @date 2020年04月20日
  **/
 @Service
@@ -61,12 +61,12 @@ public class CoordinationServiceImpl implements CoordinationService {
         if(users.size() <= 1) {
             return ResponseConsts.COORDINATION_USER_LESS_TWO;
         }
-        // 设置协同文件的fatherId为null
+        // modify the fatherId of the coordination file to null
         portfolioDao.updateFatherIdById(id, null);
         portfolioDao.updateCoordinationNumById(id, users.size());
         for(User user : users) {
             List<Portfolio> portfolios = portfolioDao.listByFatherId(user.getPortfolioId());
-            // 查找用户的协同文件夹对象
+            // find the coordination file object of user
             for (Portfolio portfolio : portfolios) {
                 if (portfolio.getIconCls().equals(IconClsEnum.COORDINATION)) {
                     portfolioDao.addChild(portfolio.getId(), id);
@@ -107,9 +107,10 @@ public class CoordinationServiceImpl implements CoordinationService {
         String id = principal.getId();
         switch (CommandEnum.getValueOf(principal.getType())) {
             case COORDINATION_TYPE_ENTER: {
-                logger.info(principal.getUserName() + "开始编辑" + principal.getId());
+                logger.info(principal.getUserName() + "start editing coordination file " + principal.getId());
                 sessionAttributes.put("principal", principal);
                 String data = null;
+                // add a lock to prevent concurrent crisis
                 synchronized (textMap) {
                     if (!textMap.containsKey(id)) {
                         String text = contentDao.getContentById(id);
@@ -118,20 +119,21 @@ public class CoordinationServiceImpl implements CoordinationService {
                     data = textMap.get(id);
                 }
                 Set<WebSocketSession> set = null;
+                // add a lock to prevent concurrent crisis
                 synchronized (sessionMap) {
-                    // if sessionMap not contain id key then put value with id as a key
+                    // if sessionMap not contain id key, put new Set into sessionMap and id as a key
                     if (!sessionMap.containsKey(id)) {
                         sessionMap.put(id, ConcurrentHashMap.newKeySet());
                     }
                     set = sessionMap.get(id);
                 }
                 set.add(session);
-                logger.info("文本" + id + "当前正在编辑人数：" + set.size());
+                logger.info("the number of people who are editing the coordination file " + id + "is " + set.size());
                 sendMessage(session, CommandEnum.COORDINATION_RESPONSE_ALL, data);
                 break;
             }
             case COORDINATION_TYPE_EXIT: {
-                logger.info(principal.getUserName() + "退出编辑" + principal.getId());
+                logger.info(principal.getUserName() + "exit editing coordination file " + principal.getId());
                 dealExit(id, session, textMap, sessionMap);
                 break;
             }
@@ -153,34 +155,35 @@ public class CoordinationServiceImpl implements CoordinationService {
         CommandEnum.getValueOf(noteText.getType());
         switch (CommandEnum.getValueOf(noteText.getType())) {
             case COORDINATION_ADD: {
+                // insert content from coordination file
                 textBuilder.insert(noteText.getStart(), noteText.getValue());
                 break;
             }
             case COORDINATION_DELETE: {
-                // 删除协同文件内容
+                // delete content of coordination file
                 textBuilder.delete(noteText.getStart(), noteText.getEnd());
                 break;
             }
             case COORDINATION_REPLACE: {
+                // replace content of coordination file
                 textBuilder.replace(noteText.getStart(), noteText.getEnd(), noteText.getValue());
                 break;
             }
             default:
                 break;
         }
+        // add a lock to prevent concurrent crisis
         synchronized (textMap) {
             textMap.put(id, textBuilder.toString());
         }
-        List<WebSocketSession> list = new LinkedList<>();
+        List<WebSocketSession> collect = null;
+        // add a lock to prevent concurrent crisis
         synchronized (sessionMap) {
-            Set<WebSocketSession> set = sessionMap.get(id);
-            for (WebSocketSession socketSession : set) {
-                if (!socketSession.equals(session)) {
-                    list.add(socketSession);
-                }
-            }
+            collect = sessionMap.get(id).stream()
+                    .filter(socketSession -> !socketSession.equals(session))
+                    .collect(Collectors.toList());
         }
-        for(WebSocketSession socketSession : list) {
+        for(WebSocketSession socketSession : collect) {
             sendMessage(socketSession, CommandEnum.COORDINATION_RESPONSE_PART, noteText);
         }
     }
@@ -190,14 +193,16 @@ public class CoordinationServiceImpl implements CoordinationService {
         Boolean isSave = false;
         int numEdit = 0;
         String text = null;
+        // add a lock to prevent concurrent crisis
         synchronized (sessionMap) {
             if(sessionMap.containsKey(id)) {
                 Set<WebSocketSession> set = sessionMap.get(id);
                 if (set != null) {
                     set.remove(session);
-                    // 所有人退出协同文件编辑
+                    // all of people exit editing of coordination file
                     if (set.size() == 0) {
                         sessionMap.remove(id);
+                        // add a lock to prevent concurrent crisis
                         synchronized (textMap) {
                             if(textMap.containsKey(id)) {
                                 text = textMap.get(id);
@@ -210,10 +215,10 @@ public class CoordinationServiceImpl implements CoordinationService {
                 }
             }
         }
-        logger.info("文本" + id + "当前正在编辑人数：" + numEdit);
+        logger.info("the remaining number of people who are editing the coordination file " + id + "is " + numEdit);
         if(isSave) {
             contentDao.updateContentById(new Content(id, text));
-            logger.info("所有人已经退出协同编辑" + id + "，执行清理");
+            logger.info("Everyone exit editing the coordination file " + id + " then system perform cleanup");
         }
     }
 
