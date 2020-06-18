@@ -8,16 +8,16 @@
             <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
             <!--             这个都知道是输出日志的格式 -->
             <PatternLayout pattern="%d{yyyy.MM.dd HH:mm:ss.SSS} %-3level %c{36} %L %M %msg%xEx%n"/>
-<!--            <PatternLayout pattern="{'time':'%d{yyyy.MM.dd HH:mm:ss.SSS}','level':'%level','class':'%c{36}','line':'%L','method':'%M','content':'%msg%xEx%n'}"/>-->
+<!--            <PatternLayout pattern="{&quot;time&quot;:&quot;%d{yyyy.MM.dd HH:mm:ss.SSS}&quot;,&quot;level&quot;:&quot;%level&quot;,&quot;class&quot;:&quot;%c{36}&quot;,&quot;line&quot;:&quot;%L&quot;,&quot;method&quot;:&quot;%M&quot;,&quot;content&quot;:&quot;%msg%xEx&quot;}%n"/>-->
         </Console>
 
         <!-- 输出日志到Kafka -->
-<!--        <Kafka name="kafka" topic="log-test">-->
-<!--            <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY" />-->
-<!--            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss,SSS}:%4p %t (%F:%L) - %m%n" />-->
-<!--            <Property name="bootstrap.servers">47.100.218.48:9092</Property>-->
-<!--        </Kafka>-->
-
+        <Kafka name="kafka" topic="test">
+            <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY" />
+            <PatternLayout pattern="{&quot;time&quot;:&quot;%d{yyyy.MM.dd HH:mm:ss.SSS}&quot;,&quot;level&quot;:&quot;%level&quot;,&quot;class&quot;:&quot;%c{36}&quot;,&quot;line&quot;:&quot;%L&quot;,&quot;method&quot;:&quot;%M&quot;,&quot;content&quot;:&quot;%msg%xEx&quot;}%n"/>
+            <Property name="bootstrap.servers">47.100.218.48:9092</Property>
+        </Kafka>
+//1073741824
         <!--文件会打印出所有信息，这个log每次运行程序会自动清空，由append属性决定，这个也挺有用的，适合临时测试用 -->
         <!--append为TRUE表示消息增加到指定文件中，false表示消息覆盖指定的文件内容，默认值是true -->
         <File name="log" fileName="/tmp/logs/log4j2.log" append="false">
@@ -43,7 +43,7 @@
     <loggers>
         <root level="trace">
             <appender-ref ref="console"/>
-            <appender-ref ref="console"/>
+            <appender-ref ref="kafka"/>
 <!--            <appender-ref ref="RollingFile"/>-->
 <!--            <appender-ref ref="ERROR" />-->
 <!--            <appender-ref ref="log"/>-->
