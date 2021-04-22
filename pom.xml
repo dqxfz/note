@@ -25,7 +25,7 @@
         <thymeleaf.version>3.0.11.RELEASE</thymeleaf.version>
         <jedis.version>3.1.0</jedis.version>
         <mybatis-spring.version>2.0.4</mybatis-spring.version>
-        <mybatis.version>3.5.4</mybatis.version>
+        <mybatis.version>3.5.6</mybatis.version>
         <mysql.version>8.0.19</mysql.version>
         <common-dbcp.version>1.4</common-dbcp.version>
         <spring-rabbit.version>2.2.5.RELEASE</spring-rabbit.version>
