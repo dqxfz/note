@@ -16,7 +16,7 @@
     <properties>
         <failOnMissingWebXml>false</failOnMissingWebXml>
         <!-- dependency version -->
-        <spring.version>5.2.5.RELEASE</spring.version>
+        <spring.version>5.2.9.RELEASE</spring.version>
         <spring-data.version>Moore-SR6</spring-data.version>
         <log4j.version>2.13.1</log4j.version>
         <servlet.version>3.1.0</servlet.version>
