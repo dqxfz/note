@@ -29,7 +29,7 @@
         <mysql.version>8.0.19</mysql.version>
         <common-dbcp.version>1.4</common-dbcp.version>
         <spring-rabbit.version>2.2.5.RELEASE</spring-rabbit.version>
-        <commons-net.version>3.6</commons-net.version>
+        <commons-net.version>3.9.0</commons-net.version>
         <spring-kafka.version>2.5.2.RELEASE</spring-kafka.version>
         <!-- plugin version-->
         <tomcat7-maven.version>2.2</tomcat7-maven.version>
